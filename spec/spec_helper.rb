@@ -16,19 +16,29 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    @filter = {
+      "id" => {
+        "gte" => 20,
+        "lt" => 40
+      }
+    }
     @per_page = Faker::Number.between(5,15)
     @page = Faker::Number.between(2,5)
     @url_params = {
       parent_id: 1,
       random_param: true,
       per_page: @per_page.to_s,
-      page: @page.to_s
+      page: @page.to_s,
+      filter: @filter,
+      sort: "name:desc"
     }
   end
 
+  PatternQueryHelper.active_record_adapter = "sqlite3"
+
   # Set up a database that resides in RAM
   ActiveRecord::Base.establish_connection(
-    adapter: 'sqlite3',
+    adapter: PatternQueryHelper.active_record_adapter,
     database: ':memory:'
   )
 
