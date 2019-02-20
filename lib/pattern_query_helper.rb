@@ -75,18 +75,22 @@ module PatternQueryHelper
     parse_params(url_params)
     filtered_query = PatternQueryHelper::Filtering.filter_active_record_query(active_record_call, @filtering)
     sorted_query = PatternQueryHelper::Sorting.sort_active_record_query(active_record_call, @sorting)
+    with_associations = PatternQueryHelper::Associations.load_associations(sorted_query, @associations)
     {
-      data: sorted_query
+      data: with_associations
     }
   end
 
   def self.paginated_active_record_query(active_record_call, url_params)
-    sorted_query = active_record_query(active_record_call, url_params)
+    parse_params(url_params)
+    filtered_query = PatternQueryHelper::Filtering.filter_active_record_query(active_record_call, @filtering)
+    sorted_query = PatternQueryHelper::Sorting.sort_active_record_query(active_record_call, @sorting)
     paginated_query = PatternQueryHelper::Pagination.paginate_active_record_query(sorted_query, @pagination)
-    pagination = create_pagination_payload(paginated_query.count, @pagination)
+    with_associations = PatternQueryHelper::Associations.load_associations(paginated_query, @associations)
+    pagination = PatternQueryHelper::Pagination.create_pagination_payload(sorted_query.count, @pagination)
     {
       pagination: pagination,
-      data: paginated_query
+      data: with_associations
     }
   end
 
