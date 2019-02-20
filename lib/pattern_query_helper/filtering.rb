@@ -1,9 +1,5 @@
 module PatternQueryHelper
   class Filtering
-    def self.parse_pagination_params(params)
-      params[:filter]
-    end
-
     def self.create_filters(filters, column_map=nil, symbol_prefix="")
       filters ||= {}
       filter_string = "true = true"
@@ -69,6 +65,10 @@ module PatternQueryHelper
         filter_array: filter_array
       }
 
+    end
+
+    def self.filter_active_record_query(active_record_call, filtering)
+      active_record_call.where(filtering[:filter_string], filtering[:filter_params])
     end
   end
 end

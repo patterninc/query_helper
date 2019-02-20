@@ -52,5 +52,11 @@ module PatternQueryHelper
       model.find_by_sql([count_sql, query_params]).first["count"]
     end
 
+    def self.single_record_query(config)
+      results = sql_query(config)
+      raise StandardError.new("single record query returned multiple results") unless results.length == 1
+      results.first
+    end
+
   end
 end

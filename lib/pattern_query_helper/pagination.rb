@@ -57,13 +57,7 @@ module PatternQueryHelper
     def self.paginate_active_record_query(active_record_call, pagination_params)
       page = pagination_params[:page]
       per_page = pagination_params[:per_page]
-      results = active_record_call.page(page).per(per_page)
-      pagination = create_pagination_payload(active_record_call.count, pagination_params)
-
-      {
-        pagination: pagination,
-        data: results
-      }
+      active_record_call.page(page).per(per_page)
     end
   end
 end

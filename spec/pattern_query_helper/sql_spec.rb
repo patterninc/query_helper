@@ -4,8 +4,6 @@ RSpec.describe PatternQueryHelper::Sql do
 
   describe "sql_query" do
     it "query returns the same number of results as designated by per_page" do
-      # sort_string = PatternQueryHelper::Pagination.parse_sorting_params("id:desc")
-      # filters = PatternQueryHelper::Pagination.create_filters("id:desc")
       per_page = Faker::Number.between(2,10)
       results = PatternQueryHelper::Sql.sql_query(
         model: Child,
@@ -19,7 +17,6 @@ RSpec.describe PatternQueryHelper::Sql do
 
     it "query sorts correctly" do
       sort_string = PatternQueryHelper::Sorting.parse_sorting_params({sort:"id:desc"})
-      # filters = PatternQueryHelper::Pagination.create_filters("id:desc")
       results = PatternQueryHelper::Sql.sql_query(
         model: Child,
         query: "select * from children c join parents p on p.id = c.parent_id",
@@ -90,4 +87,20 @@ RSpec.describe PatternQueryHelper::Sql do
     end
   end
 
+  describe "single_record_query" do
+    it "errors out if query has more than one result" do
+      expect { PatternQueryHelper::Sql.single_record_query(
+        model: Child,
+        query: "select * from children c join parents p on p.id = c.parent_id",
+      ) }.to raise_error(StandardError)
+    end
+    
+    it "returns one result" do
+      result = PatternQueryHelper::Sql.single_record_query(
+        model: Child,
+        query: "select * from children c join parents p on p.id = c.parent_id where c.id = 1",
+      )
+      expect(result.class).to eq(Child)
+    end
+  end
 end
