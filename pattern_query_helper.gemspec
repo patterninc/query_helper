@@ -10,7 +10,8 @@ Gem::Specification.new do |spec|
   spec.email         = ["eamigo13@gmail.com"]
 
   spec.summary       = %q{Ruby Gem to help with pagination and data formatting at Pattern, Inc.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.description   = %q{Ruby gem developed to help with pagination, filtering, sorting, and including associations on both active record queries and custom sql queries}
+  spec.homepage      = "https://github.com/iserve-products/pattern_query_helper"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
