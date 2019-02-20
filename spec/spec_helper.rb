@@ -30,7 +30,8 @@ RSpec.configure do |config|
       per_page: @per_page.to_s,
       page: @page.to_s,
       filter: @filter,
-      sort: "name:desc"
+      sort: "name:desc",
+      include: "parent"
     }
   end
 
