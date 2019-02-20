@@ -1,5 +1,8 @@
 require "bundler/setup"
 require "pattern_query_helper"
+require 'sqlite3'
+require 'active_record'
+require 'faker'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -10,5 +13,52 @@ RSpec.configure do |config|
 
   config.expect_with :rspec do |c|
     c.syntax = :expect
+  end
+
+  config.before(:each) do
+    @per_page = Faker::Number.between(5,15)
+    @page = Faker::Number.between(2,5)
+    @url_params = {
+      parent_id: 1,
+      random_param: true,
+      per_page: @per_page.to_s,
+      page: @page.to_s
+    }
+  end
+
+  # Set up a database that resides in RAM
+  ActiveRecord::Base.establish_connection(
+    adapter: 'sqlite3',
+    database: ':memory:'
+  )
+
+  # Set up database tables and columns
+  ActiveRecord::Schema.define do
+    create_table :parents, force: true do |t|
+      t.string :name
+    end
+    create_table :children, force: true do |t|
+      t.string :name
+      t.references :parent
+    end
+  end
+
+  # Set up model classes
+  class ApplicationRecord < ActiveRecord::Base
+    self.abstract_class = true
+  end
+  class Parent < ApplicationRecord
+    has_many :children
+  end
+  class Child < ApplicationRecord
+    belongs_to :parent
+  end
+
+  # Load data into databases
+  (0..99).each do
+    parent = Parent.create(name: Faker::Name.name)
+    (0..Faker::Number.between(1, 5)).each do
+      Child.create(name: Faker::Name.name, parent: parent)
+    end
   end
 end
