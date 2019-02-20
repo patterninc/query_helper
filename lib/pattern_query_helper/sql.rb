@@ -3,37 +3,54 @@ module PatternQueryHelper
     def self.sql_query(config)
       model = config[:model]
       query = config[:query]
-      query_params = config[:query_params]
-      pagination_params = config[:pagination_params]
+      query_params = config[:query_params] || {}
+      page = config[:page]
+      per_page = config[:per_page]
       filter_string = config[:filter_string]
-      filter_params = config[:filter_params]
+      filter_params = config[:filter_params] || {}
       sort_string = config[:sort_string]
 
-      query_params = query_params.merge(filter_params)
+      if page && per_page
+        query_params[:limit] = per_page
+        query_params[:offset] = (page - 1) * per_page
+        limit = "limit :limit offset :offset"
+      end
+
+      query_params = query_params.merge(filter_params).symbolize_keys
+      sort_string = "order by #{sort_string}" if !sort_string.blank?
+      filter_string = "where #{filter_string}" if !filter_string.blank?
+
+      sql = %(
+          with query as (#{query})
+          select *
+          from query
+          #{filter_string}
+          #{sort_string}
+          #{limit}
+        )
+
+      model.find_by_sql([sql, query_params])
+    end
+
+    def self.sql_query_count(config)
+      model = config[:model]
+      query = config[:query]
+      query_params = config[:query_params] || {}
+      filter_string = config[:filter_string]
+      filter_params = config[:filter_params] || {}
+
+      query_params = query_params.merge(filter_params).symbolize_keys
+      filter_string = "where #{filter_string}" if !filter_string.blank?
 
       count_sql = %(
           with query as (#{query})
           select count(*) as count
           from query
-          where #{filter_string}
+          #{filter_string}
         )
 
-      count = model.find_by_sql([count_sql, query_params]).first["count"]
-      query_params[:limit] = pagination_params[:per_page]
-      query_params[:offset] = (pagination_params[:page] - 1) * pagination_params[:per_page]
-      limit = "limit :limit offset :offset"
-
-      sorts = "order by #{@sorts}" if !@sorts.blank?
-
-      sql = %(
-          select *
-          from (#{query}) as query
-          where #{@filter_string}
-          #{sorts}
-          #{limit}
-        )
-
-      results = include_associations(model.find_by_sql([sql, query_params]), @associations)
+      model.find_by_sql([count_sql, query_params]).first["count"]
     end
+
   end
 end
