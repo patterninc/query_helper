@@ -10,7 +10,7 @@ module PatternQueryHelper
             when "sqlite3"
               direction = "desc"
             else
-              direction = "desc null last"
+              direction = "desc nulls last"
             end
           else
             direction = "asc"
