@@ -54,7 +54,6 @@ module PatternQueryHelper
 
     def self.single_record_query(config)
       results = sql_query(config)
-      raise StandardError.new("single record query returned multiple results") unless results.length == 1
       results.first
     end
 
