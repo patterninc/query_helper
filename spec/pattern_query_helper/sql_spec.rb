@@ -33,9 +33,11 @@ RSpec.describe PatternQueryHelper::Sql do
 
     it "query filters correctly" do
       filters = PatternQueryHelper::Filtering.create_filters({
-        "id" => {
-          "gte" => 20,
-          "lt" => 40
+        filter: {
+          "id" => {
+            "gte" => 20,
+            "lt" => 40
+          }
         }
       })
       results = PatternQueryHelper::Sql.sql_query(
@@ -72,9 +74,11 @@ RSpec.describe PatternQueryHelper::Sql do
 
     it "should count the number of rows correctly with filters in place" do
       filters = PatternQueryHelper::Filtering.create_filters({
-        "id" => {
-          "gte" => 20,
-          "lt" => 40
+        filter: {
+          "id" => {
+            "gte" => 20,
+            "lt" => 40
+          }
         }
       })
       count = PatternQueryHelper::Sql.sql_query_count(
@@ -88,13 +92,6 @@ RSpec.describe PatternQueryHelper::Sql do
   end
 
   describe "single_record_query" do
-    it "errors out if query has more than one result" do
-      expect { PatternQueryHelper::Sql.single_record_query(
-        model: Child,
-        query: "select * from children c join parents p on p.id = c.parent_id",
-      ) }.to raise_error(StandardError)
-    end
-    
     it "returns one result" do
       result = PatternQueryHelper::Sql.single_record_query(
         model: Child,

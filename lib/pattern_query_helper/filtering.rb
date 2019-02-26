@@ -1,7 +1,7 @@
 module PatternQueryHelper
   class Filtering
-    def self.create_filters(filters, column_map=nil, symbol_prefix="")
-      filters ||= {}
+    def self.create_filters(params, column_map=nil, symbol_prefix="")
+      filters = params[:filter] || {}
       filter_string = "true = true"
       filter_params = {}
       filter_array = []
