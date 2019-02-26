@@ -6,7 +6,11 @@ RSpec.describe PatternQueryHelper::Sorting do
     it "parses params into sorting sql string" do
       sort_string = PatternQueryHelper::Sorting.parse_sorting_params(@url_params)
       expect(sort_string).to eq("name desc")
-      # expect(sort_string).to eq("name desc null last")
+    end
+
+    it "lowercase if asked for" do
+      sort_string = PatternQueryHelper::Sorting.parse_sorting_params(sort: "name:desc:lowercase")
+      expect(sort_string).to eq("lower(name) desc") 
     end
   end
 

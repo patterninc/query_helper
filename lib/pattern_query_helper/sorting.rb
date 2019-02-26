@@ -5,7 +5,11 @@ module PatternQueryHelper
       if params[:sort]
         sorts = params[:sort].split(",")
         sorts.each_with_index do |sort, index|
-          if sort.split(":")[1] == "desc"
+          column = sort.split(":")[0]
+          direction = sort.split(":")[1]
+          modifier = sort.split(":")[2]
+
+          if direction == "desc"
             case PatternQueryHelper.active_record_adapter
             when "sqlite3"
               direction = "desc"
@@ -15,7 +19,13 @@ module PatternQueryHelper
           else
             direction = "asc"
           end
-          sort_sql << "#{sort.split(":")[0]} #{direction}"
+
+          case modifier
+          when "lowercase"
+            column = "lower(#{column})"
+          end
+
+          sort_sql << "#{column} #{direction}"
         end
       end
       sort_sql.join(", ")
