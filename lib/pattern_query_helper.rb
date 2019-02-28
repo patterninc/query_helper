@@ -6,6 +6,10 @@ require "pattern_query_helper/sorting"
 require "pattern_query_helper/sql"
 
 module PatternQueryHelper
+  PAGINATED_QUERY = "paginated"
+  SINGLE_RECORD_QUERY = "single_record"
+  COMPLETE_QUERY = "all"
+
   def self.run_sql_query(model, query, query_params, query_helpers, query_type)
     case query_type
     when "single_record"
