@@ -1,18 +1,18 @@
 RSpec.describe PatternQueryHelper do
   it "returns a paginated sql query" do
-    results = PatternQueryHelper.run_sql_query(Child, "select * from children", {}, @url_params, "paginated")
+    results = PatternQueryHelper.run_sql_query(Child, "select * from children", {}, @url_params)
     expect(results[:pagination]).to_not be nil
     expect(results[:data]).to_not be nil
   end
 
   it "returns a sql query" do
-    results = PatternQueryHelper.run_sql_query(Child, "select * from children", {}, @url_params, "all")
+    results = PatternQueryHelper.run_sql_query(Child, "select * from children", {}, @url_params)
     expect(results[:data]).to_not be nil
   end
 
   it "returns a single record sql query" do
     @url_params[:filter] = nil
-    results = PatternQueryHelper.run_sql_query(Child, "select * from children where id=#{Child.first.id}", {}, @url_params, "single_record")
+    results = PatternQueryHelper.run_sql_query(Child, "select * from children where id=#{Child.first.id}", {}, @url_params, true)
     expect(results[:data]).to_not be nil
   end
 

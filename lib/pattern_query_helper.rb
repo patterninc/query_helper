@@ -6,28 +6,23 @@ require "pattern_query_helper/sorting"
 require "pattern_query_helper/sql"
 
 module PatternQueryHelper
-  PAGINATED_QUERY = "paginated"
-  SINGLE_RECORD_QUERY = "single_record"
-  COMPLETE_QUERY = "all"
 
-  def self.run_sql_query(model, query, query_params, query_helpers, query_type)
-    case query_type
-    when "single_record"
+  def self.run_sql_query(model, query, query_params, query_helpers, single_record=false)
+    if single_record
       single_record_sql_query(model, query, query_params, query_helpers)
-    when "paginated"
+    elsif query_helpers[:per_page] || query_helpers[:page]
       paginated_sql_query(model, query, query_params, query_helpers)
-    when "all"
+    else
       sql_query(model, query, query_params, query_helpers)
     end
   end
 
-  def self.run_active_record_query(active_record_call, query_helpers, query_type)
-    case query_type
-    when "single_record"
+  def self.run_active_record_query(active_record_call, query_helpers, single_record=false)
+    if single_record
       single_record_active_record_query(active_record_call, query_helpers)
-    when "paginated"
+    elsif query_helpers[:per_page] || query_helpers[:page]
       paginated_active_record_query(active_record_call, query_helpers)
-    when "all"
+    else
       active_record_query(active_record_call, query_helpers)
     end
   end
