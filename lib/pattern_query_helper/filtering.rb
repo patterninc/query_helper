@@ -66,9 +66,5 @@ module PatternQueryHelper
       }
 
     end
-
-    def self.filter_active_record_query(active_record_call, filtering)
-      active_record_call.where(filtering[:filter_string], filtering[:filter_params].symbolize_keys)
-    end
   end
 end

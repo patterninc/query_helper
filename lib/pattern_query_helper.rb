@@ -18,13 +18,7 @@ module PatternQueryHelper
   end
 
   def self.run_active_record_query(active_record_call, query_helpers, single_record=false)
-    if single_record
-      single_record_active_record_query(active_record_call, query_helpers)
-    elsif query_helpers[:per_page] || query_helpers[:page]
-      paginated_active_record_query(active_record_call, query_helpers)
-    else
-      active_record_query(active_record_call, query_helpers)
-    end
+    run_sql_query(active_record_call.model, active_record_call.to_sql, {}, query_helpers, single_record)
   end
 
   private
@@ -92,34 +86,6 @@ module PatternQueryHelper
     {
       data: data
     }
-  end
-
-  def self.active_record_query(active_record_call, query_helpers)
-    query_helpers = parse_helpers(query_helpers)
-    filtered_query = PatternQueryHelper::Filtering.filter_active_record_query(active_record_call, query_helpers[:filters])
-    sorted_query = PatternQueryHelper::Sorting.sort_active_record_query(active_record_call, query_helpers[:sorting])
-    with_associations = PatternQueryHelper::Associations.load_associations(sorted_query, query_helpers[:associations])
-    {
-      data: with_associations
-    }
-  end
-
-  def self.paginated_active_record_query(active_record_call, query_helpers)
-    query_helpers = parse_helpers(query_helpers)
-    filtered_query = PatternQueryHelper::Filtering.filter_active_record_query(active_record_call, query_helpers[:filters])
-    sorted_query = PatternQueryHelper::Sorting.sort_active_record_query(active_record_call, query_helpers[:sorting])
-    paginated_query = PatternQueryHelper::Pagination.paginate_active_record_query(sorted_query, query_helpers[:pagination])
-    with_associations = PatternQueryHelper::Associations.load_associations(paginated_query, query_helpers[:associations])
-    count = ActiveRecord::Base.connection.execute(%{with query as (#{sorted_query.to_sql}) select count(*) as count from query}).first["count"].to_i
-    pagination = PatternQueryHelper::Pagination.create_pagination_payload(count, query_helpers[:pagination])
-    {
-      pagination: pagination,
-      data: with_associations
-    }
-  end
-
-  def self.single_record_active_record_query(active_record_call, query_helpers)
-    # TODO: Add Logic to this method
   end
 
   def self.parse_helpers(params)

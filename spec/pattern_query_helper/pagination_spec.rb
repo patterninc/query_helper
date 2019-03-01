@@ -70,17 +70,4 @@ RSpec.describe PatternQueryHelper::Pagination do
 
   end
 
-  describe "paginate_active_record_query" do
-
-    before(:each) do
-      @pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@page, @per_page)
-      @results = PatternQueryHelper::Pagination.paginate_active_record_query(Parent.all, @pagination_params)
-    end
-
-    it "return the correct number of records per page" do
-      expect(@results.length).to eq(@per_page)
-    end
-
-  end
-
 end
