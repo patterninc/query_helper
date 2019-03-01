@@ -17,12 +17,12 @@ RSpec.describe PatternQueryHelper do
   end
 
   it "returns an active record query" do
-    results = PatternQueryHelper.run_active_record_query(Child.all, @url_params, "all")
+    results = PatternQueryHelper.run_active_record_query(Child.all, @url_params)
     expect(results[:data]).to_not be nil
   end
 
   it "returns a paginated active record query" do
-    results = PatternQueryHelper.run_active_record_query(Child.all, @url_params, "paginated")
+    results = PatternQueryHelper.run_active_record_query(Child.all, @url_params)
     expect(results[:pagination]).to_not be nil
     expect(results[:data]).to_not be nil
   end
