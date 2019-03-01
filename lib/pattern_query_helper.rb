@@ -123,10 +123,10 @@ module PatternQueryHelper
   end
 
   def self.parse_helpers(params)
-    filtering = PatternQueryHelper::Filtering.create_filters(params)
-    sorting = PatternQueryHelper::Sorting.parse_sorting_params(params)
-    associations = PatternQueryHelper::Associations.process_association_params(params)
-    pagination = PatternQueryHelper::Pagination.parse_pagination_params(params)
+    filtering = PatternQueryHelper::Filtering.create_filters(params[:filter])
+    sorting = PatternQueryHelper::Sorting.parse_sorting_params(params[:sort])
+    associations = PatternQueryHelper::Associations.process_association_params(params[:include])
+    pagination = PatternQueryHelper::Pagination.parse_pagination_params(params[:page], params[:per_page])
 
     {
       filters: filtering,

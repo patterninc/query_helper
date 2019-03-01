@@ -1,9 +1,9 @@
 module PatternQueryHelper
   class Sorting
-    def self.parse_sorting_params(params)
-      sort_sql= []
-      if params[:sort]
-        sorts = params[:sort].split(",")
+    def self.parse_sorting_params(sort)
+      sort_sql = []
+      if sort
+        sorts = sort.split(",")
         sorts.each_with_index do |sort, index|
           column = sort.split(":")[0]
           direction = sort.split(":")[1]

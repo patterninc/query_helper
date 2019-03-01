@@ -4,14 +4,14 @@ RSpec.describe PatternQueryHelper::Associations do
 
   describe "process_association_params" do
     it "parses association params" do
-      associations = PatternQueryHelper::Associations.process_association_params(@url_params)
+      associations = PatternQueryHelper::Associations.process_association_params("parent")
       expect(associations).to eq([:parent])
     end
   end
 
   describe "load_associations" do
     it "loads associations" do
-      associations = PatternQueryHelper::Associations.process_association_params(@url_params)
+      associations = PatternQueryHelper::Associations.process_association_params("parent")
       payload = Child.all
       results = PatternQueryHelper::Associations.load_associations(payload, associations)
       results.each do |child|

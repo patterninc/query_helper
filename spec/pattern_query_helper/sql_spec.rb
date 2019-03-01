@@ -16,7 +16,7 @@ RSpec.describe PatternQueryHelper::Sql do
     end
 
     it "query sorts correctly" do
-      sort_string = PatternQueryHelper::Sorting.parse_sorting_params({sort:"id:desc"})
+      sort_string = PatternQueryHelper::Sorting.parse_sorting_params("id:desc")
       results = PatternQueryHelper::Sql.sql_query(
         model: Child,
         query: "select * from children c join parents p on p.id = c.parent_id",
@@ -33,11 +33,9 @@ RSpec.describe PatternQueryHelper::Sql do
 
     it "query filters correctly" do
       filters = PatternQueryHelper::Filtering.create_filters({
-        filter: {
-          "id" => {
-            "gte" => 20,
-            "lt" => 40
-          }
+        "id" => {
+          "gte" => 20,
+          "lt" => 40
         }
       })
       results = PatternQueryHelper::Sql.sql_query(
@@ -74,11 +72,9 @@ RSpec.describe PatternQueryHelper::Sql do
 
     it "should count the number of rows correctly with filters in place" do
       filters = PatternQueryHelper::Filtering.create_filters({
-        filter: {
-          "id" => {
-            "gte" => 20,
-            "lt" => 40
-          }
+        "id" => {
+          "gte" => 20,
+          "lt" => 40
         }
       })
       count = PatternQueryHelper::Sql.sql_query_count(

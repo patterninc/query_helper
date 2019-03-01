@@ -4,19 +4,19 @@ RSpec.describe PatternQueryHelper::Sorting do
 
   describe "parse_sorting_params" do
     it "parses params into sorting sql string" do
-      sort_string = PatternQueryHelper::Sorting.parse_sorting_params(@url_params)
+      sort_string = PatternQueryHelper::Sorting.parse_sorting_params("name:desc")
       expect(sort_string).to eq("name desc")
     end
 
     it "lowercase if asked for" do
-      sort_string = PatternQueryHelper::Sorting.parse_sorting_params(sort: "name:desc:lowercase")
-      expect(sort_string).to eq("lower(name) desc") 
+      sort_string = PatternQueryHelper::Sorting.parse_sorting_params("name:desc:lowercase")
+      expect(sort_string).to eq("lower(name) desc")
     end
   end
 
   describe "sort_active_record_query" do
     it "sorts active record query" do
-      sort_string = PatternQueryHelper::Sorting.parse_sorting_params(@url_params)
+      sort_string = PatternQueryHelper::Sorting.parse_sorting_params("name:desc")
       parents = PatternQueryHelper::Sorting.sort_active_record_query(Parent.all, sort_string)
 
       previous_parent_name = "zzzzzzzzzz"

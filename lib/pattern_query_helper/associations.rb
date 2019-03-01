@@ -1,7 +1,7 @@
 module PatternQueryHelper
   class Associations
-    def self.process_association_params(params)
-      associations = params[:include] || []
+    def self.process_association_params(associations)
+      associations ||= []
       if associations.class == String
         return [associations.to_sym]
       else

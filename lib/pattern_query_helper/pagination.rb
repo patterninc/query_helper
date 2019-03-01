@@ -3,32 +3,24 @@ require 'kaminari'
 
 module PatternQueryHelper
   class Pagination
-    def self.parse_pagination_params(params)
-      if params[:per_page] == 'all'
-        pagination_params = {
-          include_all: true
-        }
+    def self.parse_pagination_params(page, per_page)
+      if page
+        page = page.to_i
       else
-        if params[:page]
-          page = params[:page].to_i
-        else
-          page = 1
-        end
-        if params[:per_page]
-          per_page = params[:per_page].to_i
-        else
-          per_page = 20
-        end
-        raise RangeError.new("page must be greater than 0") unless page > 0
-        raise RangeError.new("per_page must be greater than 0") unless per_page > 0
-        pagination_params = {
-          page: page.to_i,
-          per_page: per_page.to_i
-        }
+        page = 1
       end
+      if per_page
+        per_page = per_page.to_i
+      else
+        per_page = 20
+      end
+      raise RangeError.new("page must be greater than 0") unless page > 0
+      raise RangeError.new("per_page must be greater than 0") unless per_page > 0
 
-      pagination_params
-
+      {
+        page: page,
+        per_page: per_page
+      }
     end
 
     def self.create_pagination_payload(count, pagination_params)

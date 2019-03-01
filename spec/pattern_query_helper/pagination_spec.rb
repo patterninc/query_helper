@@ -1,42 +1,34 @@
 require "spec_helper"
 
 RSpec.describe PatternQueryHelper::Pagination do
+  before(:each) do
+    @per_page = Faker::Number.between(5,15)
+    @page = Faker::Number.between(2,5)
+  end
 
   describe "parse_pagination_params" do
 
     it "creates pagination params from url params" do
-      pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@url_params)
+      pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@page, @per_page)
       expect(pagination_params[:per_page]).to eq(@per_page)
       expect(pagination_params[:page]).to eq(@page)
     end
 
-    it "sets include_all to true if per_page == 'all'" do
-      @url_params[:per_page] = 'all'
-      pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@url_params)
-      expect(pagination_params[:per_page]).to eq(nil)
-      expect(pagination_params[:page]).to eq(nil)
-      expect(pagination_params[:include_all]).to eq(true)
-    end
-
     it "fails if page <= 0" do
-      @url_params[:page] = '0'
-      expect { PatternQueryHelper::Pagination.parse_pagination_params(@url_params) }.to raise_error(RangeError)
+      expect { PatternQueryHelper::Pagination.parse_pagination_params(0, @per_page) }.to raise_error(RangeError)
     end
 
     it "fails if per_page <= 0" do
-      @url_params[:per_page] = '0'
-      expect { PatternQueryHelper::Pagination.parse_pagination_params(@url_params) }.to raise_error(RangeError)
+      expect { PatternQueryHelper::Pagination.parse_pagination_params(@page, 0) }.to raise_error(RangeError)
     end
 
     it "default per page is 20" do
-      @url_params[:per_page] = nil
-      pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@url_params)
+      pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@page, nil)
       expect(pagination_params[:per_page]).to eq(20)
     end
 
     it "default page is 1" do
-      @url_params[:page] = nil
-      pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@url_params)
+      pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(nil, @per_page)
       expect(pagination_params[:page]).to eq(1)
     end
 
@@ -45,7 +37,7 @@ RSpec.describe PatternQueryHelper::Pagination do
   describe "create_pagination_payload" do
 
     before(:each) do
-      @pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@url_params)
+      @pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@page, @per_page)
       @count = Faker::Number.between(100, 500)
       @pagination_payload = PatternQueryHelper::Pagination.create_pagination_payload(@count, @pagination_params)
       expect(@pagination_payload[:previous_page]).to eq(@page - 1)
@@ -81,7 +73,7 @@ RSpec.describe PatternQueryHelper::Pagination do
   describe "paginate_active_record_query" do
 
     before(:each) do
-      @pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@url_params)
+      @pagination_params = PatternQueryHelper::Pagination.parse_pagination_params(@page, @per_page)
       @results = PatternQueryHelper::Pagination.paginate_active_record_query(Parent.all, @pagination_params)
     end
 
