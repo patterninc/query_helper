@@ -1,4 +1,6 @@
 # PatternQueryHelper
+[![TravisCI](https://travis-ci.org/iserve-products/pattern_query_helper.svg?branch=master)](https://travis-ci.org/iserve-products/pattern_query_helper)
+[![Gem Version](https://badge.fury.io/rb/pattern_query_helper.svg)](https://badge.fury.io/rb/pattern_query_helper)
 
 Ruby Gem developed and used at Pattern to paginate, sort, filter, and include associations on sql and active record queries.
 
