@@ -1,8 +1,6 @@
 # PatternQueryHelper
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pattern_query_helper`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Ruby Gem developed and used at Pattern to paginate, sort, filter, and include associations on sql and active record queries.
 
 ## Installation
 
@@ -22,7 +20,83 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+The PatternQueryHelper gem will return results in one of three formats
+
+Paginated List Payload:
+```json
+{
+  "pagination": {
+    "count": 18,
+    "current_page": 1,
+    "next_page": 2,
+    "previous_page": null,
+    "total_pages": 6,
+    "per_page": 3,
+    "first_page": true,
+    "last_page": false,
+    "out_of_range": false
+  },
+  "data": [
+    {
+      "id": 1,
+      "attribute_1": "string_attribute",
+      "attribute_2": 12345,
+      "attribute_3": 0.3423212
+    },
+    {
+      "id": 2,
+      "attribute_1": "string_attribute",
+      "attribute_2": 12345,
+      "attribute_3": 0.3423212
+    },
+    {
+      "id": 3,
+      "attribute_1": "string_attribute",
+      "attribute_2": 12345,
+      "attribute_3": 0.3423212
+    },
+  ]
+}
+```
+
+List Payload:
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "attribute_1": "string_attribute",
+      "attribute_2": 12345,
+      "attribute_3": 0.3423212
+    },
+    {
+      "id": 2,
+      "attribute_1": "string_attribute",
+      "attribute_2": 12345,
+      "attribute_3": 0.3423212
+    },
+    {
+      "id": 3,
+      "attribute_1": "string_attribute",
+      "attribute_2": 12345,
+      "attribute_3": 0.3423212
+    },
+  ]
+}
+```
+
+Single Record Payload:
+```json
+{
+  "data": {
+    "id": 1,
+    "attribute_1": "string_attribute",
+    "attribute_2": 12345,
+    "attribute_3": 0.3423212
+  }
+}
+```
+
 
 ## Development
 
