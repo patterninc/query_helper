@@ -20,6 +20,8 @@ Or install it yourself as:
 
 ## Use
 
+### Active Record Queries
+
 To run an active record query execute
 ```ruby
 PatternQueryHelper.run_sql_query(active_record_call, query_helpers, single_record)
@@ -27,6 +29,8 @@ PatternQueryHelper.run_sql_query(active_record_call, query_helpers, single_recor
 active_record_call: Valid active record syntax (i.e. ```Object.where(state: 'Active')```)
 query_helpers: See docs below
 single_record: Default is false.  Pass in true to format payload as a single object instead of a list of objects
+
+### Custom SQL Queries
 
 To run a custom sql query execute
 ```ruby
@@ -68,11 +72,69 @@ Sort direction can be either asc or desc.  If you wish to lowercase string befor
 }
 ```
 
+### Filtering
+Filtering is controlled by the `filter` object in the query_helpers hash
+
+```ruby
+{
+  filter: {
+    "column_1" => {
+      "gte" => 20,
+      "lt" => 40
+    },
+    "column_2" => {
+      "eql" => "my_string"
+    }
+}
+```
+
+The following operator codes are valid
+
+```
+“gte”: >=
+“lte”: <=
+“gt”: >
+“lt”: <
+“eql”: =
+“noteql”: !=
+“in”: in
+“notin” not in
+“null”: “is null” or “is not null” (pass in true or false as the value)
+```
+
+### Associations
+
+To include associated objects in the payload, pass in the following as part of the query_helpers hash:
+
+```ruby
+{
+  include: ['associated_object_1', 'associated_object_2']
+}
+```
+
+### Example
+
+The following is an example of a query_helpers object that can be passed into the sql and active record methods
+
+```ruby
+query_helpers = {
+  page: 1,
+  per_page: 20,
+  sort: "name:desc"
+  include: ["child"]
+  filter: {
+    "id" => {
+      "gte" => 20,
+      "lt" => 40
+    }
+}
+```
+
 ## Payload Formats
 
 The PatternQueryHelper gem will return results in one of three formats
 
-Paginated List Payload:
+### Paginated List Payload
 ```json
 {
   "pagination": {
@@ -109,7 +171,7 @@ Paginated List Payload:
 }
 ```
 
-List Payload:
+### List Payload
 ```json
 {
   "data": [
@@ -135,7 +197,7 @@ List Payload:
 }
 ```
 
-Single Record Payload:
+### Single Record Payload
 ```json
 {
   "data": {
