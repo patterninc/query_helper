@@ -18,7 +18,57 @@ Or install it yourself as:
 
     $ gem install pattern_query_helper
 
-## Usage
+## Use
+
+To run an active record query execute
+```ruby
+PatternQueryHelper.run_sql_query(active_record_call, query_helpers, single_record)
+```
+active_record_call: Valid active record syntax (i.e. ```Object.where(state: 'Active')```)
+query_helpers: See docs below
+single_record: Default is false.  Pass in true to format payload as a single object instead of a list of objects
+
+To run a custom sql query execute
+```ruby
+PatternQueryHelper.run_sql_query(model, query, query_params, query_helpers, single_record)
+```
+model: A valid ActiveRecord model
+query: A string containing your custom SQL query
+query_params: a symbolized hash of binds to be included in your SQL query
+query_helpers: See docs below
+single_record: Default is false.  Pass in true to format payload as a single object instead of a list of objects
+
+## Query Helpers
+query_helpers is a symbolized hash passed in with information about pagination, associations, filtering and sorting.
+
+### Pagination
+There are two pagination keys you can pass in as part of the query_helpers objects
+
+```ruby
+{
+  page: 1,
+  per_page: 20
+}
+```
+
+If at least one of these keys is present, paginated results will be returned.
+
+### Sorting
+Sorting is controlled by the `sort` key in the query_helpers object
+
+```ruby
+{
+    sort: "column_name:sort_direction"
+}
+```
+Sort direction can be either asc or desc.  If you wish to lowercase string before sorting include the following:
+```ruby
+{
+    sort: "name:desc:lowercase"
+}
+```
+
+## Payload Formats
 
 The PatternQueryHelper gem will return results in one of three formats
 
@@ -96,6 +146,7 @@ Single Record Payload:
   }
 }
 ```
+
 
 
 ## Development
