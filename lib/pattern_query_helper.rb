@@ -18,7 +18,7 @@ module PatternQueryHelper
   end
 
   def self.run_active_record_query(active_record_call, query_helpers, valid_columns=[], single_record=false)
-    run_sql_query(active_record_call.model, active_record_call.to_sql, {}, query_helpers, single_record)
+    run_sql_query(active_record_call.model, active_record_call.to_sql, {}, query_helpers, valid_columns, single_record)
   end
 
   private

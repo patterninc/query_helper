@@ -16,7 +16,7 @@ RSpec.describe PatternQueryHelper::Sql do
     end
 
     it "query sorts correctly" do
-      sort_string = PatternQueryHelper::Sorting.parse_sorting_params("id:desc")
+      sort_string = PatternQueryHelper::Sorting.parse_sorting_params("id:desc", ["id"])
       results = PatternQueryHelper::Sql.sql_query(
         model: Child,
         query: "select * from children c join parents p on p.id = c.parent_id",
