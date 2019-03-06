@@ -32,8 +32,6 @@ RSpec.describe PatternQueryHelper do
   end
 
   it "sets up the test database correctly" do
-    puts ":::::::::ActiveRecord::::::::#{Parent.all.count}"
-    puts ":::::::::SQL:::::::::::::::::#{Parent.find_by_sql("with q as (select * from parents) select * from q")}"
     expect(Parent.all.count).to eq(100)
     # Every parent has between 2 and 6 children
     expect(Child.all.count).to be_between(200, 600).inclusive

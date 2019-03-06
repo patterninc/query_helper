@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pattern_query_helper (0.2.0)
+    pattern_query_helper (0.2.1)
       activerecord (~> 5.0)
       kaminari (~> 1.1.1)
 

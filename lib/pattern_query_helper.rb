@@ -7,24 +7,24 @@ require "pattern_query_helper/sql"
 
 module PatternQueryHelper
 
-  def self.run_sql_query(model, query, query_params, query_helpers, single_record=false)
+  def self.run_sql_query(model, query, query_params, query_helpers, valid_columns=[], single_record=false)
     if single_record
-      single_record_sql_query(model, query, query_params, query_helpers)
+      single_record_sql_query(model, query, query_params, query_helpers, valid_columns)
     elsif query_helpers[:per_page] || query_helpers[:page]
-      paginated_sql_query(model, query, query_params, query_helpers)
+      paginated_sql_query(model, query, query_params, query_helpers, valid_columns)
     else
-      sql_query(model, query, query_params, query_helpers)
+      sql_query(model, query, query_params, query_helpers, valid_columns)
     end
   end
 
-  def self.run_active_record_query(active_record_call, query_helpers, single_record=false)
+  def self.run_active_record_query(active_record_call, query_helpers, valid_columns=[], single_record=false)
     run_sql_query(active_record_call.model, active_record_call.to_sql, {}, query_helpers, single_record)
   end
 
   private
 
-  def self.paginated_sql_query(model, query, query_params, query_helpers)
-    query_helpers = parse_helpers(query_helpers)
+  def self.paginated_sql_query(model, query, query_params, query_helpers, valid_columns)
+    query_helpers = parse_helpers(query_helpers, valid_columns)
 
     query_config = {
       model: model,
@@ -48,8 +48,8 @@ module PatternQueryHelper
     }
   end
 
-  def self.sql_query(model, query, query_params, query_helpers)
-    query_helpers = parse_helpers(query_helpers)
+  def self.sql_query(model, query, query_params, query_helpers, valid_columns)
+    query_helpers = parse_helpers(query_helpers, valid_columns)
 
     query_config = {
       model: model,
@@ -68,8 +68,8 @@ module PatternQueryHelper
     }
   end
 
-  def self.single_record_sql_query(model, query, query_params, query_helpers)
-    query_helpers = parse_helpers(query_helpers)
+  def self.single_record_sql_query(model, query, query_params, query_helpers, valid_columns)
+    query_helpers = parse_helpers(query_helpers, valid_columns)
 
     query_config = {
       model: model,
@@ -88,11 +88,15 @@ module PatternQueryHelper
     }
   end
 
-  def self.parse_helpers(params)
-    filtering = PatternQueryHelper::Filtering.create_filters(params[:filter])
-    sorting = PatternQueryHelper::Sorting.parse_sorting_params(params[:sort])
-    associations = PatternQueryHelper::Associations.process_association_params(params[:include])
-    pagination = PatternQueryHelper::Pagination.parse_pagination_params(params[:page], params[:per_page])
+  def self.parse_helpers(query_helpers, valid_columns)
+    valid_columns_map = {}
+    valid_columns.each do |c|
+      valid_columns_map["#{c}"] = c
+    end
+    filtering = PatternQueryHelper::Filtering.create_filters(query_helpers[:filter], valid_columns_map)
+    sorting = PatternQueryHelper::Sorting.parse_sorting_params(query_helpers[:sort], valid_columns)
+    associations = PatternQueryHelper::Associations.process_association_params(query_helpers[:include])
+    pagination = PatternQueryHelper::Pagination.parse_pagination_params(query_helpers[:page], query_helpers[:per_page])
 
     {
       filters: filtering,
