@@ -19,4 +19,23 @@ RSpec.describe PatternQueryHelper::Associations do
       end
     end
   end
+
+  describe 'json_associations' do
+    subject { described_class.json_associations(associations) }
+
+    context 'nested associations' do
+      let(:associations) do
+        [:parent,
+         children: [:grand_children],
+         pets: :grand_pets,
+         messages: { author: [:avatar, :profile] }]
+      end
+
+      it 'translates to as_json format' do
+        expect(subject).to eq([:parent, children: { include: [:grand_children] },
+                                        pets: { include: [:grand_pets] },
+                                        messages: { include: [ author: { include: [:avatar, :profile] }]}])
+      end
+    end
+  end
 end
