@@ -3,6 +3,7 @@ require "pattern_query_helper"
 require 'sqlite3'
 require 'active_record'
 require 'faker'
+require 'byebug'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

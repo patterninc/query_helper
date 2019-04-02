@@ -41,6 +41,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "sqlite3", "~> 1.3.6"
   spec.add_development_dependency "faker", "~> 1.9.3"
+  spec.add_development_dependency "byebug"
 
   spec.add_dependency "activerecord", "~> 5.0"
   spec.add_dependency "kaminari", "~> 1.1.1"
