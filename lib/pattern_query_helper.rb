@@ -38,7 +38,7 @@ module PatternQueryHelper
     }
 
     data = PatternQueryHelper::Sql.sql_query(query_config)
-    data = PatternQueryHelper::Associations.load_associations(data, query_helpers[:associations])
+    data = PatternQueryHelper::Associations.load_associations(data, query_helpers[:associations], query_helpers[:as_json])
     count = PatternQueryHelper::Sql.sql_query_count(query_config)
     pagination = PatternQueryHelper::Pagination.create_pagination_payload(count, query_helpers[:pagination])
 
@@ -61,7 +61,7 @@ module PatternQueryHelper
     }
 
     data = PatternQueryHelper::Sql.sql_query(query_config)
-    data = PatternQueryHelper::Associations.load_associations(data, query_helpers[:associations])
+    data = PatternQueryHelper::Associations.load_associations(data, query_helpers[:associations], query_helpers[:as_json])
 
     {
       data: data
@@ -81,7 +81,7 @@ module PatternQueryHelper
     }
 
     data = PatternQueryHelper::Sql.single_record_query(query_config)
-    data = PatternQueryHelper::Associations.load_associations(data, query_helpers[:associations])
+    data = PatternQueryHelper::Associations.load_associations(data, query_helpers[:associations], query_helpers[:as_json])
 
     {
       data: data
@@ -97,12 +97,14 @@ module PatternQueryHelper
     sorting = PatternQueryHelper::Sorting.parse_sorting_params(query_helpers[:sort], valid_columns)
     associations = PatternQueryHelper::Associations.process_association_params(query_helpers[:include])
     pagination = PatternQueryHelper::Pagination.parse_pagination_params(query_helpers[:page], query_helpers[:per_page])
+    as_json = query_helpers[:as_json]
 
     {
       filters: filtering,
       sorting: sorting,
       associations: associations,
-      pagination: pagination
+      pagination: pagination,
+      as_json: as_json
     }
   end
 
