@@ -9,9 +9,10 @@ module PatternQueryHelper
       end
     end
 
-    def self.load_associations(payload, associations)
+    def self.load_associations(payload, associations, as_json_options)
       ActiveRecord::Associations::Preloader.new.preload(payload, associations)
-      payload.as_json(include: json_associations(associations))
+      as_json_options ||= { include: json_associations(associations) }
+      payload.as_json(as_json_options)
     end
 
     def self.json_associations(associations)
