@@ -11,7 +11,7 @@ module PatternQueryHelper
 
     def self.load_associations(payload, associations, as_json_options)
       as_json_options ||= {}
-      as_json_options[:include] = Array(as_json_options[:include]) + json_associations(associations)
+      as_json_options[:include] = as_json_options[:include] || json_associations(associations)
       ActiveRecord::Associations::Preloader.new.preload(payload, associations)
       payload.as_json(as_json_options)
     end
