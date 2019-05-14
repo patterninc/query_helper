@@ -26,22 +26,24 @@ Or install it yourself as:
 
 To run an active record query execute
 ```ruby
-PatternQueryHelper.run_active_record_query(active_record_call, query_helpers, single_record)
+PatternQueryHelper.run_active_record_query(active_record_call, query_helpers, valid_columns, single_record)
 ```
 active_record_call: Valid active record syntax (i.e. ```Object.where(state: 'Active')```)
 query_helpers: See docs below
+valid_columns: Default is [].  Pass in an array of columns you want to allow sorting and filtering on.
 single_record: Default is false.  Pass in true to format payload as a single object instead of a list of objects
 
 ### Custom SQL Queries
 
 To run a custom sql query execute
 ```ruby
-PatternQueryHelper.run_sql_query(model, query, query_params, query_helpers, single_record)
+PatternQueryHelper.run_sql_query(model, query, query_params, query_helpers, valid_columns, single_record)
 ```
 model: A valid ActiveRecord model
 query: A string containing your custom SQL query
 query_params: a symbolized hash of binds to be included in your SQL query
 query_helpers: See docs below
+valid_columns: Default is [].  Pass in an array of columns you want to allow sorting and filtering on.
 single_record: Default is false.  Pass in true to format payload as a single object instead of a list of objects
 
 ## Query Helpers
