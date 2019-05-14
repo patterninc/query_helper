@@ -26,7 +26,7 @@ Or install it yourself as:
 
 To run an active record query execute
 ```ruby
-PatternQueryHelper.run_sql_query(active_record_call, query_helpers, single_record)
+PatternQueryHelper.run_active_record_query(active_record_call, query_helpers, single_record)
 ```
 active_record_call: Valid active record syntax (i.e. ```Object.where(state: 'Active')```)
 query_helpers: See docs below
