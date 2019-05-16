@@ -9,7 +9,6 @@ module PatternQueryHelper
         if valid_columns
           raise ArgumentError.new("Invalid filter '#{filter_attribute}'") unless valid_columns.include? filter_attribute
         end
-        filter_column = filter_attribute
         criteria.each do |operator_code, criterion|
           filter_symbol = "#{symbol_prefix}#{filter_attribute}_#{operator_code}"
           case operator_code
@@ -41,7 +40,7 @@ module PatternQueryHelper
             else
               raise ArgumentError.new("Invalid operator code '#{operator_code}' on '#{filter_attribute}' filter")
           end
-          filter_string = "#{filter_string} and #{filter_column} #{operator}"
+          filter_string = "#{filter_string} and #{filter_attribute} #{operator}"
           filter_string << " :#{filter_symbol}" unless filter_symbol_already_embedded or filter_symbol.blank?
           filter_params["#{filter_symbol}"] = criterion unless filter_symbol.blank?
           filter_array << {
