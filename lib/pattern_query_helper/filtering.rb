@@ -28,7 +28,8 @@ module PatternQueryHelper
             when "likewilds"
               values = criterion
             when "likeprewild"
-              pass
+              operator = "like 'nt'"
+              filter_symbol = ""
             when "likepostwild"
               pass
             when "in"
