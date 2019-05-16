@@ -25,13 +25,8 @@ module PatternQueryHelper
               operator = "="
             when "noteql"
               operator = "!="
-            when "likewilds"
-              values = criterion
-            when "likeprewild"
-              operator = "like 'nt'"
-              filter_symbol = ""
-            when "likepostwild"
-              pass
+            when "like"
+              operator = "like"
             when "in"
               values = criterion.split(",").map { |s| s.to_i }
               values = values.to_s.gsub("[","(").gsub("]",")")
