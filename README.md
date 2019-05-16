@@ -93,7 +93,7 @@ Filtering is controlled by the `filter` object in the query_helpers hash
       "like" => "my_string%"
     },
     "column_4" => {
-      "in" => "1,20,83"
+      "in" => "item1,item2,item3"
     }
 }
 ```
@@ -112,8 +112,6 @@ The following operator codes are valid
 “notin” not in
 “null”: “is null” or “is not null” (pass in true or false as the value)
 ```
-
-NOTE: `in` and `notin` can only operate on integers
 
 ### Associations
 
