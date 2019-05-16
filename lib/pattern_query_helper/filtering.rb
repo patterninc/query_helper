@@ -1,17 +1,15 @@
 module PatternQueryHelper
   class Filtering
-    def self.create_filters(filters, column_map=nil, symbol_prefix="")
+    def self.create_filters(filters, valid_columns=nil, symbol_prefix="")
       filters ||= {}
       filter_string = "true = true"
       filter_params = {}
       filter_array = []
       filters.each do |filter_attribute, criteria|
-        if column_map
-          raise ArgumentError.new("Invalid filter '#{filter_attribute}'") unless column_map[filter_attribute]
-          filter_column = column_map[filter_attribute]
-        else
-          filter_column = filter_attribute
+        if valid_columns
+          raise ArgumentError.new("Invalid filter '#{filter_attribute}'") unless valid_columns.include? filter_attribute
         end
+        filter_column = filter_attribute
         criteria.each do |operator_code, criterion|
           filter_symbol = "#{symbol_prefix}#{filter_attribute}_#{operator_code}"
           case operator_code
