@@ -2,11 +2,7 @@ module PatternQueryHelper
   class Associations
     def self.process_association_params(associations)
       associations ||= []
-      if associations.class == String
-        [associations.to_sym]
-      else
-        associations
-      end
+      associations.class == String ? [associations.to_sym] : associations
     end
 
     def self.load_associations(payload, associations, as_json_options)

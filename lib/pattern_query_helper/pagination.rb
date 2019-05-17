@@ -4,16 +4,8 @@ require 'kaminari'
 module PatternQueryHelper
   class Pagination
     def self.parse_pagination_params(page, per_page)
-      if page
-        page = page.to_i
-      else
-        page = 1
-      end
-      if per_page
-        per_page = per_page.to_i
-      else
-        per_page = 20
-      end
+      page = page ? page.to_i : 1
+      per_page = per_page ? per_page.to_i : 20
       raise RangeError.new("page must be greater than 0") unless page > 0
       raise RangeError.new("per_page must be greater than 0") unless per_page > 0
 
