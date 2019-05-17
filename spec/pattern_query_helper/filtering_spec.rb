@@ -15,7 +15,7 @@ RSpec.describe PatternQueryHelper::Filtering do
           "like" => "my_name%"
         }
       }, ["id", "name"])
-      expect(filters[:filter_string]).to eq("true = true and id >= :id_gte and id < :id_lt and id in (:id_in) and id is not null and name like :name_like")
+      expect(filters[:filter_string]).to eq("true = true and id >= :id_gte and id < :id_lt and id in (:id_in) and id is not null and lower(name) like :name_like")
       expect(filters[:filter_params]).to eq({"id_gte"=>20, "id_in"=>["20","25","30"], "id_lt"=>40, "name_like"=>"my_name%"})
       expect(filters[:filter_array]).to eq([
         {:column=>"id", :operator=>">=", :value=>20, :symbol=>"id_gte"},

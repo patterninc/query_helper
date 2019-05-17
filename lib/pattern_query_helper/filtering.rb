@@ -25,14 +25,24 @@ module PatternQueryHelper
             when "noteql"
               operator = "!="
             when "like"
+              modified_filter_attribute = "lower(#{filter_attribute})"
               operator = "like"
+              criterion.downcase!
             when "in"
               operator = "in (:#{filter_symbol})"
-              criterion = criterion.split(",")
+              # if criterion are anything but numbers, downcase the filter_attribute
+              if criterion.scan(/[^\d|,|\s]/).any?
+                modified_filter_attribute = "lower(#{filter_attribute})"
+              end
+              criterion = criterion.downcase.split(",")
               filter_symbol_already_embedded = true
             when "notin"
               operator = "not in (:#{filter_symbol})"
-              criterion = criterion.split(",")
+              # if criterion are anything but numbers, downcase the filter_attribute
+              if criterion.scan(/[^\d|,|\s]/).any?
+                modified_filter_attribute = "lower(#{filter_attribute})"
+              end
+              criterion = criterion.downcase.split(",")
               filter_symbol_already_embedded = true
             when "null"
               operator = criterion.to_s == "true" ? "is null" : "is not null"
@@ -40,7 +50,8 @@ module PatternQueryHelper
             else
               raise ArgumentError.new("Invalid operator code '#{operator_code}' on '#{filter_attribute}' filter")
           end
-          filter_string = "#{filter_string} and #{filter_attribute} #{operator}"
+          filter_column = modified_filter_attribute || filter_attribute
+          filter_string = "#{filter_string} and #{filter_column} #{operator}"
           filter_string << " :#{filter_symbol}" unless filter_symbol_already_embedded or filter_symbol.blank?
           filter_params["#{filter_symbol}"] = criterion unless filter_symbol.blank?
           filter_array << {
