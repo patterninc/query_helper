@@ -1,13 +1,16 @@
 module PatternQueryHelper
   class Filtering
-    def self.create_filters(filters, valid_columns=nil, symbol_prefix="")
+    def self.create_filters(filters, valid_columns_map=nil, symbol_prefix="")
       filters ||= {}
       filter_string = "true = true"
       filter_params = {}
       filter_array = []
       filters.each do |filter_attribute, criteria|
-        if valid_columns
-          raise ArgumentError.new("Invalid filter '#{filter_attribute}'") unless valid_columns.include? filter_attribute
+        if valid_columns_map
+          raise ArgumentError.new("Invalid filter '#{filter_attribute}'") unless valid_columns_map[filter_attribute]
+          filter_column = valid_columns_map[filter_attribute]
+        else
+          filter_column = filter_attribute
         end
         criteria.each do |operator_code, criterion|
           filter_symbol = "#{symbol_prefix}#{filter_attribute}_#{operator_code}"
@@ -25,22 +28,22 @@ module PatternQueryHelper
             when "noteql"
               operator = "!="
             when "like"
-              modified_filter_attribute = "lower(#{filter_attribute})"
+              modified_filter_column = "lower(#{filter_column})"
               operator = "like"
               criterion.downcase!
             when "in"
               operator = "in (:#{filter_symbol})"
-              # if criterion are anything but numbers, downcase the filter_attribute
+              # if criterion are anything but numbers, downcase the filter_column
               if criterion.scan(/[^\d|,|\s]/).any?
-                modified_filter_attribute = "lower(#{filter_attribute})"
+                modified_filter_column = "lower(#{filter_column})"
               end
               criterion = criterion.downcase.split(",")
               filter_symbol_already_embedded = true
             when "notin"
               operator = "not in (:#{filter_symbol})"
-              # if criterion are anything but numbers, downcase the filter_attribute
+              # if criterion are anything but numbers, downcase the filter_column
               if criterion.scan(/[^\d|,|\s]/).any?
-                modified_filter_attribute = "lower(#{filter_attribute})"
+                modified_filter_column = "lower(#{filter_column})"
               end
               criterion = criterion.downcase.split(",")
               filter_symbol_already_embedded = true
@@ -50,7 +53,7 @@ module PatternQueryHelper
             else
               raise ArgumentError.new("Invalid operator code '#{operator_code}' on '#{filter_attribute}' filter")
           end
-          filter_column = modified_filter_attribute || filter_attribute
+          filter_column = modified_filter_column || filter_column
           filter_string = "#{filter_string} and #{filter_column} #{operator}"
           filter_string << " :#{filter_symbol}" unless filter_symbol_already_embedded or filter_symbol.blank?
           filter_params["#{filter_symbol}"] = criterion unless filter_symbol.blank?
