@@ -14,10 +14,7 @@ module PatternQueryHelper
         limit = "limit :limit offset :offset"
       end
 
-      if page or per_page
-        full_count_join = "join (select count(*) as full_count from filtered_query) as filtered_query_count on true"
-      end
-
+      full_count_join = "join (select count(*) as full_count from filtered_query) as filtered_query_count on true" if page or per_page
       query_params = query_params.merge(filter_params).symbolize_keys
       sort_string = "order by #{sort_string}" if !sort_string.blank?
 
