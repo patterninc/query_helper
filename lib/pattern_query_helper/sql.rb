@@ -6,7 +6,6 @@ module PatternQueryHelper
       page = config[:page]
       per_page = config[:per_page]
       filter_params = config[:filter_params] || {}
-      sort_string = config[:sort_string]
 
       if page and per_page
         query_params[:limit] = per_page
@@ -16,14 +15,12 @@ module PatternQueryHelper
 
       full_count_join = "join (select count(*) as full_count from filtered_query) as filtered_query_count on true" if page or per_page
       query_params = query_params.merge(filter_params).symbolize_keys
-      sort_string = "order by #{sort_string}" if !sort_string.blank?
 
       sql = %(
         with filtered_query as (#{filtered_query(config)})
         select *
         from filtered_query
         #{full_count_join}
-        #{sort_string}
         #{limit}
       )
 
@@ -47,12 +44,15 @@ module PatternQueryHelper
       query = config[:query]
       filter_string = config[:filter_string]
       filter_string = "where #{filter_string}" if !filter_string.blank?
+      sort_string = config[:sort_string]
+      sort_string = "order by #{sort_string}" if !sort_string.blank?
 
       sql = %(
           with query as (#{query})
           select *
           from query
           #{filter_string}
+          #{sort_string}
         )
     end
   end
