@@ -7,7 +7,7 @@ module PatternQueryHelper
       per_page = config[:per_page]
       filter_params = config[:filter_params] || {}
 
-      if page and per_page
+      if page && per_page
         query_params[:limit] = per_page
         query_params[:offset] = (page - 1) * per_page
         limit = "limit :limit offset :offset"
