@@ -8,10 +8,14 @@ module PatternQueryHelper
       filter_params = config[:filter_params] || {}
       sort_string = config[:sort_string]
 
-      if page && per_page
+      if page and per_page
         query_params[:limit] = per_page
         query_params[:offset] = (page - 1) * per_page
         limit = "limit :limit offset :offset"
+      end
+
+      if page or per_page
+        full_count_join = "join (select count(*) as full_count from filtered_query) as filtered_query_count on true"
       end
 
       query_params = query_params.merge(filter_params).symbolize_keys
@@ -21,7 +25,7 @@ module PatternQueryHelper
         with filtered_query as (#{filtered_query(config)})
         select *
         from filtered_query
-        join (select count(*) as full_count from filtered_query) as filtered_query_count on true
+        #{full_count_join}
         #{sort_string}
         #{limit}
       )
@@ -30,7 +34,8 @@ module PatternQueryHelper
     end
 
     def self.sql_query_count(config)
-      results = sql_query(config)
+      # not used anymore - keeping to pass existing tests
+      results = sql_query(config.merge({"page": 1}))
       count = results.empty? ?  0 : results.first["full_count"]
     end
 
