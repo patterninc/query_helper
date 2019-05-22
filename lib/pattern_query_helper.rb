@@ -39,7 +39,7 @@ module PatternQueryHelper
 
     data = PatternQueryHelper::Sql.sql_query(query_config)
     data = PatternQueryHelper::Associations.load_associations(data, query_helpers[:associations], query_helpers[:as_json])
-    count = PatternQueryHelper::Sql.sql_query_count(query_config)
+    count = data.empty? ? 0 : data.first["full_count"]
     pagination = PatternQueryHelper::Pagination.create_pagination_payload(count, query_helpers[:pagination])
 
     {

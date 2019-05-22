@@ -2,11 +2,9 @@ module PatternQueryHelper
   class Sql
     def self.sql_query(config)
       model = config[:model]
-      query = config[:query]
       query_params = config[:query_params] || {}
       page = config[:page]
       per_page = config[:per_page]
-      filter_string = config[:filter_string]
       filter_params = config[:filter_params] || {}
       sort_string = config[:sort_string]
 
@@ -18,38 +16,22 @@ module PatternQueryHelper
 
       query_params = query_params.merge(filter_params).symbolize_keys
       sort_string = "order by #{sort_string}" if !sort_string.blank?
-      filter_string = "where #{filter_string}" if !filter_string.blank?
 
       sql = %(
-          with query as (#{query})
-          select *
-          from query
-          #{filter_string}
-          #{sort_string}
-          #{limit}
-        )
+        with filtered_query as (#{filtered_query(config)})
+        select *
+        from filtered_query
+        join (select count(*) as full_count from filtered_query) as filtered_query_count on true
+        #{sort_string}
+        #{limit}
+      )
 
       model.find_by_sql([sql, query_params])
     end
 
     def self.sql_query_count(config)
-      model = config[:model]
-      query = config[:query]
-      query_params = config[:query_params] || {}
-      filter_string = config[:filter_string]
-      filter_params = config[:filter_params] || {}
-
-      query_params = query_params.merge(filter_params).symbolize_keys
-      filter_string = "where #{filter_string}" if !filter_string.blank?
-
-      count_sql = %(
-          with query as (#{query})
-          select count(*) as count
-          from query
-          #{filter_string}
-        )
-
-      model.find_by_sql([count_sql, query_params]).first["count"]
+      results = sql_query(config)
+      count = results.empty? ?  0 : results.first["full_count"]
     end
 
     def self.single_record_query(config)
@@ -57,5 +39,19 @@ module PatternQueryHelper
       results.first
     end
 
+    private
+
+    def self.filtered_query(config)
+      query = config[:query]
+      filter_string = config[:filter_string]
+      filter_string = "where #{filter_string}" if !filter_string.blank?
+
+      sql = %(
+          with query as (#{query})
+          select *
+          from query
+          #{filter_string}
+        )
+    end
   end
 end
