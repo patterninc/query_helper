@@ -1,5 +1,6 @@
 module PatternQueryHelper
   class Sql
+    QUERY_COUNT_COLUMN = "_query_full_count".freeze
     def self.sql_query(config)
       model = config[:model]
       query_params = config[:query_params] || {}
@@ -13,7 +14,7 @@ module PatternQueryHelper
         limit = "limit :limit offset :offset"
       end
 
-      full_count_join = "join (select count(*) as full_count from filtered_query) as filtered_query_count on true" if page || per_page
+      full_count_join = "join (select count(*) as #{QUERY_COUNT_COLUMN} from filtered_query) as filtered_query_count on true" if page || per_page
       query_params = query_params.merge(filter_params).symbolize_keys
 
       sql = %(
@@ -28,7 +29,7 @@ module PatternQueryHelper
     end
 
     def self.sql_query_count(sql_query_results)
-      count = sql_query_results.empty? ?  0 : sql_query_results.first["full_count"]
+      sql_query_results.empty? ? 0 : sql_query_results.first[QUERY_COUNT_COLUMN]
     end
 
     def self.single_record_query(config)
