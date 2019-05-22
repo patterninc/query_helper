@@ -13,7 +13,7 @@ module PatternQueryHelper
         limit = "limit :limit offset :offset"
       end
 
-      full_count_join = "join (select count(*) as full_count from filtered_query) as filtered_query_count on true" if page or per_page
+      full_count_join = "join (select count(*) as full_count from filtered_query) as filtered_query_count on true" if page || per_page
       query_params = query_params.merge(filter_params).symbolize_keys
 
       sql = %(
@@ -27,10 +27,8 @@ module PatternQueryHelper
       model.find_by_sql([sql, query_params])
     end
 
-    def self.sql_query_count(config)
-      # not used anymore - keeping to pass existing tests
-      results = sql_query(config.merge({"page": 1}))
-      count = results.empty? ?  0 : results.first["full_count"]
+    def self.sql_query_count(sql_query_results)
+      count = sql_query_results.empty? ?  0 : sql_query_results.first["full_count"]
     end
 
     def self.single_record_query(config)

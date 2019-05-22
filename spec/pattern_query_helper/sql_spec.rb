@@ -63,10 +63,12 @@ RSpec.describe PatternQueryHelper::Sql do
 
   describe "sql_query_count" do
     it "should count the number of rows correctly" do
-      count = PatternQueryHelper::Sql.sql_query_count(
+      results = PatternQueryHelper::Sql.sql_query(
         model: Child,
         query: "select * from children c join parents p on p.id = c.parent_id",
+        page: 1
       )
+      count = PatternQueryHelper::Sql.sql_query_count(results)
       expect(count).to eq(Child.all.length)
     end
 
@@ -77,12 +79,14 @@ RSpec.describe PatternQueryHelper::Sql do
           "lt" => 40
         }
       })
-      count = PatternQueryHelper::Sql.sql_query_count(
+      results = PatternQueryHelper::Sql.sql_query(
         model: Child,
         query: "select * from children c join parents p on p.id = c.parent_id",
         filter_string: filters[:filter_string],
-        filter_params: filters[:filter_params]
+        filter_params: filters[:filter_params],
+        page: 1,
       )
+      count = PatternQueryHelper::Sql.sql_query_count(results)
       expect(count).to eq(Child.all.where("id >= 20 and id < 40").length)
     end
   end
