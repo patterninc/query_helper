@@ -72,11 +72,6 @@ RSpec.describe PatternQueryHelper::Sql do
       expect(count).to eq(Child.all.length)
     end
 
-    it "should support common table expressions" do
-      result = ActiveRecord::Base.connection.select_value('with testing_cte as (select 1 as example_col) SELECT * from testing_cte')
-      expect(result).to eq(1)
-    end
-
     it "should count the number of rows correctly with filters in place" do
       filters = PatternQueryHelper::Filtering.create_filters({
         "id" => {
