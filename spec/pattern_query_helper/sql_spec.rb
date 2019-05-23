@@ -73,8 +73,8 @@ RSpec.describe PatternQueryHelper::Sql do
     end
 
     it "should support common table expressions" do
-      result = ActiveRecord::Base.connection.select_value('with testing_cte as (select 1 as example_col) SELECT * from testing_cte')
-      expect(result).to eq(1)
+      versions = ActiveRecord::Base.connection.select_value('SELECT sqlite_version(), sqlite_source_id()')
+      expect(versions).to eq(1)
     end
 
     it "should count the number of rows correctly with filters in place" do
