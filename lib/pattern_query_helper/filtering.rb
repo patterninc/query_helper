@@ -2,7 +2,7 @@ module PatternQueryHelper
   class Filtering
     def self.create_filters(filters, valid_columns_map=nil, symbol_prefix="")
       filters ||= {}
-      filter_string = "true = true"
+      filter_string = "1 = 1"
       filter_params = {}
       filter_array = []
       filters.each do |filter_attribute, criteria|
