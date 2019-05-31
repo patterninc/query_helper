@@ -94,7 +94,7 @@ module PatternQueryHelper
     valid_columns.each do |c|
       valid_columns_map["#{c}"] = c
     end
-    filtering = PatternQueryHelper::Filtering.create_filters(query_helpers[:filter], valid_columns_map)
+    filtering = PatternQueryHelper::Filtering.create_filters(filters: query_helpers[:filter], valid_columns_map: valid_columns_map)
     sorting = PatternQueryHelper::Sorting.parse_sorting_params(query_helpers[:sort], valid_columns)
     associations = PatternQueryHelper::Associations.process_association_params(query_helpers[:include])
     pagination = PatternQueryHelper::Pagination.parse_pagination_params(query_helpers[:page], query_helpers[:per_page])

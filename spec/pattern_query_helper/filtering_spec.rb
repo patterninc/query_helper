@@ -4,7 +4,7 @@ RSpec.describe PatternQueryHelper::Filtering do
 
   describe "parse_pagination_params" do
     it "create filters" do
-      filters = PatternQueryHelper::Filtering.create_filters({
+      filters = PatternQueryHelper::Filtering.create_filters(filters: {
         "id" => {
           "gte" => 20,
           "lt" => 40,
@@ -14,7 +14,7 @@ RSpec.describe PatternQueryHelper::Filtering do
         "name" => {
           "like" => "my_name%"
         }
-      }, {"id" => "id", "name" => "name"})
+      }, valid_columns_map: {"id" => "id", "name" => "name"})
       expect(filters[:filter_string]).to eq("where id >= :id_gte\n and id < :id_lt\n and id in (:id_in)\n and id is not null\n and lower(name) like :name_like")
       expect(filters[:filter_params]).to eq({"id_gte"=>20, "id_in"=>["20","25","30"], "id_lt"=>40, "name_like"=>"my_name%"})
       expect(filters[:filter_array]).to eq([
@@ -26,11 +26,11 @@ RSpec.describe PatternQueryHelper::Filtering do
       ])
     end
     it "handles a single filter" do
-      filters = PatternQueryHelper::Filtering.create_filters({
+      filters = PatternQueryHelper::Filtering.create_filters(filters: {
         "id" => {
           "gte" => 20
         }
-      }, {"id" => "id"})
+      }, valid_columns_map: {"id" => "id"})
       expect(filters[:filter_string]).to eq("where id >= :id_gte")
       expect(filters[:filter_params]).to eq({"id_gte"=>20})
       expect(filters[:filter_array]).to eq([
@@ -38,9 +38,9 @@ RSpec.describe PatternQueryHelper::Filtering do
       ])
     end
     it "handles no filter" do
-      filters = PatternQueryHelper::Filtering.create_filters({
-      }, {})
-      expect(filters[:filter_string]).to eq("")
+      filters = PatternQueryHelper::Filtering.create_filters(filters: {
+      }, include_where: false)
+      expect(filters[:filter_string]).to eq("1 = 1")
       expect(filters[:filter_params]).to eq({})
       expect(filters[:filter_array]).to eq([])
     end

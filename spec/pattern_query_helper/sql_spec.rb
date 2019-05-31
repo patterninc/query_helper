@@ -32,7 +32,7 @@ RSpec.describe PatternQueryHelper::Sql do
     end
 
     it "query filters correctly" do
-      filters = PatternQueryHelper::Filtering.create_filters({
+      filters = PatternQueryHelper::Filtering.create_filters(filters: {
         "id" => {
           "gte" => 20,
           "lt" => 40
@@ -73,7 +73,7 @@ RSpec.describe PatternQueryHelper::Sql do
     end
 
     it "should count the number of rows correctly with filters in place" do
-      filters = PatternQueryHelper::Filtering.create_filters({
+      filters = PatternQueryHelper::Filtering.create_filters(filters: {
         "id" => {
           "gte" => 20,
           "lt" => 40
