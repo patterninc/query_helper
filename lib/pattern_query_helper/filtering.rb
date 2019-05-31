@@ -1,6 +1,6 @@
 module PatternQueryHelper
   class Filtering
-    def self.create_filters(filters, valid_columns_map=nil, symbol_prefix="")
+    def self.create_filters(filters:, valid_columns_map: nil, symbol_prefix: "", include_where: true)
       filters ||= {}
       all_conditions = []
       filter_params = {}
@@ -67,8 +67,11 @@ module PatternQueryHelper
         end
       end
 
-      filter_string = ""
-      filter_string = "where " + all_conditions.join("\n and ") unless all_conditions.empty?
+      if include_where
+        filter_string = "where " + all_conditions.join("\n and ") unless all_conditions.empty?
+      else
+        filter_string = all_conditions.empty? ? "1 = 1" : all_conditions.join("\n and ")
+      end
 
       {
         filter_string: filter_string,
