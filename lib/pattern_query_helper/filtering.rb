@@ -2,7 +2,7 @@ module PatternQueryHelper
   class Filtering
     def self.create_filters(filters, valid_columns_map=nil, symbol_prefix="")
       filters ||= {}
-      filter_string = "true = true"
+      all_conditions = []
       filter_params = {}
       filter_array = []
       filters.each do |filter_attribute, criteria|
@@ -54,8 +54,9 @@ module PatternQueryHelper
               raise ArgumentError.new("Invalid operator code '#{operator_code}' on '#{filter_attribute}' filter")
           end
           filter_column = modified_filter_column || filter_column
-          filter_string = "#{filter_string} and #{filter_column} #{operator}"
-          filter_string << " :#{filter_symbol}" unless filter_symbol_already_embedded or filter_symbol.blank?
+          condition = "#{filter_column} #{operator}"
+          condition << " :#{filter_symbol}" unless filter_symbol_already_embedded or filter_symbol.blank?
+          all_conditions << condition
           filter_params["#{filter_symbol}"] = criterion unless filter_symbol.blank?
           filter_array << {
             column: filter_attribute,
@@ -65,6 +66,9 @@ module PatternQueryHelper
           }
         end
       end
+
+      filter_string = ""
+      filter_string = "where " + all_conditions.join("\n and ") unless all_conditions.empty?
 
       {
         filter_string: filter_string,

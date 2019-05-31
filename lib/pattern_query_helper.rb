@@ -39,7 +39,8 @@ module PatternQueryHelper
 
     data = PatternQueryHelper::Sql.sql_query(query_config)
     data = PatternQueryHelper::Associations.load_associations(data, query_helpers[:associations], query_helpers[:as_json])
-    count = PatternQueryHelper::Sql.sql_query_count(query_config)
+    count = PatternQueryHelper::Sql.sql_query_count(data)
+    data.map! { |d| d.except(PatternQueryHelper::Sql::QUERY_COUNT_COLUMN) } if query_config[:page] or query_config[:per_page]
     pagination = PatternQueryHelper::Pagination.create_pagination_payload(count, query_helpers[:pagination])
 
     {
