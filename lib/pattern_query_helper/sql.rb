@@ -14,7 +14,7 @@ module PatternQueryHelper
         limit = "limit :limit offset :offset"
       end
 
-      full_count_join = "join (select count(*) as #{QUERY_COUNT_COLUMN} from filtered_query) as filtered_query_count on 1 = 1" if page || per_page
+      full_count_join = "cross join (select count(*) as #{QUERY_COUNT_COLUMN} from filtered_query) as filtered_query_count" if page || per_page
       query_params = query_params.merge(filter_params).symbolize_keys
 
       sql = %(
@@ -42,7 +42,6 @@ module PatternQueryHelper
     def self.filtered_query(config)
       query = config[:query]
       filter_string = config[:filter_string]
-      filter_string = "where #{filter_string}" if !filter_string.blank?
       sort_string = config[:sort_string]
       sort_string = "order by #{sort_string}" if !sort_string.blank?
 
