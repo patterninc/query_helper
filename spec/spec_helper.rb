@@ -48,10 +48,12 @@ RSpec.configure do |config|
   ActiveRecord::Schema.define do
     create_table :parents, force: true do |t|
       t.string :name
+      t.integer :age
     end
     create_table :children, force: true do |t|
       t.string :name
       t.references :parent
+      t.integer :age
     end
   end
 

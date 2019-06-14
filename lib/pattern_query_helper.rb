@@ -5,7 +5,42 @@ require "pattern_query_helper/associations"
 require "pattern_query_helper/sorting"
 require "pattern_query_helper/sql"
 
+
+
+require "pattern_query_helper/filter"
+require "pattern_query_helper/column_map"
+
 module PatternQueryHelper
+
+  def initialize(
+    type:, # :active_record or :sql
+    query:, # the query to be executed (either an active record query or a sql query)
+    query_params: {}, # hash of variables to bind into the query
+    page: nil,
+    per_page: nil,
+    filter: nil,
+    column_map:,
+    sort: nil,
+    include: nil,
+    associations: nil,
+    as_json: nil,
+    valid_columns: [],
+    single_record: false
+  )
+    @type = type
+    @query = query
+    @query_params = query_params
+    @page = page
+    @per_page = per_page
+    @filter = filter
+    @sort = sort
+    @include = include
+    @associations = associations
+    @as_json = as_json
+    @valid_columns = valid_columns
+    @single_record = single_record
+
+  end
 
   def self.run_sql_query(model, query, query_params, query_helpers, valid_columns=[], single_record=false)
     if single_record
