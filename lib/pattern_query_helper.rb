@@ -9,6 +9,7 @@ require "pattern_query_helper/sql"
 
 require "pattern_query_helper/filter"
 require "pattern_query_helper/column_map"
+require "pattern_query_helper/query_string"
 
 module PatternQueryHelper
 
