@@ -92,7 +92,6 @@ RSpec.describe PatternQueryHelper::QueryString do
     it "adds correct pagination to query" do
       complex_query.add_pagination(2,3)
       expected_result = complex_query.modified_query_string.include?("limit 3 offset 3")
-      byebug
       expect(expected_result).to be true
     end
   end
