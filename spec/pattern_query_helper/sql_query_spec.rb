@@ -22,7 +22,7 @@ RSpec.describe PatternQueryHelper::SqlQuery do
     {"age"=>{"lt"=>100}, "children_count"=>{"gt"=>0}}
   end
 
-  it "first test" do
+  it "returns a payload" do
     sql_query = described_class.new(
       model: Parent,
       query: query,
@@ -31,8 +31,11 @@ RSpec.describe PatternQueryHelper::SqlQuery do
       page: 1,
       per_page: 5
     )
+    results = sql_query.payload()
     expected_results = Parent.all.to_a.select{ |p| p.children.length > 1 && p.age < 100 }
-    byebug
-    
+    expect(results[:pagination][:count]).to eq(expected_results.length)
+    expect(results[:pagination][:per_page]).to eq(5)
+    expect(results[:pagination][:page]).to eq(1)
+    expect(results[:data]).to eq(5)
   end
 end

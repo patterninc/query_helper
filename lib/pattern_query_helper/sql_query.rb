@@ -7,19 +7,19 @@ module PatternQueryHelper
       model:, # the model to run the query against
       query:, # the custom sql to be executed
       query_params: {},
-      column_mappings: nil, # A hash that translates aliases to sql expressions
-      filters: nil,
+      column_mappings: {}, # A hash that translates aliases to sql expressions
+      filters: {},
       page: nil,
-      per_page: nil
+      per_page: nil,
+      single_record: false
     )
       @model = model
       @query_params = query_params
       @page = page.to_i if page
       @per_page = per_page.to_i if per_page
-
+      @single_record = single_record
       @column_maps = PatternQueryHelper::ColumnMap.create_from_hash(column_mappings)
       @query_filter = PatternQueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
-
       @query_string = PatternQueryHelper::QueryString.new(
         sql: query,
         where_filters: @query_filter.where_filter_strings,
@@ -28,14 +28,13 @@ module PatternQueryHelper
         page: @page,
         per_page: @per_page
       )
-
       @query_params.merge!(@query_filter.bind_variables)
-
       execute_query()
     end
 
     def execute_query
       @results = @model.find_by_sql([@query_string.build(), @query_params]).as_json
+      @results = @results.first if @single_record
       @count = @page && @per_page && results.length > 0? results.first["_query_full_count"] : results.length
       clean_results()
     end
@@ -66,10 +65,14 @@ module PatternQueryHelper
     end
 
     def payload
-      {
-        pagination: pagination_results(),
-        data: @results
-      }
+      if @page && @per_page
+        {
+          pagination: pagination_results(),
+          data: @results
+        }
+      else
+        { data: @results }
+      end
     end
   end
 end
