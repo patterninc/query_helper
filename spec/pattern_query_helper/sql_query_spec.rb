@@ -18,14 +18,15 @@ RSpec.describe PatternQueryHelper::SqlQuery do
     }
   end
 
-  let(:filters) do
-    {"age"=>{"lt"=>100}, "children_count"=>{"gt"=>0}}
-  end
+  let(:filters) { {"age"=>{"lt"=>100}, "children_count"=>{"gt"=>0}} }
+
+  let(:sorts) {"name:asc:lowercase,age:desc"}
 
   it "returns a payload" do
     sql_query = described_class.new(
       model: Parent,
       query: query,
+      sorts: sorts,
       column_mappings: column_mappings,
       filters: filters,
       page: 1,
@@ -35,7 +36,7 @@ RSpec.describe PatternQueryHelper::SqlQuery do
     expected_results = Parent.all.to_a.select{ |p| p.children.length > 1 && p.age < 100 }
     expect(results[:pagination][:count]).to eq(expected_results.length)
     expect(results[:pagination][:per_page]).to eq(5)
-    expect(results[:pagination][:page]).to eq(1)
-    expect(results[:data]).to eq(5)
+    expect(results[:pagination][:current_page]).to eq(1)
+    expect(results[:data].length).to eq(5)
   end
 end

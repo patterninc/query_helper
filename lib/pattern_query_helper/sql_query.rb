@@ -9,6 +9,7 @@ module PatternQueryHelper
       query_params: {},
       column_mappings: {}, # A hash that translates aliases to sql expressions
       filters: {},
+      sorts: "",
       page: nil,
       per_page: nil,
       single_record: false
@@ -20,11 +21,12 @@ module PatternQueryHelper
       @single_record = single_record
       @column_maps = PatternQueryHelper::ColumnMap.create_from_hash(column_mappings)
       @query_filter = PatternQueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
+      @sorts = PatternQueryHelper::Sort.new(sort_string: sorts, column_maps: @column_maps)
       @query_string = PatternQueryHelper::QueryString.new(
         sql: query,
         where_filters: @query_filter.where_filter_strings,
         having_filters: @query_filter.having_filter_strings,
-        sorts: [],
+        sorts: @sorts.sort_strings,
         page: @page,
         per_page: @per_page
       )
