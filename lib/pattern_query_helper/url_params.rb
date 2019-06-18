@@ -3,7 +3,7 @@ require 'active_support/dependencies'
 require 'active_support/concern'
 
 module PatternQueryHelper
-  module AuthRequest
+  module UrlParams
     extend ActiveSupport::Concern
 
     included do
