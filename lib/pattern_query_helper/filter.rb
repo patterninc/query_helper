@@ -1,20 +1,19 @@
 module PatternQueryHelper
   class Filter
 
-    attr_accessor :operator, :criterion, :comparate, :operator_code, :aggregate, :bind_variable, :cte_filter
+    attr_accessor :operator, :criterion, :comparate, :operator_code, :aggregate, :bind_variable
 
     def initialize(
       operator_code:,
       criterion:,
       comparate:,
-      aggregate: false,
-      cte_filter: true # Filter after creating a common table expression with the rest of the query.  This will happen if the filter map doesn't include the comparate requested.
+      aggregate: false
     )
       @operator_code = operator_code
       @criterion = criterion # Converts to a string to be inserted into sql.
       @comparate = comparate
       @aggregate = aggregate
-      @bind_variable = SecureRandom.hex.to_sym
+      @bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
 
       translate_operator_code()
       mofify_criterion()

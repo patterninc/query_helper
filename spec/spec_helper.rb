@@ -70,9 +70,9 @@ RSpec.configure do |config|
 
   # Load data into databases
   (0..99).each do
-    parent = Parent.create(name: Faker::Name.name)
+    parent = Parent.create(name: Faker::Name.name, age: Faker::Number.between(25, 55))
     (0..Faker::Number.between(1, 5)).each do
-      Child.create(name: Faker::Name.name, parent: parent)
+      Child.create(name: Faker::Name.name, parent: parent, age: Faker::Number.between(1, 25))
     end
   end
 end
