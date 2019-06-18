@@ -8,13 +8,13 @@ RSpec.describe PatternQueryHelper::Filter do
       described_class.new(
         operator_code: "gte",
         criterion: Time.now,
-        column: "children.age"
+        comparate: "children.age"
       )
     end
 
     it "creates sql string" do
       sql_string = filter.sql_string()
-      expect(sql_string).to eq("#{filter.column} #{filter.operator} #{filter.criterion}")
+      expect(sql_string).to eq("#{filter.comparate} #{filter.operator} :#{filter.bind_variable}")
     end
 
     it "creates array correctly for in/not in"
@@ -31,7 +31,7 @@ RSpec.describe PatternQueryHelper::Filter do
     #       filter = described_class.new(
     #         operator_code: code,
     #         criterion: Faker::Number.between(0, 100),
-    #         column: "children.age"
+    #         comparate: "children.age"
     #       )
     #       expect(filter.operator).to_not be_nil
     #     end
@@ -44,7 +44,7 @@ RSpec.describe PatternQueryHelper::Filter do
           described_class.new(
             operator_code: "fake_code",
             criterion: Faker::Number.between(0, 100),
-            column: "children.age"
+            comparate: "children.age"
           )
         }.to raise_error(ArgumentError)
       end
@@ -71,7 +71,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "gte",
           criterion: Faker::Number.between(0, 100),
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end
@@ -83,7 +83,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "gte",
           criterion: Date.today,
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end
@@ -95,7 +95,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "gte",
           criterion: Time.now,
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end
@@ -107,7 +107,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "gte",
           criterion: "hello",
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end
@@ -119,7 +119,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "in",
           criterion: [1,2,3,4],
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end
@@ -131,7 +131,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "in",
           criterion: Date.today,
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end
@@ -143,7 +143,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "null",
           criterion: true,
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end
@@ -155,7 +155,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "null",
           criterion: false,
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end
@@ -167,7 +167,7 @@ RSpec.describe PatternQueryHelper::Filter do
         described_class.new(
           operator_code: "null",
           criterion: "stringything",
-          column: "children.age"
+          comparate: "children.age"
         )
       end
     end

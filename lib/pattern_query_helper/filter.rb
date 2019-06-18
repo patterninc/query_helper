@@ -71,7 +71,7 @@ module PatternQueryHelper
       @criterion.downcase! if criterion.class == String && criterion.scan(/[a-zA-Z]/).any?
 
       # turn the criterion into an array for in and notin comparisons
-      @criterion = criterion.split(",") if ["in", "notin"].include?(operator_code) && criterion.class != Array
+      @criterion = criterion.split(",") if ["in", "notin"].include?(operator_code) && criterion.class == String
     end
 
     def modify_comparate

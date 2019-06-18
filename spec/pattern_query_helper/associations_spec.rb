@@ -13,7 +13,7 @@ RSpec.describe PatternQueryHelper::Associations do
     it "loads associations" do
       associations = PatternQueryHelper::Associations.process_association_params("parent")
       payload = Child.all
-      results = PatternQueryHelper::Associations.load_associations(payload, associations, nil)
+      results = PatternQueryHelper::Associations.load_associations(payload: payload, associations: associations)
       results.each do |child|
         expect(child["parent_id"]).to eq(child["parent"]["id"])
       end
