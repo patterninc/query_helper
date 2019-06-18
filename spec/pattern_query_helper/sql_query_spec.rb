@@ -31,7 +31,8 @@ RSpec.describe PatternQueryHelper::SqlQuery do
       page: 1,
       per_page: 5
     )
-    results = sql_query.execute_query
     expected_results = Parent.all.to_a.select{ |p| p.children.length > 1 && p.age < 100 }
+    byebug
+    
   end
 end

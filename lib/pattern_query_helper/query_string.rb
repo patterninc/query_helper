@@ -23,6 +23,7 @@ module PatternQueryHelper
 
     def calculate_indexes
       @last_select_index = @sql.rindex(/[Ss][Ee][Ll][Ee][Cc][Tt]/)
+      @last_from_index = @sql.rindex(/[Ff][Rr][Oo][Mm]/)
       @last_where_index = @sql.index(/[Ww][Hh][Ee][Rr][Ee]/, @last_select_index)
       @last_group_by_index = @sql.index(/[Gg][Rr][Oo][Uu][Pp] [Bb][Yy]/, @last_select_index)
       @last_having_index = @sql.index(/[Hh][Aa][Vv][Ii][Nn][Gg]/, @last_select_index)
@@ -36,6 +37,8 @@ module PatternQueryHelper
       @insert_where_index = @last_group_by_index || @last_order_by_index || @sql.length
       @insert_having_index = @last_order_by_index || @sql.length
       @insert_order_by_index = @sql.length
+      @insert_join_index = @last_where_index || @last_group_by_index || @last_order_by_index || @sql.length
+      @insert_select_index = @last_from_index
     end
 
     def where_insert
@@ -56,19 +59,24 @@ module PatternQueryHelper
     end
 
     def pagination_insert
-      raise ArgumentError.new("page and per_page must be integers") unless page.class == Integer && per_page.class == Integer
-      limit = per_page
-      offset = (page - 1) * per_page
+      raise ArgumentError.new("page and per_page must be integers") unless @page.class == Integer && @per_page.class == Integer
+      limit = @per_page
+      offset = (@page - 1) * @per_page
       "  limit #{limit} offset #{offset}  "
+    end
+
+    def total_count_select_insert
+      "  ,count(*) over () as _query_full_count "
     end
 
     def build
       modified_sql = @sql.dup
       modified_sql = modified_sql.slice(0, @last_order_by_index) if @order_by_included # Remove previous sorting if it exists
-      modified_sql.insert(modified_sql.length, pagination_insert)
+      modified_sql.insert(modified_sql.length, pagination_insert) if @page && @per_page
       modified_sql.insert(@insert_order_by_index, sort_insert) if @sorts && @sorts.length > 0
       modified_sql.insert(@insert_having_index, having_insert) if @having_filters && @having_filters.length > 0
       modified_sql.insert(@insert_where_index, where_insert) if @where_filters && @where_filters.length > 0
+      modified_sql.insert(@insert_select_index, total_count_select_insert) if @page && @per_page
       modified_sql.squish
     end
   end

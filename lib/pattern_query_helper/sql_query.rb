@@ -1,7 +1,7 @@
 module PatternQueryHelper
   class SqlQuery
 
-    attr_accessor :query_string, :query_params, :query_filter
+    attr_accessor :model, :query_string, :query_params, :query_filter, :results
 
     def initialize(
       model:, # the model to run the query against
@@ -17,7 +17,6 @@ module PatternQueryHelper
       @page = page.to_i if page
       @per_page = per_page.to_i if per_page
 
-
       @column_maps = PatternQueryHelper::ColumnMap.create_from_hash(column_mappings)
       @query_filter = PatternQueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
 
@@ -31,12 +30,46 @@ module PatternQueryHelper
       )
 
       @query_params.merge!(@query_filter.bind_variables)
+
+      execute_query()
     end
 
     def execute_query
-      results = @model.find_by_sql([@query_string.build(), @query_params])
-      byebug
-      results.as_json
+      @results = @model.find_by_sql([@query_string.build(), @query_params]).as_json
+      @count = @page && @per_page && results.length > 0? results.first["_query_full_count"] : results.length
+      clean_results()
+    end
+
+    def clean_results
+      @results.map!{ |r| r.except("_query_full_count") } if @page && @per_page
+    end
+
+    def pagination_results
+      total_pages = (@count/(@per_page.nonzero? || 1).to_f).ceil
+      next_page = @page + 1 if @page.between?(1, total_pages - 1)
+      previous_page = @page - 1 if @page.between?(2, total_pages)
+      first_page = @page == 1
+      last_page = @page == total_pages
+      out_of_range = !@page.between?(1,total_pages)
+
+      {
+        count: @count,
+        current_page: @page,
+        next_page: next_page,
+        previous_page: previous_page,
+        total_pages: total_pages,
+        per_page: @per_page,
+        first_page: first_page,
+        last_page: last_page,
+        out_of_range: out_of_range
+      }
+    end
+
+    def payload
+      {
+        pagination: pagination_results(),
+        data: @results
+      }
     end
   end
 end

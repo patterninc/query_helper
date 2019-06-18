@@ -14,7 +14,6 @@ RSpec.describe PatternQueryHelper::Filter do
 
     it "creates sql string" do
       sql_string = filter.sql_string()
-      byebug
       expect(sql_string).to eq("#{filter.column} #{filter.operator} #{filter.criterion}")
     end
 
