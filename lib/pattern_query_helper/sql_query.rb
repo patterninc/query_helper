@@ -12,16 +12,20 @@ module PatternQueryHelper
       sorts: "",
       page: nil,
       per_page: nil,
-      single_record: false
+      single_record: false,
+      associations: [],
+      as_json_options: {}
     )
       @model = model
       @query_params = query_params
       @page = page.to_i if page
       @per_page = per_page.to_i if per_page
       @single_record = single_record
+      @as_json_options = as_json_options
       @column_maps = PatternQueryHelper::ColumnMap.create_from_hash(column_mappings)
       @query_filter = PatternQueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
       @sorts = PatternQueryHelper::Sort.new(sort_string: sorts, column_maps: @column_maps)
+      @associations = PatternQueryHelper::Associations.process_association_params(associations)
       @query_string = PatternQueryHelper::QueryString.new(
         sql: query,
         where_filters: @query_filter.where_filter_strings,
@@ -35,10 +39,25 @@ module PatternQueryHelper
     end
 
     def execute_query
-      @results = @model.find_by_sql([@query_string.build(), @query_params]).as_json
-      @results = @results.first if @single_record
+      # Execute Sql Query
+      @results = @model.find_by_sql([@query_string.build(), @query_params])
+
+      # Determine total result count
       @count = @page && @per_page && results.length > 0? results.first["_query_full_count"] : results.length
+
+      # Return a single result if requested
+      @results = @results.first if @single_record
+
+      load_associations()
       clean_results()
+    end
+
+    def load_associations
+      @results = PatternQueryHelper::Associations.load_associations(
+        payload: @results,
+        associations: @associations,
+        as_json_options: @as_json_options
+      )
     end
 
     def clean_results

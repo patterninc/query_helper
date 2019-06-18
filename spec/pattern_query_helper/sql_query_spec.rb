@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe PatternQueryHelper::SqlQuery do
   let(:query) do
     %{
-      select parents.name, count(children.id) as children_count
+      select parents.id, parents.name, count(children.id) as children_count
       from parents
       join children on parents.id = children.parent_id
       group by parents.id
@@ -22,6 +22,10 @@ RSpec.describe PatternQueryHelper::SqlQuery do
 
   let(:sorts) {"name:asc:lowercase,age:desc"}
 
+  let(:includes) {"children"}
+
+  let(:as_json_options) {{ methods: [:favorite_star_wars_character] }}
+
   it "returns a payload" do
     sql_query = described_class.new(
       model: Parent,
@@ -29,6 +33,8 @@ RSpec.describe PatternQueryHelper::SqlQuery do
       sorts: sorts,
       column_mappings: column_mappings,
       filters: filters,
+      associations: includes,
+      as_json_options: as_json_options,
       page: 1,
       per_page: 5
     )
