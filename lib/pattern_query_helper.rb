@@ -6,6 +6,7 @@ require "pattern_query_helper/sql_query"
 require "pattern_query_helper/query_filter"
 require "pattern_query_helper/sort"
 require "pattern_query_helper/associations"
+require "pattern_query_helper/query_helper_concern"
 
 module PatternQueryHelper
 
