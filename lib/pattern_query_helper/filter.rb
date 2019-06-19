@@ -76,7 +76,7 @@ module PatternQueryHelper
 
     def modify_comparate
       # lowercase strings for comparison
-      @comparate = "lower(#{@comparate})" if criterion.class == String && criterion.scan(/[a-zA-Z]/).any?
+      @comparate = "lower(#{@comparate})" if criterion.class == String && criterion.scan(/[a-zA-Z]/).any? && !["true", "false"].include?(criterion)
     end
 
     def validate_criterion
