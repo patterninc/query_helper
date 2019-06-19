@@ -22,22 +22,29 @@ module PatternQueryHelper
     end
 
     def calculate_indexes
-      @last_select_index = @sql.rindex(/[Ss][Ee][Ll][Ee][Cc][Tt]/)
-      @last_from_index = @sql.rindex(/[Ff][Rr][Oo][Mm]/)
-      @last_where_index = @sql.index(/[Ww][Hh][Ee][Rr][Ee]/, @last_select_index)
-      @last_group_by_index = @sql.index(/[Gg][Rr][Oo][Uu][Pp] [Bb][Yy]/, @last_select_index)
-      @last_having_index = @sql.index(/[Hh][Aa][Vv][Ii][Nn][Gg]/, @last_select_index)
-      @last_order_by_index = @sql.index(/[Oo][Rr][Dd][Ee][Rr] [Bb][Yy]/, @last_select_index)
+      # Replace everything between () to find indexes.
+      # This will allow us to ignore subueries when determing indexes
+      white_out_sql = @sql.dup
+      while white_out_sql.scan(/\([^()]*\)/).length > 0 do
+        white_out_sql.scan(/\([^()]*\)/).each { |s| white_out_sql.gsub!(s,s.gsub(/./, '*')) }
+      end
+
+      @last_select_index = white_out_sql.rindex(/(?<!\(|\( )[Ss][Ee][Ll][Ee][Cc][Tt]/)  # Last select that isn't a subquery (denoted by a '(' or '( ')
+      @last_from_index = white_out_sql.rindex(/[Ff][Rr][Oo][Mm]/)
+      @last_where_index = white_out_sql.index(/[Ww][Hh][Ee][Rr][Ee]/, @last_select_index)
+      @last_group_by_index = white_out_sql.index(/[Gg][Rr][Oo][Uu][Pp] [Bb][Yy]/, @last_select_index)
+      @last_having_index = white_out_sql.index(/[Hh][Aa][Vv][Ii][Nn][Gg]/, @last_select_index)
+      @last_order_by_index = white_out_sql.index(/[Oo][Rr][Dd][Ee][Rr] [Bb][Yy]/, @last_select_index)
 
       @where_included = !@last_where_index.nil?
       @group_by_included = !@last_group_by_index.nil?
       @having_included = !@last_having_index.nil?
       @order_by_included = !@last_order_by_index.nil?
 
-      @insert_where_index = @last_group_by_index || @last_order_by_index || @sql.length
-      @insert_having_index = @last_order_by_index || @sql.length
-      @insert_order_by_index = @sql.length
-      @insert_join_index = @last_where_index || @last_group_by_index || @last_order_by_index || @sql.length
+      @insert_where_index = @last_group_by_index || @last_order_by_index || white_out_sql.length
+      @insert_having_index = @last_order_by_index || white_out_sql.length
+      @insert_order_by_index = white_out_sql.length
+      @insert_join_index = @last_where_index || @last_group_by_index || @last_order_by_index || white_out_sql.length
       @insert_select_index = @last_from_index
     end
 
