@@ -1,5 +1,5 @@
 module PatternQueryHelper
-  class ActiveRecordQuery < SqlQuery
+  class ActiveRecord < Sql
 
     def initialize(
       active_record_call:, # the active_record_query to be executed
@@ -29,6 +29,6 @@ module PatternQueryHelper
         as_json_options: as_json_options,
         run: run
       )
-    end 
+    end
   end
 end

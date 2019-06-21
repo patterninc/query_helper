@@ -1,5 +1,5 @@
 module PatternQueryHelper
-  class SqlQuery
+  class Sql
 
     attr_accessor :model, :query_string, :query_params, :query_filter, :results
 
