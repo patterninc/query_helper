@@ -1,5 +1,3 @@
-require 'rails'
-require 'active_support/dependencies'
 require 'active_support/concern'
 
 module PatternQueryHelper
