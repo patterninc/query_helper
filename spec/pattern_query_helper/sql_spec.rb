@@ -13,8 +13,8 @@ RSpec.describe PatternQueryHelper::Sql do
   let(:column_mappings) do
     {
       "children_count" => {sql_expression: "count(children.id)", aggregate: true},
-      "name" => "parents.name",
-      "age" => "parents.age"
+      # "name" => "parents.name",
+      # "age" => "parents.age"
     }
   end
 
@@ -36,8 +36,10 @@ RSpec.describe PatternQueryHelper::Sql do
       associations: includes,
       as_json_options: as_json_options,
       page: 1,
-      per_page: 5
+      per_page: 5,
+      run: true
     )
+    byebug
     results = sql_query.payload()
     expected_results = Parent.all.to_a.select{ |p| p.children.length > 1 && p.age < 100 }
     expect(results[:pagination][:count]).to eq(expected_results.length)

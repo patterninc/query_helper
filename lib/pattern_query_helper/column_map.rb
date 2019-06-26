@@ -32,6 +32,5 @@ module PatternQueryHelper
       end
       map
     end
-
   end
 end

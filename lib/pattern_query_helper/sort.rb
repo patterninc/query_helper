@@ -25,7 +25,7 @@ module PatternQueryHelper
 
         if direction == "desc"
           case PatternQueryHelper.active_record_adapter
-          when "sqlite3"
+          when "sqlite3" # sqlite3 is used in the test suite
             direction = "desc"
           else
             direction = "desc nulls last"

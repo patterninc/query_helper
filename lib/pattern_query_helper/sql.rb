@@ -23,19 +23,36 @@ module PatternQueryHelper
       @per_page = per_page.to_i if per_page
       @single_record = single_record
       @as_json_options = as_json_options
-      @column_maps = PatternQueryHelper::ColumnMap.create_from_hash(column_mappings)
-      @query_filter = PatternQueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
-      @sorts = PatternQueryHelper::Sort.new(sort_string: sorts, column_maps: @column_maps)
-      @associations = PatternQueryHelper::Associations.process_association_params(associations)
+
+      # Create the query string object
       @query_string = PatternQueryHelper::QueryString.new(
         sql: query,
-        where_filters: @query_filter.where_filter_strings,
-        having_filters: @query_filter.having_filter_strings,
-        sorts: @sorts.sort_strings,
         page: @page,
         per_page: @per_page
       )
+
+      # Create our column maps.  Use default maps if custom mappings aren't passed in.
+      @column_maps = PatternQueryHelper::ColumnMap.create_from_hash(column_mappings)
+      default_maps = @query_string.alias_map.map{|m| PatternQueryHelper::ColumnMap.new(**m)}
+      default_maps.each do |m|
+        @column_maps << m if @column_maps.select{|x| x.alias_name == m.alias_name}.empty?
+      end
+
+      # Create the filter and sort objects
+      @query_filter = PatternQueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
+      @sorts = PatternQueryHelper::Sort.new(sort_string: sorts, column_maps: @column_maps)
+      @associations = PatternQueryHelper::Associations.process_association_params(associations)
+
+      # Update the sql string with the filters and sorts
+      @query_string.update(
+        where_filters: @query_filter.where_filter_strings,
+        having_filters: @query_filter.having_filter_strings,
+        sorts: @sorts.sort_strings,
+      )
+
+      # Merge the filter bind variables into the query_params
       @query_params.merge!(@query_filter.bind_variables)
+
       execute_query() if run
     end
 
