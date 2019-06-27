@@ -40,6 +40,11 @@ model | <ul><li>- [x] </li></ul> | | the model to run the query against | test
 query | <ul><li>- [x] </li></ul> | | the custom sql string to be executed | `select * from parents`
 query_params | <ul><li>- [x] </li></ul> | | a hash of bind variables to be embedded into the query | `{ age: 20, name: 'John' }`
 
+Markdown | Less | Pretty
+--- | --- | ---
+*Still* | `renders` | **nicely**
+1 | 2 | 3
+
 ```ruby
 Argument               Required     DefaultValue   Description                                                
 model:                 #required                   # the model to run the query against
