@@ -57,117 +57,117 @@ The following arguments are accepted when creating a new objects
     <td>model</td>
     <td>the model to run the query against</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         Parent
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>query</td>
     <td>the custom sql string to be executed</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         'select * from parents'
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>query_params</td>
     <td>a hash of bind variables to be embedded into the sql query</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         {
           age: 20,
           name: 'John'
         }
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>column_mappings</td>
     <td>A hash that translates aliases to sql expressions</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         {
           "age" => "parents.age"
           "children_count" => { sql_expression: "count(children.id)", aggregate: true }
         }
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>filters</td>
     <td>a list of filters in the form of `{"comparate_alias"=>{"operator_code"=>"value"}}`</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         {
           "age" => { "lt" => 100 },
           "children_count" => { "gt" => 0 }
         }
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>sorts</td>
     <td>a comma separated string with a list of sort values</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         "age:desc,name:asc:lowercase"
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>page</td>
     <td>the page you want returned</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         5
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>per_page</td>
     <td>the number of results per page</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         20
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>single_record</td>
     <td>whether or not you expect the record to return a single result, if toggled, only the first result will be returned</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         false
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>associations</td>
     <td>a list of activerecord associations you'd like included in the payload </td>
     <td>
-      ```ruby
+      <pre lang="ruby">
 
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>as_json_options</td>
     <td>a list of as_json options you'd like run before returning the payload</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
 
-      ```
+      </pre>
     </td>
   </tr>
   <tr>
     <td>run</td>
     <td>whether or not you'd like to run the query on initilization</td>
     <td>
-      ```ruby
+      <pre lang="ruby">
         false
-      ```
+      </pre>
     </td>
   </tr>
 </table>
