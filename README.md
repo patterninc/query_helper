@@ -90,7 +90,10 @@ Parent
 <pre lang="ruby">
 {
   "age" => "parents.age"
-  "children_count" => { sql_expression: "count(children.id)", aggregate: true }
+  "children_count" => {
+    sql_expression: "count(children.id)",
+    aggregate: true
+  }
 }
 </pre>
 </td>
