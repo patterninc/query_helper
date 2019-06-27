@@ -24,27 +24,19 @@ module PatternQueryHelper
       @single_record = single_record
       @as_json_options = as_json_options
 
-      # Create the query string object
-      @query_string = PatternQueryHelper::QueryString.new(
-        sql: query,
-        page: @page,
-        per_page: @per_page
-      )
-
-      # Create our column maps.  Use default maps if custom mappings aren't passed in.
-      @column_maps = PatternQueryHelper::ColumnMap.create_from_hash(column_mappings)
-      default_maps = @query_string.alias_map.map{|m| PatternQueryHelper::ColumnMap.new(**m)}
-      default_maps.each do |m|
-        @column_maps << m if @column_maps.select{|x| x.alias_name == m.alias_name}.empty?
-      end
+      # Create our column maps.
+      @column_maps = PatternQueryHelper::ColumnMap.create_column_mappings(custom_mappings: column_mappings, query: query)
 
       # Create the filter and sort objects
       @query_filter = PatternQueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
       @sorts = PatternQueryHelper::Sort.new(sort_string: sorts, column_maps: @column_maps)
       @associations = PatternQueryHelper::Associations.process_association_params(associations)
 
-      # Update the sql string with the filters and sorts
-      @query_string.update(
+      # create the query string object with the filters and sorts
+      @query_string = PatternQueryHelper::QueryString.new(
+        sql: query,
+        page: @page,
+        per_page: @per_page,
         where_filters: @query_filter.where_filter_strings,
         having_filters: @query_filter.having_filter_strings,
         sorts: @sorts.sort_strings,
