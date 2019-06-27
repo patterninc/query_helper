@@ -22,6 +22,40 @@ Or install it yourself as:
 
 ## Use
 
+### SQL Queries
+
+#### Initialize
+
+To create a new sql query object run
+
+```ruby
+PatternQueryHelper::Sql.new()
+```
+
+The following arguments are accepted when creating a new objects
+
+Argument | Required | Default Value | Description | Example Value |
+--- | --- | --- | --- | --- | ---
+model | <ul><li>- [x] </li></ul> | | the model to run the query against | |
+query | <ul><li>- [x] </li></ul> | | the custom sql string to be executed | `select * from parents` |
+query_params | <ul><li>- [x] </li></ul> | | a hash of bind variables to be embedded into the query | `{ age: 20, name: 'John' }` |
+
+```ruby
+Argument               Required     DefaultValue   Description                                                
+model:                 #required                   # the model to run the query against
+query:                 #required                   # the custom sql to be executed
+query_params:          #optional                   # a list of bind variables to be embedded into the query
+column_mappings:       #optional                   # A hash that translates aliases to sql expressions
+filters:               #optional                   # a list of filters in the form of {"comparate_alias"=>{"operator_code"=>"value"}}.  i.e. {"age"=>{"lt"=>100}, "children_count"=>{"gt"=>0}}
+sorts:                 #optional                   # a comma separated string with a list of sort values i.e "age:desc,name:asc:lowercase"
+page:                  #optional                   # define the page you want returned
+per_page:              #optional                   # define how many results you want per page
+single_record:         #optional    #false         # whether or not you expect the record to return a single result, if toggled, only the first result will be returned
+associations:          #optional                   # a list of activerecord associations you'd like included in the payload
+as_json_options:       #optional                   # a list of as_json options you'd like run before returning the payload
+run:                   #optional    #true          # whether or not you'd like to run the query on initilization
+```
+
 ### Active Record Queries
 
 To run an active record query execute
@@ -33,12 +67,7 @@ query_helpers: See docs below
 valid_columns: Default is [].  Pass in an array of columns you want to allow sorting and filtering on.
 single_record: Default is false.  Pass in true to format payload as a single object instead of a list of objects
 
-### Custom SQL Queries
 
-To run a custom sql query execute
-```ruby
-PatternQueryHelper.run_sql_query(model, query, query_params, query_helpers, valid_columns, single_record)
-```
 model: A valid ActiveRecord model
 query: A string containing your custom SQL query
 query_params: a symbolized hash of binds to be included in your SQL query
