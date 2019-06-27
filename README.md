@@ -29,41 +29,39 @@ Or install it yourself as:
 To create a new sql query object run
 
 ```ruby
-PatternQueryHelper::Sql.new()
+PatternQueryHelper::Sql.new(
+  model:,             # required
+  query:,             # required
+  query_params: ,     # optional
+  column_mappings: ,  # optional
+  filters: ,          # optional
+  sorts: ,            # optional
+  page: ,             # optional
+  per_page: ,         # optional
+  single_record: ,    # optional, default: false
+  associations: ,     # optional
+  as_json_options: ,  # optional
+  run:                # optional, default: true
+)
 ```
 
 The following arguments are accepted when creating a new objects
 
-| Argument | Description | Example Value | Required | Default Value |
-| --- | --- | --- | --- | --- |
-| model |  the model to run the query against |   | <ul><li>- [x] </li></ul> |  |
-| query |  the custom sql string to be executed | `select * from parents` | <ul><li>- [x] </li></ul> |  |
+| Argument | Description | Example Value |
+| --- | --- | --- |
+| model |  the model to run the query against |
+| query |  the custom sql string to be executed | `select * from parents` |
+| query_params |  the custom sql string to be executed | `{ age: 20, name: 'John' }` |
+| column_mappings |  A hash that translates aliases to sql expressions | `{ "children_count" => { sql_expression: "count(children.id)", aggregate: true } }`|
+| filters | a list of filters in the form of `{"comparate_alias"=>{"operator_code"=>"value"}}` | `{"age"=>{"lt"=>100}, "children_count"=>{"gt"=>0}}`|
+| sorts | a comma separated string with a list of sort values | `age:desc,name:asc:lowercase`|
+| page | define the page you want returned | 5 |
+| page | define how many results you want per page | 20 |
+| single_record | whether or not you expect the record to return a single result, if toggled, only the first result will be returned |  |
+| associations | a list of activerecord associations you'd like included in the payload |  |
+| as_json_options | a list of as_json options you'd like run before returning the payload |  |
+| as_json_options | whether or not you'd like to run the query on initilization |  |
 
-
-model | <ul><li>- [x] </li></ul> | | the model to run the query against | test
-query | <ul><li>- [x] </li></ul> | | the custom sql string to be executed | `select * from parents`
-query_params | <ul><li>- [x] </li></ul> | | a hash of bind variables to be embedded into the query | `{ age: 20, name: 'John' }`
-
-Markdown | Less | Pretty
---- | --- | ---
-*Still* | `renders` | **nicely**
-1 | 2 | 3
-
-```ruby
-Argument               Required     DefaultValue   Description                                                
-model:                 #required                   # the model to run the query against
-query:                 #required                   # the custom sql to be executed
-query_params:          #optional                   # a list of bind variables to be embedded into the query
-column_mappings:       #optional                   # A hash that translates aliases to sql expressions
-filters:               #optional                   # a list of filters in the form of {"comparate_alias"=>{"operator_code"=>"value"}}.  i.e. {"age"=>{"lt"=>100}, "children_count"=>{"gt"=>0}}
-sorts:                 #optional                   # a comma separated string with a list of sort values i.e "age:desc,name:asc:lowercase"
-page:                  #optional                   # define the page you want returned
-per_page:              #optional                   # define how many results you want per page
-single_record:         #optional    #false         # whether or not you expect the record to return a single result, if toggled, only the first result will be returned
-associations:          #optional                   # a list of activerecord associations you'd like included in the payload
-as_json_options:       #optional                   # a list of as_json options you'd like run before returning the payload
-run:                   #optional    #true          # whether or not you'd like to run the query on initilization
-```
 
 ### Active Record Queries
 
