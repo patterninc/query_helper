@@ -117,17 +117,17 @@ module PatternQueryHelper
     end
 
     def update(
-      where_filters: [],
-      having_filters: [],
-      sorts: [],
+      where_filters: nil,
+      having_filters: nil,
+      sorts: nil,
       page: nil,
       per_page: nil
     )
-      @where_filters = where_filters
-      @having_filters = having_filters
-      @sorts = sorts
-      @page = page
-      @per_page = per_page
+      @where_filters = where_filters if where_filters
+      @having_filters = having_filters if having_filters
+      @sorts = sorts if sorts
+      @page = page if page
+      @per_page = per_page if per_page
     end
   end
 end

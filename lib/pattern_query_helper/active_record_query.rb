@@ -1,5 +1,5 @@
 module PatternQueryHelper
-  class ActiveRecord < Sql
+  class ActiveRecordQuery < Sql
 
     def initialize(
       active_record_call:, # the active_record_query to be executed

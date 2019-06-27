@@ -58,29 +58,26 @@ module PatternQueryHelper
 
     def execute_query
       # Execute Sql Query
-      @results = @model.find_by_sql([@query_string.build(), @query_params])
+      @results = @model.find_by_sql([@query_string.build(), @query_params]) # Execute Sql Query
+      @results = @results.first if @single_record # Return a single result if requested
 
-      # Determine total result count
-      @count = @page && @per_page && results.length > 0? results.first["_query_full_count"] : results.length
-
-      # Return a single result if requested
-      @results = @results.first if @single_record
-
+      determine_count()
       load_associations()
       clean_results()
     end
 
-    def load_associations
-      @results = PatternQueryHelper::Associations.load_associations(
-        payload: @results,
-        associations: @associations,
-        as_json_options: @as_json_options
-      )
+    def payload
+      if @page && @per_page
+        {
+          pagination: pagination_results(),
+          data: @results
+        }
+      else
+        { data: @results }
+      end
     end
 
-    def clean_results
-      @results.map!{ |r| r.except("_query_full_count") } if @page && @per_page
-    end
+    private
 
     def pagination_results
       total_pages = (@count/(@per_page.nonzero? || 1).to_f).ceil
@@ -103,15 +100,21 @@ module PatternQueryHelper
       }
     end
 
-    def payload
-      if @page && @per_page
-        {
-          pagination: pagination_results(),
-          data: @results
-        }
-      else
-        { data: @results }
-      end
+    def clean_results
+      @results.map!{ |r| r.except("_query_full_count") } if @page && @per_page
+    end
+
+    def load_associations
+      @results = PatternQueryHelper::Associations.load_associations(
+        payload: @results,
+        associations: @associations,
+        as_json_options: @as_json_options
+      )
+    end
+
+    def determine_count
+      # Determine total result count (unpaginated)
+      @count = @page && @per_page && results.length > 0 ? results.first["_query_full_count"] : results.length
     end
   end
 end
