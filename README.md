@@ -47,21 +47,130 @@ PatternQueryHelper::Sql.new(
 
 The following arguments are accepted when creating a new objects
 
-| Argument | Description | Example Value |
-| --- | --- | --- |
-| model |  the model to run the query against |
-| query |  the custom sql string to be executed | `select * from parents` |
-| query_params |  the custom sql string to be executed | `{ age: 20, name: 'John' }` |
-| column_mappings |  A hash that translates aliases to sql expressions | `{ "children_count" => { sql_expression: "count(children.id)", aggregate: true } }`|
-| filters | a list of filters in the form of `{"comparate_alias"=>{"operator_code"=>"value"}}` | `{"age"=>{"lt"=>100}, "children_count"=>{"gt"=>0}}`|
-| sorts | a comma separated string with a list of sort values | `age:desc,name:asc:lowercase`|
-| page | define the page you want returned | 5 |
-| page | define how many results you want per page | 20 |
-| single_record | whether or not you expect the record to return a single result, if toggled, only the first result will be returned |  |
-| associations | a list of activerecord associations you'd like included in the payload |  |
-| as_json_options | a list of as_json options you'd like run before returning the payload |  |
-| as_json_options | whether or not you'd like to run the query on initilization |  |
+<table>
+  <tr>
+    <th>Argument</th>
+    <th>Description</th>
+    <th>Example</th>
+  </tr>
+  <tr>
+    <td>model</td>
+    <td>the model to run the query against</td>
+    <td>
+      ```ruby
+        Parent
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>query</td>
+    <td>the custom sql string to be executed</td>
+    <td>
+      ```ruby
+        'select * from parents'
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>query_params</td>
+    <td>a hash of bind variables to be embedded into the sql query</td>
+    <td>
+      ```ruby
+        {
+          age: 20,
+          name: 'John'
+        }
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>column_mappings</td>
+    <td>A hash that translates aliases to sql expressions</td>
+    <td>
+      ```ruby
+        {
+          "age" => "parents.age"
+          "children_count" => { sql_expression: "count(children.id)", aggregate: true }
+        }
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>filters</td>
+    <td>a list of filters in the form of `{"comparate_alias"=>{"operator_code"=>"value"}}`</td>
+    <td>
+      ```ruby
+        {
+          "age" => { "lt" => 100 },
+          "children_count" => { "gt" => 0 }
+        }
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>sorts</td>
+    <td>a comma separated string with a list of sort values</td>
+    <td>
+      ```ruby
+        "age:desc,name:asc:lowercase"
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>page</td>
+    <td>the page you want returned</td>
+    <td>
+      ```ruby
+        5
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>per_page</td>
+    <td>the number of results per page</td>
+    <td>
+      ```ruby
+        20
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>single_record</td>
+    <td>whether or not you expect the record to return a single result, if toggled, only the first result will be returned</td>
+    <td>
+      ```ruby
+        false
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>associations</td>
+    <td>a list of activerecord associations you'd like included in the payload </td>
+    <td>
+      ```ruby
 
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>as_json_options</td>
+    <td>a list of as_json options you'd like run before returning the payload</td>
+    <td>
+      ```ruby
+
+      ```
+    </td>
+  </tr>
+  <tr>
+    <td>run</td>
+    <td>whether or not you'd like to run the query on initilization</td>
+    <td>
+      ```ruby
+        false
+      ```
+    </td>
+  </tr>
+</table>
 
 ### Active Record Queries
 
