@@ -34,10 +34,10 @@ PatternQueryHelper::Sql.new()
 
 The following arguments are accepted when creating a new objects
 
-| Argument | Required | Default Value | Description | Example Value |
+| Argument | Description | Example Value | Required | Default Value |
 | --- | --- | --- | --- | --- |
-| model | <ul><li>- [x] </li></ul> | n/a | the model to run the query against |   |
-| query | <ul><li>- [x] </li></ul> | the custom sql string to be executed | `select * from parents` |
+| model |  the model to run the query against |   | <ul><li>- [x] </li></ul> |  |
+| query |  the custom sql string to be executed | `select * from parents` | <ul><li>- [x] </li></ul> |  |
 
 
 model | <ul><li>- [x] </li></ul> | | the model to run the query against | test
