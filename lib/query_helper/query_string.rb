@@ -1,4 +1,4 @@
-module PatternQueryHelper
+module QueryHelper
   class QueryString
 
     attr_accessor :query_string, :where_filters, :having_filters, :sorts, :page, :per_page, :alias_map

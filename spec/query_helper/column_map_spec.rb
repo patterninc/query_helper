@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PatternQueryHelper::ColumnMap do
+RSpec.describe QueryHelper::ColumnMap do
   let(:valid_operator_codes) {["gte", "lte", "gt", "lt", "eql", "noteql", "in", "notin", "null"]}
 
   describe ".create_from_hash" do

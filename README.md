@@ -1,6 +1,6 @@
-# PatternQueryHelper
-[![TravisCI](https://travis-ci.org/iserve-products/pattern_query_helper.svg?branch=master)](https://travis-ci.org/iserve-products/pattern_query_helper)
-[![Gem Version](https://badge.fury.io/rb/pattern_query_helper.svg)](https://badge.fury.io/rb/pattern_query_helper)
+# QueryHelper
+[![TravisCI](https://travis-ci.org/iserve-products/query_helper.svg?branch=master)](https://travis-ci.org/iserve-products/query_helper)
+[![Gem Version](https://badge.fury.io/rb/query_helper.svg)](https://badge.fury.io/rb/query_helper)
 
 Ruby Gem developed and used at Pattern to paginate, sort, filter, and include associations on sql and active record queries.
 
@@ -9,7 +9,7 @@ Ruby Gem developed and used at Pattern to paginate, sort, filter, and include as
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'pattern_query_helper'
+gem 'query_helper'
 ```
 
 And then execute:
@@ -18,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install pattern_query_helper
+    $ gem install query_helper
 
 ## Use
 
@@ -29,7 +29,7 @@ Or install it yourself as:
 To create a new sql query object run
 
 ```ruby
-PatternQueryHelper::Sql.new(
+QueryHelper::Sql.new(
   model:,             # required
   query:,             # required
   query_params: ,     # optional
@@ -179,7 +179,7 @@ false
 
 To run an active record query execute
 ```ruby
-PatternQueryHelper.run_active_record_query(active_record_call, query_helpers, valid_columns, single_record)
+QueryHelper.run_active_record_query(active_record_call, query_helpers, valid_columns, single_record)
 ```
 active_record_call: Valid active record syntax (i.e. ```Object.where(state: 'Active')```)
 query_helpers: See docs below
@@ -291,7 +291,7 @@ query_helpers = {
 
 ## Payload Formats
 
-The PatternQueryHelper gem will return results in one of three formats
+The QueryHelper gem will return results in one of three formats
 
 ### Paginated List Payload
 ```json
@@ -370,7 +370,7 @@ The PatternQueryHelper gem will return results in one of three formats
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/pattern_query_helper. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/query_helper. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
@@ -378,4 +378,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the PatternQueryHelper project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/pattern_query_helper/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the QueryHelper project’s codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/query_helper/blob/master/CODE_OF_CONDUCT.md).

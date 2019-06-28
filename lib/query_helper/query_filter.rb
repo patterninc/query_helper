@@ -1,4 +1,4 @@
-module PatternQueryHelper
+module QueryHelper
   class QueryFilter
 
     attr_accessor :filters, :where_filter_strings, :having_filter_strings, :bind_variables
@@ -30,7 +30,7 @@ module PatternQueryHelper
         criterion = criteria.values.first
 
         # create the filter
-        filters << PatternQueryHelper::Filter.new(
+        filters << QueryHelper::Filter.new(
           operator_code: operator_code,
           criterion: criterion,
           comparate: comparate,

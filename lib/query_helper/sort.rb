@@ -1,4 +1,4 @@
-module PatternQueryHelper
+module QueryHelper
   class Sort
 
     attr_accessor :sort_strings
@@ -24,7 +24,7 @@ module PatternQueryHelper
         end
 
         if direction == "desc"
-          case PatternQueryHelper.active_record_adapter
+          case QueryHelper.active_record_adapter
           when "sqlite3" # sqlite3 is used in the test suite
             direction = "desc"
           else

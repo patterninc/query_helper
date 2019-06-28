@@ -1,4 +1,4 @@
-module PatternQueryHelper
+module QueryHelper
   class ActiveRecordQuery < Sql
 
     def initialize(

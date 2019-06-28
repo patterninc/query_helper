@@ -1,19 +1,19 @@
 require "spec_helper"
 
-RSpec.describe PatternQueryHelper::Associations do
+RSpec.describe QueryHelper::Associations do
 
   describe "process_association_params" do
     it "parses association params" do
-      associations = PatternQueryHelper::Associations.process_association_params("parent")
+      associations = QueryHelper::Associations.process_association_params("parent")
       expect(associations).to eq([:parent])
     end
   end
 
   describe "load_associations" do
     it "loads associations" do
-      associations = PatternQueryHelper::Associations.process_association_params("parent")
+      associations = QueryHelper::Associations.process_association_params("parent")
       payload = Child.all
-      results = PatternQueryHelper::Associations.load_associations(payload: payload, associations: associations)
+      results = QueryHelper::Associations.load_associations(payload: payload, associations: associations)
       results.each do |child|
         expect(child["parent_id"]).to eq(child["parent"]["id"])
       end

@@ -1,4 +1,4 @@
-module PatternQueryHelper
+module QueryHelper
   class Filter
 
     attr_accessor :operator, :criterion, :comparate, :operator_code, :aggregate, :bind_variable

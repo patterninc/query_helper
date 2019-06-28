@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PatternQueryHelper::QueryString do
+RSpec.describe QueryHelper::QueryString do
   let(:complex_query) do
     query = %{
       with cte as (

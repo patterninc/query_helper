@@ -1,15 +1,14 @@
-module PatternQueryHelper
+module QueryHelper
   class Sql
 
     attr_accessor :model, :query_string, :query_params, :query_filter, :results
 
     def initialize(
       model:, # the model to run the query against
-      query:, # the custom sql to be executed
+      query_string:, # a query string object
       query_params: {}, # a list of bind variables to be embedded into the query
-      column_mappings: {}, # A hash that translates aliases to sql expressions
-      filters: {}, # a list of filters in the form of {"comparate_alias"=>{"operator_code"=>"value"}}.  i.e. {"age"=>{"lt"=>100}, "children_count"=>{"gt"=>0}}
-      sorts: "", # a comma separated string with a list of sort values i.e "age:desc,name:asc:lowercase"
+      query_filter: nil, # a QueryFilter object
+      sort: nil, # a Sort object
       page: nil, # define the page you want returned
       per_page: nil, # define how many results you want per page
       single_record: false, # whether or not you expect the record to return a single result, if toggled, only the first result will be returned
@@ -19,21 +18,21 @@ module PatternQueryHelper
     )
       @model = model
       @query_params = query_params
+      @query_filter = query_filter
+      @sort = sort
       @page = page.to_i if page
       @per_page = per_page.to_i if per_page
       @single_record = single_record
+      @associations = associations
       @as_json_options = as_json_options
 
-      # Create our column maps.
-      @column_maps = PatternQueryHelper::ColumnMap.create_column_mappings(custom_mappings: column_mappings, query: query)
-
       # Create the filter and sort objects
-      @query_filter = PatternQueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
-      @sorts = PatternQueryHelper::Sort.new(sort_string: sorts, column_maps: @column_maps)
-      @associations = PatternQueryHelper::Associations.process_association_params(associations)
+      @query_filter = QueryHelper::QueryFilter.new(filter_values: filters, column_maps: @column_maps)
+      @sorts = QueryHelper::Sort.new(sort_string: sorts, column_maps: @column_maps)
+      @associations = QueryHelper::Associations.process_association_params(associations)
 
       # create the query string object with the filters and sorts
-      @query_string = PatternQueryHelper::QueryString.new(
+      @query_string = QueryHelper::QueryString.new(
         sql: query,
         page: @page,
         per_page: @per_page,
@@ -97,7 +96,7 @@ module PatternQueryHelper
     end
 
     def load_associations
-      @results = PatternQueryHelper::Associations.load_associations(
+      @results = QueryHelper::Associations.load_associations(
         payload: @results,
         associations: @associations,
         as_json_options: @as_json_options

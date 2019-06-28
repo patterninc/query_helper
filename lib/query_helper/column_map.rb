@@ -1,4 +1,4 @@
-module PatternQueryHelper
+module QueryHelper
   class ColumnMap
 
     def self.create_column_mappings(custom_mappings:, query:)
@@ -35,9 +35,9 @@ module PatternQueryHelper
     def self.find_aliases_in_query(query)
       # Determine alias expression combos.  White out sql used in case there
       # are any custom strings or subqueries in the select clause
-      select_index = PatternQueryHelper::QueryString.last_select_index(query)
-      from_index = PatternQueryHelper::QueryString.last_from_index(query)
-      white_out_select = PatternQueryHelper::QueryString.white_out_query(query)[select_index..from_index]
+      select_index = QueryHelper::QueryString.last_select_index(query)
+      from_index = QueryHelper::QueryString.last_from_index(query)
+      white_out_select = QueryHelper::QueryString.white_out_query(query)[select_index..from_index]
       select_clause = query[select_index..from_index]
       comma_split_points = white_out_select.each_char.with_index.map{|char, i| i if char == ','}.compact
       comma_split_points.unshift(-1) # We need the first select clause to start out with a 'split'
@@ -53,7 +53,7 @@ module PatternQueryHelper
         elsif x.squish.split(".")[1]
           select_clause[comma_split_points[i] + 1, x.length]
         end
-        PatternQueryHelper::ColumnMap.new(
+        QueryHelper::ColumnMap.new(
           alias_name: sql_alias,
           sql_expression: sql_expression.squish,
           aggregate: /(array_agg|avg|bit_and|bit_or|bool_and|bool_or|count|every|json_agg|jsonb_agg|json_object_agg|jsonb_object_agg|max|min|string_agg|sum|xmlagg)\((.*)\)/.match?(sql_expression)

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PatternQueryHelper::Sql do
+RSpec.describe QueryHelper::Sql do
   let(:query) do
     %{
       select parents.id, parents.name, parents.age, count(children.id) as children_count

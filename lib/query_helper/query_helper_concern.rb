@@ -1,6 +1,6 @@
 require 'active_support/concern'
 
-module PatternQueryHelper
+module QueryHelper
   module QueryHelperConcern
     extend ActiveSupport::Concern
 

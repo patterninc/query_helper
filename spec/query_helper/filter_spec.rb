@@ -1,6 +1,6 @@
 require "spec_helper"
 
-RSpec.describe PatternQueryHelper::Filter do
+RSpec.describe QueryHelper::Filter do
   let(:valid_operator_codes) {["gte", "lte", "gt", "lt", "eql", "noteql", "in", "notin", "null"]}
 
   describe ".sql_string" do

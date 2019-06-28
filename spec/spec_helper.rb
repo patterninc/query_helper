@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "pattern_query_helper"
+require "query_helper"
 require 'sqlite3'
 require 'active_record'
 require 'faker'
@@ -36,11 +36,11 @@ RSpec.configure do |config|
     }
   end
 
-  PatternQueryHelper.active_record_adapter = "sqlite3"
+  QueryHelper.active_record_adapter = "sqlite3"
 
   # Set up a database that resides in RAM
   ActiveRecord::Base.establish_connection(
-    adapter: PatternQueryHelper.active_record_adapter,
+    adapter: QueryHelper.active_record_adapter,
     database: ':memory:'
   )
 
