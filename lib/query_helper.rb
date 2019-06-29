@@ -10,6 +10,8 @@ require "query_helper/query_filter"
 require "query_helper/sort"
 require "query_helper/associations"
 require "query_helper/query_helper_concern"
+require "query_helper/sql_parser"
+require "query_helper/sql_manipulator"
 
 module QueryHelper
 
