@@ -1,5 +1,5 @@
 module QueryHelper
-  class Sort
+  class SqlSort
 
     attr_accessor :sort_strings
 

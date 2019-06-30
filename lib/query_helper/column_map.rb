@@ -1,3 +1,5 @@
+require "query_helper/sql_parser"
+
 module QueryHelper
   class ColumnMap
 

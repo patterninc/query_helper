@@ -1,10 +1,18 @@
 require 'active_support/concern'
+require "query_helper/sql_filter"
 
 module QueryHelper
   module QueryHelperConcern
     extend ActiveSupport::Concern
 
     included do
+      def sql_filter
+        SqlFilter.new(filter_values: filters, column_maps: @column_maps)
+      end
+
+      def sql_sort
+
+      end
       def query_helper_params
         helpers = {}
         helpers[:filters] = params[:filter] if params[:filter]

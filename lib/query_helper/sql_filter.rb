@@ -1,5 +1,5 @@
 module QueryHelper
-  class QueryFilter
+  class SqlFilter
 
     attr_accessor :filters, :where_filter_strings, :having_filter_strings, :bind_variables
 

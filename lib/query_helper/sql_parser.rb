@@ -1,3 +1,5 @@
+require "query_helper/column_map"
+
 module QueryHelper
   class SqlParser
 
@@ -146,6 +148,34 @@ module QueryHelper
 
     def limit_clause
       @sql[limit_index()..insert_limit_index()] if limit_included?
+    end
+
+    def find_aliases
+      # Determine alias expression combos.  White out sql used in case there
+      # are any custom strings or subqueries in the select clause
+      white_out_selects = @white_out_sql[select_index(:end)..from_index()]
+      selects = @sql[select_index(:end)..from_index()]
+      comma_split_points = white_out_selects.each_char.with_index.map{|char, i| i if char == ','}.compact
+      comma_split_points.unshift(-1) # We need the first select clause to start out with a 'split'
+      column_maps = white_out_selects.split(",").each_with_index.map do |x,i|
+        sql_alias = x.squish.split(" as ")[1] || x.squish.split(" AS ")[1] || x.squish.split(".")[1] # look for custom defined aliases or table.column notation
+        sql_alias = nil unless /^[a-zA-Z_]+$/.match?(sql_alias) # only allow aliases with letters and underscores
+        sql_expression = if x.split(" as ")[1]
+          expression_length = x.split(" as ")[0].length
+          selects[comma_split_points[i] + 1, expression_length]
+        elsif x.squish.split(" AS ")[1]
+          expression_length = x.split(" AS ")[0].length
+          selects[comma_split_points[i] + 1, expression_length]
+        elsif x.squish.split(".")[1]
+          selects[comma_split_points[i] + 1, x.length]
+        end
+        ColumnMap.new(
+          alias_name: sql_alias,
+          sql_expression: sql_expression.squish,
+          aggregate: /(array_agg|avg|bit_and|bit_or|bool_and|bool_or|count|every|json_agg|jsonb_agg|json_object_agg|jsonb_object_agg|max|min|string_agg|sum|xmlagg)\((.*)\)/.match?(sql_expression)
+        ) if sql_alias
+      end
+      column_maps.compact
     end
 
     private

@@ -18,7 +18,6 @@ module QueryHelper
       @having_clauses = having_clauses
       @order_by_clauses = order_by_clauses
       @include_limit_clause = include_limit_clause
-      build()
     end
 
     def build
