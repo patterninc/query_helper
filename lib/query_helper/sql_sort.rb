@@ -20,7 +20,7 @@ module QueryHelper
         begin
           sql_expression = @column_maps.find{ |m| m.alias_name == sort_alias }.sql_expression
         rescue NoMethodError => e
-          raise ArgumentError.new("Sorting not allowed on column '#{sort_alias}'")
+          raise InvalidQueryError.new("Sorting not allowed on column '#{sort_alias}'")
         end
 
         if direction == "desc"

@@ -46,7 +46,7 @@ RSpec.describe QueryHelper::Filter do
             criterion: Faker::Number.between(0, 100),
             comparate: "children.age"
           )
-        }.to raise_error(ArgumentError)
+        }.to raise_error(InvalidQueryError)
       end
     end
   end
@@ -60,7 +60,7 @@ RSpec.describe QueryHelper::Filter do
 
     RSpec.shared_examples "invalidates criterion" do
       it "validates criterion" do
-        expect{filter.send(:validate_criterion)}.to raise_error(ArgumentError)
+        expect{filter.send(:validate_criterion)}.to raise_error(InvalidQueryError)
       end
     end
 

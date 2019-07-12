@@ -62,7 +62,7 @@ module QueryHelper
             "is not null"
           end
         else
-          raise ArgumentError.new("Invalid operator code: '#{operator_code}'")
+          raise InvalidQueryError.new("Invalid operator code: '#{operator_code}'")
       end
     end
 
@@ -104,7 +104,7 @@ module QueryHelper
     end
 
     def invalid_criterion_error
-      raise ArgumentError.new("'#{criterion}' is not a valid criterion for the '#{operator}' operator")
+      raise InvalidQueryError.new("'#{criterion}' is not a valid criterion for the '#{operator}' operator")
     end
   end
 end

@@ -108,17 +108,17 @@ module QueryHelper
     end
 
     def insert_having_index
-      # raise ArgumentError.new("Cannot calculate insert_having_index because the query has no group by clause") unless group_by_included?
+      # raise InvalidQueryError.new("Cannot calculate insert_having_index because the query has no group by clause") unless group_by_included?
       order_by_index() || limit_index() || @sql.length
     end
 
     def insert_order_by_index
-      # ArgumentError.new("This query already includes an order by clause") if order_by_included?
+      # raise InvalidQueryError.new("This query already includes an order by clause") if order_by_included?
       limit_index() || @sql.length
     end
 
     def insert_limit_index
-      # ArgumentError.new("This query already includes a limit clause") if limit_included?
+      # raise InvalidQueryError.new("This query already includes a limit clause") if limit_included?
       @sql.length
     end
 
