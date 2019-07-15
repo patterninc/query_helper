@@ -6,20 +6,29 @@ module QueryHelper
     extend ActiveSupport::Concern
 
     included do
-      def sql_filter
-        SqlFilter.new(filter_values: filters, column_maps: @column_maps)
+      def query_helper
+        @query_helper = QueryHelper.new(**query_helper_params)
       end
 
-      def sql_sort
+      def create_query_helper_filter
 
       end
+
+      def create_query_helper_sort
+
+      end
+
+      def create_query_helper_associations
+
+      end
+
       def query_helper_params
         helpers = {}
-        helpers[:filters] = params[:filter] if params[:filter]
-        helpers[:sorts] = params[:sort] if params[:sort]
         helpers[:page] = params[:page] if params[:page]
         helpers[:per_page] = params[:per_page] if params[:per_page]
-        helpers[:associations] = params[:include] if params[:include]
+        helpers[:filters] = create_query_helper_filter() if params[:filter]
+        helpers[:sorts] = create_query_helper_sort() if params[:sort]
+        helpers[:associations] = create_query_helper_associations() if params[:include]
         helpers
       end
     end

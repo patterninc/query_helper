@@ -1,18 +1,16 @@
 module QueryHelper
   class Filter
 
-    attr_accessor :operator, :criterion, :comparate, :operator_code, :aggregate, :bind_variable
+    attr_accessor :operator, :criterion, :comparate, :operator_code, :bind_variable
 
     def initialize(
       operator_code:,
       criterion:,
-      comparate:,
-      aggregate: false
+      comparate:
     )
       @operator_code = operator_code
       @criterion = criterion # Converts to a string to be inserted into sql.
       @comparate = comparate
-      @aggregate = aggregate
       @bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
 
       translate_operator_code()

@@ -1,3 +1,8 @@
+require "spec_helper"
+
 RSpec.describe QueryHelper do
-  it "pending tests"
+
+  it "text" do
+    byebug
+  end
 end

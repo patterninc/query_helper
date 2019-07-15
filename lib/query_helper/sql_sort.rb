@@ -1,16 +1,15 @@
 module QueryHelper
   class SqlSort
 
-    attr_accessor :sort_strings
+    attr_accessor :column_maps
 
     def initialize(sort_string:, column_maps:)
       @sort_string = sort_string
       @column_maps = column_maps
-      @sort_strings = []
-      parse_sort_string()
     end
 
     def parse_sort_string
+      sql_strings = []
       sorts = @sort_string.split(",")
       sorts.each_with_index do |sort, index|
         sort_alias = sort.split(":")[0]
@@ -39,8 +38,10 @@ module QueryHelper
           sql_expression = "lower(#{sql_expression})"
         end
 
-        @sort_strings << "#{sql_expression} #{direction}"
+        sql_strings << "#{sql_expression} #{direction}"
       end
+
+      return sql_strings
     end
   end
 end
