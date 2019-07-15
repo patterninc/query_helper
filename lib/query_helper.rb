@@ -7,29 +7,31 @@ require "query_helper/associations"
 require "query_helper/query_helper_concern"
 require "query_helper/sql_parser"
 require "query_helper/sql_manipulator"
+require "query_helper/sql_filter"
+require "query_helper/sql_sort"
 
-module QueryHelper
+class QueryHelper
 
-  class InvalidQueryError < StandardError; end
+  # class InvalidQueryError < StandardError; end
 
-  class << self
+  # class << self
     attr_accessor :active_record_adapter, :model, :query, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options
 
     def initialize(
-      model:, # the model to run the query against
-      query:, # a sql string or an active record query
+      model: nil, # the model to run the query against
+      query: nil, # a sql string or an active record query
       bind_variables: {}, # a list of bind variables to be embedded into the query
-      sql_filter: nil, # a SqlFilter object
-      sql_sort: nil, # a SqlSort object
+      sql_filter: SqlFilter.new(), # a SqlFilter object
+      sql_sort: SqlSort.new(), # a SqlSort object
       page: nil, # define the page you want returned
       per_page: nil, # define how many results you want per page
       single_record: false, # whether or not you expect the record to return a single result, if toggled, only the first result will be returned
       associations: nil, # a list of activerecord associations you'd like included in the payload
       as_json_options: nil, # a list of as_json options you'd like run before returning the payload
-      custom_mappings: nil # custom keyword => sql_expression mappings
+      custom_mappings: {} # custom keyword => sql_expression mappings
     )
       @model = model
-      @query = sql
+      @query = query
       @bind_variables = bind_variables
       @sql_filter = sql_filter
       @sql_sort = sql_sort
@@ -40,15 +42,18 @@ module QueryHelper
       @as_json_options = as_json_options
       @custom_mappings = custom_mappings
 
-      # Determine limit and offset
-      limit = @per_page
-      offset = (@page - 1) * @per_page
+      if @page && @per_page
+        # Determine limit and offset
+        limit = @per_page
+        offset = (@page - 1) * @per_page
 
-      # Merge limit/offset variables into bind_variables
-      @bind_variables.merge!({limit: limit, offset: offset})
+        # Merge limit/offset variables into bind_variables
+        @bind_variables.merge!({limit: limit, offset: offset})
+      end
     end
 
     def execute_query
+      puts caller[0][/`.*'/][1..-2]
 
       # Correctly set the query and model based on query type
       determine_query_type()
@@ -101,8 +106,8 @@ module QueryHelper
           raise InvalidQueryError.new("a valid model must be included to run a custom SQL query") unless @model < ActiveRecord::Base
         # If an active record query is passed in, find the model and sql from the query
         elsif @query.class < ActiveRecord::Relation
-          @model = query.model
-          @query = query.to_sql
+          @model = @query.model
+          @query = @query.to_sql
         else
           raise InvalidQueryError.new("unable to determine query type")
         end
@@ -110,7 +115,7 @@ module QueryHelper
 
       def determine_count
         # Determine total result count (unpaginated)
-        @count = @page && @per_page && results.length > 0 ? results.first["_query_full_count"] : results.length
+        @count = @page && @per_page && @results.length > 0 ? @results.first["_query_full_count"] : @results.length
       end
 
       def load_associations
@@ -155,5 +160,5 @@ module QueryHelper
         )
       end
 
-  end
+  # end
 end

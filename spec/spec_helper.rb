@@ -4,6 +4,7 @@ require 'sqlite3'
 require 'active_record'
 require 'faker'
 require 'byebug'
+require 'fixtures/models'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
@@ -36,11 +37,11 @@ RSpec.configure do |config|
     }
   end
 
-  QueryHelper.active_record_adapter = "sqlite3"
+  # QueryHelper.active_record_adapter = "sqlite3"
 
   # Set up a database that resides in RAM
   ActiveRecord::Base.establish_connection(
-    adapter: QueryHelper.active_record_adapter,
+    adapter: "sqlite3",
     database: ':memory:'
   )
 
@@ -57,26 +58,11 @@ RSpec.configure do |config|
     end
   end
 
-  # Set up model classes
-  # class ApplicationRecord < ActiveRecord::Base
-  #   self.abstract_class = true
-  # end
-  # class Parent < ApplicationRecord
-  #   has_many :children
-  #
-  #   def favorite_star_wars_character
-  #     Faker::Movies::StarWars.character
-  #   end
-  # end
-  # class Child < ApplicationRecord
-  #   belongs_to :parent
-  # end
-
   # Load data into databases
-  # (0..99).each do
-  #   parent = Parent.create(name: Faker::Name.name, age: Faker::Number.between(25, 55))
-  #   (0..Faker::Number.between(1, 5)).each do
-  #     Child.create(name: Faker::Name.name, parent: parent, age: Faker::Number.between(1, 25))
-  #   end
-  # end
+  (0..99).each do
+    parent = Parent.create(name: Faker::Name.name, age: Faker::Number.between(25, 55))
+    (0..Faker::Number.between(1, 5)).each do
+      Child.create(name: Faker::Name.name, parent: parent, age: Faker::Number.between(1, 25))
+    end
+  end
 end

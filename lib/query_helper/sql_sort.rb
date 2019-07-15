@@ -1,9 +1,9 @@
-module QueryHelper
+class QueryHelper
   class SqlSort
 
     attr_accessor :column_maps
 
-    def initialize(sort_string:, column_maps:)
+    def initialize(sort_string: "", column_maps: [])
       @sort_string = sort_string
       @column_maps = column_maps
     end

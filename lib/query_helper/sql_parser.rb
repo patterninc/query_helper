@@ -1,6 +1,6 @@
 require "query_helper/column_map"
 
-module QueryHelper
+class QueryHelper
   class SqlParser
 
     attr_accessor :sql

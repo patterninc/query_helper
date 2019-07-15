@@ -1,4 +1,4 @@
-module QueryHelper
+class QueryHelper
   class Associations
     def self.process_association_params(associations)
       associations ||= []

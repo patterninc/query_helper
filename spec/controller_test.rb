@@ -1,16 +1,14 @@
 require 'fixtures/application'
 require 'fixtures/controllers'
-# require 'fixtures/routes'
+require 'fixtures/models'
 require 'rspec/rails'
 
  RSpec.describe ParentsController, type: :controller do
   describe '#index' do
     it "text" do
-      get :index
+      get :index, params: {hello: "world"}
       byebug
-      # ...
     end
-
   end
 end
 

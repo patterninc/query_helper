@@ -1,4 +1,4 @@
-module QueryHelper
+class QueryHelper
   class Filter
 
     attr_accessor :operator, :criterion, :comparate, :operator_code, :bind_variable

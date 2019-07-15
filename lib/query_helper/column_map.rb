@@ -1,6 +1,6 @@
 require "query_helper/sql_parser"
 
-module QueryHelper
+class QueryHelper
   class ColumnMap
 
     def self.create_column_mappings(custom_mappings:, query:)

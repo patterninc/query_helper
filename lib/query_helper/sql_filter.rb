@@ -1,9 +1,9 @@
-module QueryHelper
+class QueryHelper
   class SqlFilter
 
     attr_accessor :filter_values, :column_maps
 
-    def initialize(filter_values:, column_maps:)
+    def initialize(filter_values: [], column_maps: nil)
       @column_maps = column_maps
       @filter_values = filter_values
     end

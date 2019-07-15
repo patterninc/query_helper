@@ -1,12 +1,16 @@
 require 'active_support/concern'
 require "query_helper/sql_filter"
 
-module QueryHelper
+class QueryHelper
   module QueryHelperConcern
     extend ActiveSupport::Concern
 
     included do
       def query_helper
+        @query_helper
+      end
+
+      def create_query_helper
         @query_helper = QueryHelper.new(**query_helper_params)
       end
 
