@@ -3,12 +3,18 @@ require "query_helper/sql_parser"
 class QueryHelper
   class ColumnMap
 
-    def self.create_column_mappings(custom_mappings:, query:)
+    def self.create_column_mappings(custom_mappings:, query:, model:)
       parser = SqlParser.new(query)
       maps = create_from_hash(custom_mappings)
 
       parser.find_aliases.each do |m|
         maps << m if maps.select{|x| x.alias_name == m.alias_name}.empty?
+      end
+
+      model.attribute_names.each do |attribute|
+        if maps.select{|x| x.alias_name == attribute}.empty?
+          maps << ColumnMap.new(alias_name: attribute, sql_expression: "#{model.to_s.downcase.pluralize}.#{attribute}")
+        end
       end
 
       maps

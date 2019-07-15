@@ -1,9 +1,11 @@
+require "query_helper/invalid_query_error"
+
 class QueryHelper
   class SqlFilter
 
     attr_accessor :filter_values, :column_maps
 
-    def initialize(filter_values: [], column_maps: nil)
+    def initialize(filter_values: [], column_maps: [])
       @column_maps = column_maps
       @filter_values = filter_values
     end
@@ -14,13 +16,14 @@ class QueryHelper
       @filter_values.each do |comparate_alias, criteria|
         # Find the sql mapping if it exists
         map = @column_maps.find { |m| m.alias_name == comparate_alias }
-        raise InvalidQueryError("cannot filter by #{comparate_alias}") unless map
+        raise InvalidQueryError.new("cannot filter by #{comparate_alias}") unless map
 
         # create the filter
         @filters << QueryHelper::Filter.new(
           operator_code: criteria.keys.first,
           criterion: criteria.values.first,
-          comparate: map.sql_expression
+          comparate: map.sql_expression,
+          aggregate: map.aggregate
         )
       end
     end

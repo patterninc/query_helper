@@ -21,8 +21,8 @@ class QueryHelper
     end
 
     def build
-      insert_limit_clause()
       insert_order_by_clause()
+      insert_limit_clause()
       insert_having_clauses()
       insert_where_clauses()
       insert_total_count_select_clause()

@@ -10,7 +10,6 @@ end
 class ParentsController < ApplicationController
   def index
     @query_helper.query = Parent.all
-    byebug
     render json: @query_helper.paginated_results()
   end
 

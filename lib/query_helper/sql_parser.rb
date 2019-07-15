@@ -1,3 +1,4 @@
+require "query_helper/invalid_query_error"
 require "query_helper/column_map"
 
 class QueryHelper

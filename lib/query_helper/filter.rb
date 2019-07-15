@@ -1,12 +1,15 @@
+require "query_helper/invalid_query_error"
+
 class QueryHelper
   class Filter
 
-    attr_accessor :operator, :criterion, :comparate, :operator_code, :bind_variable
+    attr_accessor :operator, :criterion, :comparate, :operator_code, :bind_variable, :aggregate
 
     def initialize(
       operator_code:,
       criterion:,
-      comparate:
+      comparate:,
+      aggregate: false
     )
       @operator_code = operator_code
       @criterion = criterion # Converts to a string to be inserted into sql.

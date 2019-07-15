@@ -1,3 +1,5 @@
+require "query_helper/invalid_query_error"
+
 class QueryHelper
   class SqlSort
 
@@ -23,8 +25,8 @@ class QueryHelper
         end
 
         if direction == "desc"
-          case QueryHelper.active_record_adapter
-          when "sqlite3" # sqlite3 is used in the test suite
+          case ActiveRecord::Base.connection.adapter_name
+          when "SQLite" # SQLite is used in the test suite
             direction = "desc"
           else
             direction = "desc nulls last"

@@ -37,8 +37,6 @@ RSpec.configure do |config|
     }
   end
 
-  # QueryHelper.active_record_adapter = "sqlite3"
-
   # Set up a database that resides in RAM
   ActiveRecord::Base.establish_connection(
     adapter: "sqlite3",
