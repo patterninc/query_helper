@@ -1,5 +1,5 @@
-require "bundler/setup"
-require "query_helper"
+require 'bundler/setup'
+require 'query_helper'
 require 'sqlite3'
 require 'active_record'
 require 'faker'
@@ -58,25 +58,25 @@ RSpec.configure do |config|
   end
 
   # Set up model classes
-  class ApplicationRecord < ActiveRecord::Base
-    self.abstract_class = true
-  end
-  class Parent < ApplicationRecord
-    has_many :children
-
-    def favorite_star_wars_character
-      Faker::Movies::StarWars.character
-    end
-  end
-  class Child < ApplicationRecord
-    belongs_to :parent
-  end
+  # class ApplicationRecord < ActiveRecord::Base
+  #   self.abstract_class = true
+  # end
+  # class Parent < ApplicationRecord
+  #   has_many :children
+  #
+  #   def favorite_star_wars_character
+  #     Faker::Movies::StarWars.character
+  #   end
+  # end
+  # class Child < ApplicationRecord
+  #   belongs_to :parent
+  # end
 
   # Load data into databases
-  (0..99).each do
-    parent = Parent.create(name: Faker::Name.name, age: Faker::Number.between(25, 55))
-    (0..Faker::Number.between(1, 5)).each do
-      Child.create(name: Faker::Name.name, parent: parent, age: Faker::Number.between(1, 25))
-    end
-  end
+  # (0..99).each do
+  #   parent = Parent.create(name: Faker::Name.name, age: Faker::Number.between(25, 55))
+  #   (0..Faker::Number.between(1, 5)).each do
+  #     Child.create(name: Faker::Name.name, parent: parent, age: Faker::Number.between(1, 25))
+  #   end
+  # end
 end

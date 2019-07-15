@@ -42,6 +42,9 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "sqlite3", "~> 1.3.6"
   spec.add_development_dependency "faker", "~> 1.9.3"
   spec.add_development_dependency "byebug"
+  spec.add_development_dependency 'rspec-rails'
+  spec.add_development_dependency 'actionpack'
+  spec.add_development_dependency 'activesupport'
 
   spec.add_dependency "activerecord", "~> 5.0"
   spec.add_dependency "activesupport", "~> 5.0"
