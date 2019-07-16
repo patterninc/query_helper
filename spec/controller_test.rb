@@ -59,6 +59,39 @@ require 'rspec/rails'
 
         end
 
+        # q[:expected_filters].each do |filter|
+        #   # filter = {
+        #   #     "id" => {
+        #   #       "gte" => 20,
+        #   #       "lt" => 40
+        #   #     }
+        #   #   },
+        #   filter[:operator_codes].each do |oc|
+        #     filter_value = case filter[:class]
+        #     when Integer
+        #       Faker::Number.between(0,100).to_s
+        #     when String
+        #       case oc
+        #       when "in", "notin"
+        #
+        #       end
+        #     end
+        #     filter = {
+        #       filter[:alias] => {
+        #         oc => filter_value
+        #       }
+        #     }
+        #   end
+        #   url_params = {
+        #     page: Faker::Number.between(5,15).to_s,
+        #     per_page: Faker::Number.between(2,5).to_s,
+        #     sort: "#{sort}:#{sort_direction}",
+        #     test_number: index
+        #   }
+        #
+        #   puts "INDEX: #{index} --- QUERY: #{q[:query].squish} --- filter: #{filter}"
+        # end if q[:expected_filters]
+
       end
     end
   end
