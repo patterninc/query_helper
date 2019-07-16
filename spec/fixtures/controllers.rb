@@ -13,6 +13,12 @@ class ParentsController < ApplicationController
     render json: @query_helper.paginated_results()
   end
 
-  def show
+  def test
+    test_query = ExampleQueries::SQL_QUERIES[params[:test_number].to_i]
+    @query_helper.query = test_query[:query]
+    @query_helper.model = test_query[:model]
+    results = @query_helper.paginated_results()
+    puts "EXECUTED QUERY: #{@query_helper.executed_query()}"
+    render json: @query_helper.paginated_results()
   end
 end

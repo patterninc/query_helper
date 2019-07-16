@@ -160,7 +160,7 @@ class QueryHelper
       comma_split_points.unshift(-1) # We need the first select clause to start out with a 'split'
       column_maps = white_out_selects.split(",").each_with_index.map do |x,i|
         sql_alias = x.squish.split(" as ")[1] || x.squish.split(" AS ")[1] || x.squish.split(".")[1] # look for custom defined aliases or table.column notation
-        sql_alias = nil unless /^[a-zA-Z_]+$/.match?(sql_alias) # only allow aliases with letters and underscores
+        # sql_alias = nil unless /^[a-zA-Z_]+$/.match?(sql_alias) # only allow aliases with letters and underscores
         sql_expression = if x.split(" as ")[1]
           expression_length = x.split(" as ")[0].length
           selects[comma_split_points[i] + 1, expression_length]

@@ -55,13 +55,13 @@ class QueryHelper
 
     def insert_order_by_clause
       return unless @order_by_clauses.length > 0
+      @sql.slice!(@parser.limit_clause) if @parser.limit_included? # remove existing limit clause
       @sql.slice!(@parser.order_by_clause) if @parser.order_by_included? # remove existing order by clause
       @sql.insert(@parser.insert_having_index, " order by #{@order_by_clauses.join(", ")} ")
     end
 
     def insert_limit_clause
       return unless @include_limit_clause
-      @sql.slice!(@parser.limit_clause) if @parser.limit_included? # remove existing limit clause
       @sql.insert(@parser.insert_limit_index, " limit :limit offset :offset ")
     end
   end

@@ -13,7 +13,7 @@ require "query_helper/invalid_query_error"
 
 class QueryHelper
 
-  attr_accessor :model, :query, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options
+  attr_accessor :model, :query, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query
 
   def initialize(
     model: nil, # the model to run the query against
@@ -51,8 +51,6 @@ class QueryHelper
   end
 
   def execute_query
-    puts caller[0][/`.*'/][1..-2]
-
     # Correctly set the query and model based on query type
     determine_query_type()
 
@@ -75,8 +73,8 @@ class QueryHelper
       order_by_clauses: @sql_sort.parse_sort_string,
       include_limit_clause: @page && @per_page ? true : false
     )
-
-    @results = @model.find_by_sql([manipulator.build(), @bind_variables]) # Execute Sql Query
+    @executed_query = manipulator.build()
+    @results = @model.find_by_sql([@executed_query, @bind_variables]) # Execute Sql Query
     @results = @results.first if @single_record # Return a single result if requested
 
     determine_count()

@@ -10,7 +10,11 @@ module Rails
       return @routes if defined?(@routes)
       @routes = ActionDispatch::Routing::RouteSet.new
       @routes.draw do
-        resources :parents
+        resources :parents do
+          collection do
+            get 'test'
+          end
+        end
       end
       @routes
     end
