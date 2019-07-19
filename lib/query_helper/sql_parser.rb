@@ -124,15 +124,15 @@ class QueryHelper
     end
 
     def select_clause
-      @sql[select_index()..insert_select_index()] if select_included?
+      @sql[select_index()..insert_select_index()].strip if select_included?
     end
 
     def from_clause
-      @sql[from_index()..insert_join_index()] if from_included?
+      @sql[from_index()..insert_join_index()].strip if from_included?
     end
 
     def where_clause
-      @sql[where_index()..insert_where_index()] if where_included?
+      @sql[where_index()..insert_where_index()].strip if where_included?
     end
 
     # def group_by_clause
@@ -140,15 +140,15 @@ class QueryHelper
     # end
 
     def having_clause
-      @sql[having_index()..insert_having_index()] if having_included?
+      @sql[having_index()..insert_having_index()].strip if having_included?
     end
 
     def order_by_clause
-      @sql[order_by_index()..insert_order_by_index()] if order_by_included?
+      @sql[order_by_index()..insert_order_by_index()].strip if order_by_included?
     end
 
     def limit_clause
-      @sql[limit_index()..insert_limit_index()] if limit_included?
+      @sql[limit_index()..insert_limit_index()].strip if limit_included?
     end
 
     def find_aliases

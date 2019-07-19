@@ -13,7 +13,7 @@ class QueryHelper
       include_limit_clause: false
     )
       @parser = SqlParser.new(sql)
-      @sql = @parser.sql
+      @sql = @parser.sql.dup
       @where_clauses = where_clauses
       @having_clauses = having_clauses
       @order_by_clauses = order_by_clauses
@@ -21,12 +21,11 @@ class QueryHelper
     end
 
     def build
-      insert_order_by_clause()
-      insert_limit_clause()
       insert_having_clauses()
       insert_where_clauses()
       insert_total_count_select_clause()
-      @sql
+      insert_order_by_and_limit_clause()
+      @sql.squish
     end
 
     private
@@ -53,16 +52,11 @@ class QueryHelper
       @sql.insert(@parser.insert_having_index, " #{begin_string} #{filter_string} ")
     end
 
-    def insert_order_by_clause
-      return unless @order_by_clauses.length > 0
+    def insert_order_by_and_limit_clause
       @sql.slice!(@parser.limit_clause) if @parser.limit_included? # remove existing limit clause
       @sql.slice!(@parser.order_by_clause) if @parser.order_by_included? # remove existing order by clause
-      @sql.insert(@parser.insert_having_index, " order by #{@order_by_clauses.join(", ")} ")
-    end
-
-    def insert_limit_clause
-      return unless @include_limit_clause
-      @sql.insert(@parser.insert_limit_index, " limit :limit offset :offset ")
+      @sql += " order by #{@order_by_clauses.join(", ")} " if @order_by_clauses.length > 0
+      @sql += " limit :limit offset :offset " if @include_limit_clause
     end
   end
 end

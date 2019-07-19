@@ -59,38 +59,45 @@ require 'rspec/rails'
 
         end
 
-        # q[:expected_filters].each do |filter|
-        #   # filter = {
-        #   #     "id" => {
-        #   #       "gte" => 20,
-        #   #       "lt" => 40
-        #   #     }
-        #   #   },
-        #   filter[:operator_codes].each do |oc|
-        #     filter_value = case filter[:class]
-        #     when Integer
-        #       Faker::Number.between(0,100).to_s
-        #     when String
-        #       case oc
-        #       when "in", "notin"
-        #
-        #       end
-        #     end
-        #     filter = {
-        #       filter[:alias] => {
-        #         oc => filter_value
-        #       }
-        #     }
-        #   end
-        #   url_params = {
-        #     page: Faker::Number.between(5,15).to_s,
-        #     per_page: Faker::Number.between(2,5).to_s,
-        #     sort: "#{sort}:#{sort_direction}",
-        #     test_number: index
-        #   }
-        #
-        #   puts "INDEX: #{index} --- QUERY: #{q[:query].squish} --- filter: #{filter}"
-        # end if q[:expected_filters]
+        q[:expected_filters].each do |filter|
+          filter[:operator_codes].each do |oc|
+            filter_value = if filter[:class] == Integer
+              Faker::Number.between(0,100).to_s
+            elsif filter[:class] == String
+              case oc
+              when "in", "notin"
+                "#{q[:model].all.pluck(:name).sample},#{q[:model].all.pluck(:name).sample},#{q[:model].all.pluck(:name).sample}"
+              when "like"
+                q[:model].all.pluck(:name).sample[0..4]
+              end
+            elsif filter[:class] == TrueClass
+              case oc
+              when "null"
+                ['true', 'false'].sample
+              end
+            end
+            filter_url_param = {
+              filter[:alias] => {
+                oc => filter_value
+              }
+            }
+
+            url_params = {
+              page: Faker::Number.between(5,15).to_s,
+              per_page: Faker::Number.between(2,5).to_s,
+              filter: filter_url_param,
+              test_number: index
+            }
+
+            puts "INDEX: #{index} --- QUERY: #{q[:query].squish} --- filter: #{filter_url_param}"
+
+            get :test, params: url_params
+
+            # TODO: Add some sort of expectation
+            # Perhaps expect the result to be filtered (have less values than previously)
+
+          end
+        end if q[:expected_filters]
 
       end
     end

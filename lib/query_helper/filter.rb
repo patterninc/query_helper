@@ -106,7 +106,7 @@ class QueryHelper
     end
 
     def invalid_criterion_error
-      raise InvalidQueryError.new("'#{criterion}' is not a valid criterion for the '#{operator}' operator")
+      raise InvalidQueryError.new("'#{criterion}' is not a valid criterion for the '#{@operator}' operator")
     end
   end
 end
