@@ -13,7 +13,7 @@ require "query_helper/invalid_query_error"
 
 class QueryHelper
 
-  attr_accessor :model, :query, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query
+  attr_accessor :model, :query, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload
 
   def initialize(
     model: nil, # the model to run the query against
@@ -26,7 +26,8 @@ class QueryHelper
     single_record: false, # whether or not you expect the record to return a single result, if toggled, only the first result will be returned
     associations: nil, # a list of activerecord associations you'd like included in the payload
     as_json_options: nil, # a list of as_json options you'd like run before returning the payload
-    custom_mappings: {} # custom keyword => sql_expression mappings
+    custom_mappings: {}, # custom keyword => sql_expression mappings
+    api_payload: false # Return the paginated payload or simply return the result array
   )
     @model = model
     @query = query
@@ -39,6 +40,7 @@ class QueryHelper
     @associations = associations
     @as_json_options = as_json_options
     @custom_mappings = custom_mappings
+    @api_payload = api_payload
 
     if @page && @per_page
       # Determine limit and offset
@@ -48,6 +50,12 @@ class QueryHelper
       # Merge limit/offset variables into bind_variables
       @bind_variables.merge!({limit: limit, offset: offset})
     end
+  end
+
+  def update_query(query: nil, model:nil, bind_variables: {})
+    @model = model if model
+    @query = query if query
+    @bind_variables.merge!(bind_variables)
   end
 
   def execute_query
@@ -60,7 +68,7 @@ class QueryHelper
     @sql_sort.column_maps = column_maps
 
     # create the filters from the column maps
-    @sql_filter.create_filters
+    @sql_filter.create_filters()
 
     # merge the filter bind variables into the query bind variables
     @bind_variables.merge!(@sql_filter.bind_variables)
@@ -82,19 +90,20 @@ class QueryHelper
     clean_results()
   end
 
-  def results
+  def results()
     execute_query()
-    @results
+    return paginated_results() if @api_payload
+    return @results
   end
 
-  def paginated_results
-    execute_query()
-    { pagination: pagination_results(),
-      data: @results }
-  end
 
 
   private
+
+    def paginated_results
+      { pagination: pagination_results(),
+        data: @results }
+    end
 
     def determine_query_type
       # If a custom sql string is passed in, make sure a valid model is passed in as well
