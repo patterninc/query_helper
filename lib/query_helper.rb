@@ -58,6 +58,10 @@ class QueryHelper
     @bind_variables.merge!(bind_variables)
   end
 
+  def add_filter(operator_code:, criterion:, comparate:)
+    @sql_filter.filter_values["comparate"] = { operator_code => criterion }
+  end
+
   def execute_query
     # Correctly set the query and model based on query type
     determine_query_type()
