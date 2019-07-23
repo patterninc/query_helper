@@ -1,3 +1,3 @@
 class QueryHelper
-  VERSION = "0.2.10"
+  VERSION = "0.0.0"
 end

@@ -25,8 +25,8 @@ module ExampleQueries
         },
         {
           alias: "name",
-          operator_codes: ["in, not_in"],
-          class: Array
+          operator_codes: ["in", "notin"],
+          class: String
         },
         {
           alias: "age",
@@ -39,20 +39,15 @@ module ExampleQueries
       query: %(
         select p.name, p.age, count(c.id) as children_count
         from parents p join children c on c.parent_id = p.id
-        where p.age > 35
+        where p.age > 30
         group by p.name
         having count(c.id) > 3
         order by p.name
         limit 1
       ),
-      model: Child,
+      model: Parent,
       expected_sorts: ["name", "age", "children_count"],
       expected_filters: [
-        {
-          alias: "id",
-          operator_codes: ["gte", "gt", "lte", "lt", "eql", "noteql"],
-          class: Integer
-        },
         {
           alias: "age",
           operator_codes: ["gte", "gt", "lte", "lt", "eql", "noteql"],
@@ -65,8 +60,8 @@ module ExampleQueries
         },
         {
           alias: "name",
-          operator_codes: ["in, not_in"],
-          class: Array
+          operator_codes: ["in", "notin"],
+          class: String
         },
         {
           alias: "age",

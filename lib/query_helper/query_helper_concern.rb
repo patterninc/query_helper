@@ -11,11 +11,12 @@ class QueryHelper
       end
 
       def create_query_helper
-        @query_helper = QueryHelper.new(**query_helper_params)
+        @query_helper = QueryHelper.new(**query_helper_params, api_payload: true)
       end
 
       def create_query_helper_filter
-        QueryHelper::SqlFilter.new(filter_values: params[:filter])
+        filter_values = params[:filter].permit!.to_h
+        QueryHelper::SqlFilter.new(filter_values: filter_values)
       end
 
       def create_query_helper_sort

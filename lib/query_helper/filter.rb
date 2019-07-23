@@ -14,6 +14,7 @@ class QueryHelper
       @operator_code = operator_code
       @criterion = criterion # Converts to a string to be inserted into sql.
       @comparate = comparate
+      @aggregate = aggregate
       @bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
 
       translate_operator_code()
@@ -105,7 +106,7 @@ class QueryHelper
     end
 
     def invalid_criterion_error
-      raise InvalidQueryError.new("'#{criterion}' is not a valid criterion for the '#{operator}' operator")
+      raise InvalidQueryError.new("'#{criterion}' is not a valid criterion for the '#{@operator}' operator")
     end
   end
 end
