@@ -2,7 +2,7 @@
 [![TravisCI](https://travis-ci.org/iserve-products/query_helper.svg?branch=master)](https://travis-ci.org/iserve-products/query_helper)
 [![Gem Version](https://badge.fury.io/rb/query_helper.svg)](https://badge.fury.io/rb/query_helper)
 
-Ruby Gem developed and used at Pattern to paginate, sort, filter, and include associations on sql and active record queries.
+QueryHelper is a ruby gem used to paginate, sort, and filter your API calls in Ruby on Rails using URL params in your HTTP requests.  It currently only supports Postgres.  
 
 ## Installation
 
@@ -20,233 +20,87 @@ Or install it yourself as:
 
     $ gem install query_helper
 
-## Use
+## Quick Use
 
-### SQL Queries
-
-#### Initialize
-
-To create a new sql query object run
+### Step 1: Update Base Controller to use the QueryHelper Concern
 
 ```ruby
-QueryHelper::Sql.new(
-  model:,             # required
-  query:,             # required
-  query_params: ,     # optional
-  column_mappings: ,  # optional
-  filters: ,          # optional
-  sorts: ,            # optional
-  page: ,             # optional
-  per_page: ,         # optional
-  single_record: ,    # optional, default: false
-  associations: ,     # optional
-  as_json_options: ,  # optional
-  run:                # optional, default: true
+class ApplicationController < ActionController::API
+  include QueryHelper::QueryHelperConcern
+  before_action :create_query_helper
+end
+```
+
+Adding this code creates a `QueryHelper` object preloaded with pagination, filtering, sorting, and association information included in the URL.  This object can be accessed by using the `@query_helper` instance variable from within your controllers.
+
+### Step 2: Use QueryHelper to run active record and sql queries within your controller
+
+#### Active Record Example
+
+```ruby
+class ResourceController < ApplicationController
+
+  def index
+    @query_helper.update(
+      model: UserNotificationSetting,
+      query: "select * from resources r where r.user_id = :user_id",
+      bind_variables: { user_id: current_user().id }
+    )
+
+    render json: @query_helper.results()
+  end
+
+end
+```
+
+#### Raw SQL Example
+
+```ruby
+class ResourceController < ApplicationController
+
+  def index
+    @query_helper.query = Resource.all
+    render json: @query_helper.results()
+  end
+
+end
+```
+
+You can also use the `@query_helper.update()` method to update the QueryHelper with an ActiveRecord object
+
+```ruby
+@query_helper.update(
+  query: Resource.all
 )
 ```
 
-The following arguments are accepted when creating a new objects
+### Step 3: Paginate, Sort, Filter, and Include Associations using URL params
 
-<table>
-<tr>
-<th>Argument</th>
-<th>Description</th>
-<th>Example</th>
-</tr>
-<tr>
-<td>model</td>
-<td>the model to run the query against</td>
-<td>
-<pre lang="ruby">
-Parent
-</pre>
-</td>
-</tr>
-<tr>
-<td>query</td>
-<td>the custom sql string to be executed</td>
-<td>
-<pre lang="ruby">
-'select * from parents'
-</pre>
-</td>
-</tr>
-<tr>
-<td>query_params</td>
-<td>a hash of bind variables to be embedded into the sql query</td>
-<td>
-<pre lang="ruby">
-{
-  age: 20,
-  name: 'John'
-}
-</pre>
-</td>
-</tr>
-<tr>
-<td>column_mappings</td>
-<td>A hash that translates aliases to sql expressions</td>
-<td>
-<pre lang="ruby">
-{
-  "age" => "parents.age"
-  "children_count" => {
-    sql_expression: "count(children.id)",
-    aggregate: true
-  }
-}
-</pre>
-</td>
-</tr>
-<tr>
-<td>filters</td>
-<td>a list of filters in the form of `{"comparate_alias"=>{"operator_code"=>"value"}}`</td>
-<td>
-<pre lang="ruby">
-{
-  "age" => { "lt" => 100 },
-  "children_count" => { "gt" => 0 }
-}
-</pre>
-</td>
-</tr>
-<tr>
-<td>sorts</td>
-<td>a comma separated string with a list of sort values</td>
-<td>
-<pre lang="ruby">
-"age:desc,name:asc:lowercase"
-</pre>
-</td>
-</tr>
-<tr>
-<td>page</td>
-<td>the page you want returned</td>
-<td>
-<pre lang="ruby">
-5
-</pre>
-</td>
-</tr>
-<tr>
-<td>per_page</td>
-<td>the number of results per page</td>
-<td>
-<pre lang="ruby">
-20
-</pre>
-</td>
-</tr>
-<tr>
-<td>single_record</td>
-<td>whether or not you expect the record to return a single result, if toggled, only the first result will be returned</td>
-<td>
-<pre lang="ruby">
-false
-</pre>
-</td>
-</tr>
-<tr>
-<td>associations</td>
-<td>a list of activerecord associations you'd like included in the payload </td>
-<td>
-<pre lang="ruby">
+#### Pagination
 
-</pre>
-</td>
-</tr>
-<tr>
-<td>as_json_options</td>
-<td>a list of as_json options you'd like run before returning the payload</td>
-<td>
-<pre lang="ruby">
+`http://www.example.com/resources?page=1&per_page=25`
 
-</pre>
-</td>
-</tr>
-<tr>
-<td>run</td>
-<td>whether or not you'd like to run the query on initilization</td>
-<td>
-<pre lang="ruby">
-false
-</pre>
-</td>
-</tr>
-</table>
+#### Sorting
 
-### Active Record Queries
+`http://www.example.com/resources?sort=resource_name:desc`
 
-To run an active record query execute
-```ruby
-QueryHelper.run_active_record_query(active_record_call, query_helpers, valid_columns, single_record)
-```
-active_record_call: Valid active record syntax (i.e. ```Object.where(state: 'Active')```)
-query_helpers: See docs below
-valid_columns: Default is [].  Pass in an array of columns you want to allow sorting and filtering on.
-single_record: Default is false.  Pass in true to format payload as a single object instead of a list of objects
+You can also sort my multiple columns by separating them with commas
 
+`sort=resource_name:desc,resource_age:asc`
 
-model: A valid ActiveRecord model
-query: A string containing your custom SQL query
-query_params: a symbolized hash of binds to be included in your SQL query
-query_helpers: See docs below
-valid_columns: Default is [].  Pass in an array of columns you want to allow sorting and filtering on.
-single_record: Default is false.  Pass in true to format payload as a single object instead of a list of objects
+Additionally, for text columns you can force a lowercase sort by adding an extra modifier.  
 
-## Query Helpers
-query_helpers is a symbolized hash passed in with information about pagination, associations, filtering and sorting.
+`sort=resource_name:desc:lowercase,resource_age:asc`
 
-### Pagination
-There are two pagination keys you can pass in as part of the query_helpers objects
+#### Filtering
 
-```ruby
-{
-  page: 1,
-  per_page: 20
-}
-```
+`http://www.example.com/resources?filter[resource_age][gt]=50`
 
-If at least one of these keys is present, paginated results will be returned.
+You can add multiple filters to the url params.  Just make sure it follows the form of `filter[column][operator_code]=value`
 
-### Sorting
-Sorting is controlled by the `sort` key in the query_helpers object
+`http://www.example.com/resources?filter[resource_age][gt]=50&[resource_name][eql]=banana_resource`
 
-```ruby
-{
-    sort: "column_name:sort_direction"
-}
-```
-Sort direction can be either asc or desc.  If you wish to lowercase string before sorting include the following:
-```ruby
-{
-    sort: "name:desc:lowercase"
-}
-```
-
-### Filtering
-Filtering is controlled by the `filter` object in the query_helpers hash
-
-```ruby
-{
-  filter: {
-    "column_1" => {
-      "gte" => 20,
-      "lt" => 40
-    },
-    "column_2" => {
-      "eql" => "my_string"
-    },
-    "column_3" => {
-      "like" => "my_string%"
-    },
-    "column_4" => {
-      "in" => "item1,item2,item3"
-    }
-}
-```
-
-The following operator codes are valid
+##### Valid Operator Codes
 
 ```
 “gte”: >=
@@ -261,33 +115,17 @@ The following operator codes are valid
 “null”: “is null” or “is not null” (pass in true or false as the value)
 ```
 
-### Associations
+#### Associations
 
-To include associated objects in the payload, pass in the following as part of the query_helpers hash:
+You can ask to include active_record associations in the payload.  The association must be defined in the model.
 
-```ruby
-{
-  include: ['associated_object_1', 'associated_object_2']
-}
-```
+`http://www.example.com/resources?include=child_resource`
 
-### Example
+You can also include multiple associations
 
-The following is an example of a query_helpers object that can be passed into the sql and active record methods
+`http://www.example.com/resources?include[]=child_resource&include[]=parent_resource`
 
-```ruby
-query_helpers = {
-  page: 1,
-  per_page: 20,
-  sort: "name:desc"
-  include: ["child"]
-  filter: {
-    "id" => {
-      "gte" => 20,
-      "lt" => 40
-    }
-}
-```
+
 
 ## Payload Formats
 
