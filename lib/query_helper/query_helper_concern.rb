@@ -1,5 +1,4 @@
 require 'active_support/concern'
-require "query_helper/sql_filter"
 
 class QueryHelper
   module QueryHelperConcern
@@ -24,7 +23,7 @@ class QueryHelper
       end
 
       def create_query_helper_associations
-
+        QueryHelper::Associations.process_association_params(params[:include])
       end
 
       def query_helper_params

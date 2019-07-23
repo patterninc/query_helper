@@ -24,7 +24,7 @@ class QueryHelper
     page: nil, # define the page you want returned
     per_page: nil, # define how many results you want per page
     single_record: false, # whether or not you expect the record to return a single result, if toggled, only the first result will be returned
-    associations: nil, # a list of activerecord associations you'd like included in the payload
+    associations: [], # a list of activerecord associations you'd like included in the payload
     as_json_options: nil, # a list of as_json options you'd like run before returning the payload
     custom_mappings: {}, # custom keyword => sql_expression mappings
     api_payload: false # Return the paginated payload or simply return the result array
@@ -52,10 +52,24 @@ class QueryHelper
     end
   end
 
-  def update_query(query: nil, model:nil, bind_variables: {})
+  def update(
+    query: nil,
+    model: nil,
+    bind_variables: {},
+    filters: [],
+    associations: [],
+    as_json_options: nil,
+    single_record: nil,
+    custom_mappings: nil
+  )
     @model = model if model
     @query = query if query
     @bind_variables.merge!(bind_variables)
+    filters.each{ |f| add_filter(**f) }
+    @associations = @associations | associations
+    @single_record = single_record if single_record
+    @as_json_options = as_json_options if as_json_options
+    @custom_mappings = custom_mappings if custom_mappings
   end
 
   def add_filter(operator_code:, criterion:, comparate:)
