@@ -102,18 +102,20 @@ You can add multiple filters to the url params.  Just make sure it follows the f
 
 ##### Valid Operator Codes
 
-```
-“gte”: >=
-“lte”: <=
-“gt”: >
-“lt”: <
-“eql”: =
-“noteql”: !=
-"like": like
-“in”: in
-“notin” not in
-“null”: “is null” or “is not null” (pass in true or false as the value)
-```
+Operator Code | SQL Operator
+--- | ---
+gte | >=
+lte | <=
+gt | >
+lt | <
+eql | =
+noteql | !=
+like | like
+in | in
+notin | not in
+null | is null *or* is not null
+
+Note: For the null operator code, toggle *is null* operator with true and *is not null* operator with false
 
 #### Associations
 
