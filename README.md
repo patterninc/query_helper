@@ -93,11 +93,15 @@ Additionally, for text columns you can force a lowercase sort by adding an extra
 `sort=resource_name:desc:lowercase,resource_age:asc`
 
 #### Filtering
+Follow the following form for your url param:
+
+`filter[column][operator_code]=value`
+
+Example
 
 `http://www.example.com/resources?filter[resource_age][gt]=50`
 
-You can add multiple filters to the url params.  Just make sure it follows the form of
-`filter[column][operator_code]=value`
+You can also add multiple filters
 
 `http://www.example.com/resources?filter[resource_age][gt]=50&[resource_name][eql]=banana_resource`
 
