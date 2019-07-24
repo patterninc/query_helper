@@ -82,6 +82,10 @@ You can also use the `@query_helper.update()` method to update the QueryHelper w
 
 #### Sorting
 
+`sort=column:direction`
+
+##### Example
+
 `http://www.example.com/resources?sort=resource_name:desc`
 
 You can also sort my multiple columns by separating them with commas
@@ -93,11 +97,10 @@ Additionally, for text columns you can force a lowercase sort by adding an extra
 `sort=resource_name:desc:lowercase,resource_age:asc`
 
 #### Filtering
-Follow the following form for your url param:
 
 `filter[column][operator_code]=value`
 
-Example
+##### Example
 
 `http://www.example.com/resources?filter[resource_age][gt]=50`
 
@@ -124,7 +127,11 @@ Note: For the null operator code, toggle *is null* operator with true and *is no
 
 #### Associations
 
-You can ask to include active_record associations in the payload.  The association must be defined in the model.
+Include ActiveRecord associations in the payload.  The association must be defined in the model.
+
+`include=association`
+
+##### Example
 
 `http://www.example.com/resources?include=child_resource`
 
