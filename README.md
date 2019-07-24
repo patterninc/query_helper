@@ -129,7 +129,7 @@ You can also include multiple associations
 
 ## Payload Formats
 
-The QueryHelper gem will return results in one of three formats
+The QueryHelper gem will return the following payload
 
 ### Paginated List Payload
 ```json
@@ -168,30 +168,17 @@ The QueryHelper gem will return results in one of three formats
 }
 ```
 
-### List Payload
-```json
-{
-  "data": [
-    {
-      "id": 1,
-      "attribute_1": "string_attribute",
-      "attribute_2": 12345,
-      "attribute_3": 0.3423212
-    },
-    {
-      "id": 2,
-      "attribute_1": "string_attribute",
-      "attribute_2": 12345,
-      "attribute_3": 0.3423212
-    },
-    {
-      "id": 3,
-      "attribute_1": "string_attribute",
-      "attribute_2": 12345,
-      "attribute_3": 0.3423212
-    },
-  ]
-}
+## Single Record Queries
+If you only want to return a single result, but still want to be able to use some of the other functionality of QueryHelper, you can set `single_record` to true in the QueryHelper object.
+
+```ruby
+@query_helper.single_record = true
+```
+or
+```ruby
+@query_helper.update(
+  single_record: true
+)
 ```
 
 ### Single Record Payload
