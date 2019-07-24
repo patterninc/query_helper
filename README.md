@@ -78,37 +78,29 @@ You can also use the `@query_helper.update()` method to update the QueryHelper w
 
 #### Pagination
 
+`page=1`
+
+`per_page=20`
+
 `http://www.example.com/resources?page=1&per_page=25`
 
 #### Sorting
 
 `sort=column:direction`
 
-##### Example
+Single Sort: `http://www.example.com/resources?sort=resource_name:desc`
 
-`http://www.example.com/resources?sort=resource_name:desc`
+Multiple Sorts: `http://www.example.com/resources?sort=resource_name:desc,resource_age:asc`
 
-You can also sort my multiple columns by separating them with commas
-
-`sort=resource_name:desc,resource_age:asc`
-
-Additionally, for text columns you can force a lowercase sort by adding an extra modifier.  
-
-`sort=resource_name:desc:lowercase,resource_age:asc`
+Lowercase Sort: `http://www.example.com/resources?sort=resource_name:desc:lowercase`
 
 #### Filtering
 
 `filter[column][operator_code]=value`
 
-##### Example
+Single Filter: `http://www.example.com/resources?filter[resource_age][gt]=50`
 
-`http://www.example.com/resources?filter[resource_age][gt]=50`
-
-You can also add multiple filters
-
-`http://www.example.com/resources?filter[resource_age][gt]=50&[resource_name][eql]=banana_resource`
-
-##### Valid Operator Codes
+Multiple Filters: `http://www.example.com/resources?filter[resource_age][gt]=50&[resource_name][eql]=banana_resource`
 
 Operator Code | SQL Operator
 --- | ---
@@ -131,13 +123,9 @@ Include ActiveRecord associations in the payload.  The association must be defin
 
 `include=association`
 
-##### Example
+Single Association: `http://www.example.com/resources?include=child_resource`
 
-`http://www.example.com/resources?include=child_resource`
-
-You can also include multiple associations
-
-`http://www.example.com/resources?include[]=child_resource&include[]=parent_resource`
+Multiple Associations: `http://www.example.com/resources?include[]=child_resource&include[]=parent_resource`
 
 
 
