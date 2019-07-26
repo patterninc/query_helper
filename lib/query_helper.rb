@@ -82,6 +82,7 @@ class QueryHelper
 
     # Create column maps to be used by the filter and sort objects
     column_maps = create_column_maps()
+
     @sql_filter.column_maps = column_maps
     @sql_sort.column_maps = column_maps
 

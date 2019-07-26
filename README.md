@@ -170,7 +170,29 @@ The QueryHelper gem will return the following payload
 }
 ```
 
-## Single Record Queries
+## Advanced Options
+
+### Associations
+
+You can preload additional and include additional associations in your payload besides what's defined in the `include` url parameter.
+
+```ruby
+@query_helper.update(
+  associations: ['association1']
+)
+```
+
+### as_json options
+
+You can pass in additional as_json options to be included in the payload.
+
+```ruby
+@query_helper.update(
+  as_json_options: { methods: [:last_ran_at] }
+)
+```
+
+### Single Record Queries
 If you only want to return a single result, but still want to be able to use some of the other functionality of QueryHelper, you can set `single_record` to true in the QueryHelper object.
 
 ```ruby
