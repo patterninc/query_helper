@@ -98,7 +98,8 @@ class QueryHelper
       where_clauses: @sql_filter.where_clauses,
       having_clauses:  @sql_filter.having_clauses,
       order_by_clauses: @sql_sort.parse_sort_string,
-      include_limit_clause: @page && @per_page ? true : false
+      include_limit_clause: @page && @per_page ? true : false,
+      additional_select_clauses:  @sql_sort.select_strings
     )
     @executed_query = manipulator.build()
     @results = @model.find_by_sql([@executed_query, @bind_variables]) # Execute Sql Query

@@ -3,11 +3,12 @@ require "query_helper/invalid_query_error"
 class QueryHelper
   class SqlSort
 
-    attr_accessor :column_maps
+    attr_accessor :column_maps, :select_strings
 
     def initialize(sort_string: "", column_maps: [])
       @sort_string = sort_string
       @column_maps = column_maps
+      @select_strings = []
     end
 
     def parse_sort_string
@@ -38,6 +39,8 @@ class QueryHelper
         case modifier
         when "lowercase"
           sql_expression = "lower(#{sql_expression})"
+          # When select distincts are used, the order by clause must be included in the select clause
+          @select_strings << sql_expression
         end
 
         sql_strings << "#{sql_expression} #{direction}"

@@ -10,7 +10,8 @@ class QueryHelper
       where_clauses: nil,
       having_clauses: nil,
       order_by_clauses: nil,
-      include_limit_clause: false
+      include_limit_clause: false,
+      additional_select_clauses: []
     )
       @parser = SqlParser.new(sql)
       @sql = @parser.sql.dup
@@ -18,23 +19,23 @@ class QueryHelper
       @having_clauses = having_clauses
       @order_by_clauses = order_by_clauses
       @include_limit_clause = include_limit_clause
+      @additional_select_clauses = additional_select_clauses
     end
 
     def build
       insert_having_clauses()
       insert_where_clauses()
-      insert_total_count_select_clause()
+      insert_select_clauses()
       insert_order_by_and_limit_clause()
       @sql.squish
     end
 
     private
 
-    def insert_total_count_select_clause
-      return unless @include_limit_clause
-      total_count_clause = " ,count(*) over () as _query_full_count "
-      @sql.insert(@parser.insert_select_index, total_count_clause)
-      # Potentially update parser here
+    def insert_select_clauses
+      total_count_clause = "count(*) over () as _query_full_count"
+      @additional_select_clauses << total_count_clause if @include_limit_clause
+      @sql.insert(@parser.insert_select_index, " , #{@additional_select_clauses.join(", ")} ") if @additional_select_clauses.length > 0
     end
 
     def insert_where_clauses
