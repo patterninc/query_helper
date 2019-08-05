@@ -131,7 +131,7 @@ class QueryHelper
         raise InvalidQueryError.new("a valid model must be included to run a custom SQL query") unless @model < ActiveRecord::Base
       # If an active record query is passed in, find the model and sql from the query
       elsif @query.class < ActiveRecord::Relation
-        @model = @query.model
+        @model ||= @query.model
         @query = @query.to_sql
       else
         raise InvalidQueryError.new("unable to determine query type")
