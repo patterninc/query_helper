@@ -14,7 +14,6 @@ class QueryHelper
 
     def self.preload_associations(payload:, preload: [])
       ActiveRecord::Associations::Preloader.new.preload(payload, preload)
-      payload
     end
 
     def self.json_associations(associations)
