@@ -155,7 +155,7 @@ class QueryHelper
     end
 
     def preload_associations
-      @results = Associations.preload_associations(
+      Associations.preload_associations(
         payload: @results,
         preload: @preload
       )
