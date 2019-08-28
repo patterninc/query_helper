@@ -12,6 +12,10 @@ class QueryHelper
       payload.as_json(as_json_options)
     end
 
+    def self.preload_associations(payload:, preload: [])
+      ActiveRecord::Associations::Preloader.new.preload(payload, preload)
+    end
+
     def self.json_associations(associations)
       associations ||= []
       associations = associations.is_a?(Array) ? associations : [associations]
