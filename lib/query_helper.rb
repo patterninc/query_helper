@@ -116,14 +116,9 @@ class QueryHelper
   end
 
   def results()
-    begin
-      execute_query()
-      return paginated_results() if @api_payload
-      return @results
-    rescue => exception
-      byebug
-      puts exception.backtrace
-    end
+    execute_query()
+    return paginated_results() if @api_payload
+    return @results
   end
 
   private
