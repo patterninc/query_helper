@@ -13,7 +13,7 @@ require "query_helper/invalid_query_error"
 
 class QueryHelper
 
-  attr_accessor :model, :query, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload
+  attr_accessor :model, :query, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload
 
   def initialize(
     model: nil, # the model to run the query against
@@ -27,7 +27,8 @@ class QueryHelper
     associations: [], # a list of activerecord associations you'd like included in the payload
     as_json_options: nil, # a list of as_json options you'd like run before returning the payload
     custom_mappings: {}, # custom keyword => sql_expression mappings
-    api_payload: false # Return the paginated payload or simply return the result array
+    api_payload: false, # Return the paginated payload or simply return the result array
+    preload: [] # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
   )
     @model = model
     @query = query
@@ -41,6 +42,7 @@ class QueryHelper
     @as_json_options = as_json_options
     @custom_mappings = custom_mappings
     @api_payload = api_payload
+    @preload = preload
 
     if @page && @per_page
       # Determine limit and offset
@@ -60,7 +62,8 @@ class QueryHelper
     associations: [],
     as_json_options: nil,
     single_record: nil,
-    custom_mappings: nil
+    custom_mappings: nil,
+    preload: []
   )
     @model = model if model
     @query = query if query
@@ -70,6 +73,7 @@ class QueryHelper
     @single_record = single_record if single_record
     @as_json_options = as_json_options if as_json_options
     @custom_mappings = custom_mappings if custom_mappings
+    @preload = preload if preload
   end
 
   def add_filter(operator_code:, criterion:, comparate:)
@@ -106,6 +110,7 @@ class QueryHelper
     @results = @results.first if @single_record # Return a single result if requested
 
     determine_count()
+    preload_associations()
     load_associations()
     clean_results()
   end
@@ -115,8 +120,6 @@ class QueryHelper
     return paginated_results() if @api_payload
     return @results
   end
-
-
 
   private
 
@@ -148,6 +151,13 @@ class QueryHelper
         payload: @results,
         associations: @associations,
         as_json_options: @as_json_options
+      )
+    end
+
+    def preload_associations
+      Associations.preload_associations(
+        payload: @results,
+        preload: @preload
       )
     end
 
@@ -185,5 +195,4 @@ class QueryHelper
         model: @model
       )
     end
-
 end
