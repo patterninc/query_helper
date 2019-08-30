@@ -18,7 +18,7 @@ class QueryHelper
       @bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
 
       translate_operator_code()
-      mofify_criterion()
+      modify_criterion()
       modify_comparate()
       validate_criterion()
     end
@@ -57,6 +57,10 @@ class QueryHelper
           "like"
         when "notin"
           "not in"
+        when "contains"
+          "@>"
+        when "contained_by"
+          "<@"
         when "null"
           if criterion.to_s == "true"
             "is null"
@@ -68,12 +72,15 @@ class QueryHelper
       end
     end
 
-    def mofify_criterion
+    def modify_criterion
       # lowercase strings for comparison
-      @criterion.downcase! if @criterion.class == String && @criterion.scan(/[a-zA-Z]/).any?
+      @criterion.downcase! if @criterion.class == String && @criterion.scan(/[a-zA-Z]/).any? && !['contains', 'contained_by'].include?(operator_code) 
 
       # turn the criterion into an array for in and notin comparisons
       @criterion = @criterion.split(",") if ["in", "notin"].include?(@operator_code) && @criterion.class == String
+
+      # wrap the criterion in sql array syntax for contains/contained_by comparisons
+      @criterion = "{#{@criterion}}" if ['contains', 'contained_by'].include?(operator_code)
 
       # Add wildcards for like comparisons
       @criterion = "%#{@criterion}%" if @operator_code == "like"
@@ -81,7 +88,10 @@ class QueryHelper
 
     def modify_comparate
       # lowercase strings for comparison
-      @comparate = "lower(#{@comparate})" if criterion.class == String && criterion.scan(/[a-zA-Z]/).any? && !["true", "false"].include?(criterion)
+      @comparate = "lower(#{@comparate})" if criterion.class == String &&
+                                             criterion.scan(/[a-zA-Z]/).any? &&
+                                             !['true', 'false'].include?(criterion) &&
+                                             !['contains', 'contained_by'].include?(operator_code)
     end
 
     def validate_criterion
