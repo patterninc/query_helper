@@ -191,7 +191,7 @@ class MyModel < ApplicationRecord
 end
 ```
 
-When calling this model from outside a controller, you will get the full result set without the api wrapping. (i.e. `MyModel.first.complex_sql_function` will return an array)
+When calling this model from outside a controller, you will get the full result set without the api wrapping. (i.e. `MyModel.first.complex_sql_function` will return an array.
 
 #### Controller
 
