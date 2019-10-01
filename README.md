@@ -192,6 +192,44 @@ You can pass in additional as_json options to be included in the payload.
 )
 ```
 
+### Preload
+
+This is handy if you are loading other associations or methods with the as_json config and need to preload associations to avoid n+1 queries.
+
+```ruby
+@query_helper.update(
+  preload: [:association1, :association2]
+)
+```
+or
+```ruby
+@query_helper.update(
+  preload: [association: [:child_association]]
+)
+```
+
+### Custom Sort and Filter mappings
+
+QueryHelper will automatically determine which sql aliases to run filtering and sorting on.  In cases where this doesn't work, you can provide your own custom mappings so QueryHelper knows how to correctly sort and filter.  One common example of this is when you run a `select * from resource1` but pass `resource2` in as the model.  
+
+```ruby
+@query_helper.update(
+  custom_mappings: {
+    "alias" => "complex_sql_function"
+  }
+)
+```
+
+To indicate that a custom mapping refers to an aggregate function use the following:
+
+```ruby
+@query_helper.update(
+  custom_mappings: {
+    "alias" => { sql_expression: "MAX(resouce.age)", aggregate: true }
+  }
+)
+```
+
 ### Single Record Queries
 If you only want to return a single result, but still want to be able to use some of the other functionality of QueryHelper, you can set `single_record` to true in the QueryHelper object.
 
