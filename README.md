@@ -170,6 +170,44 @@ The QueryHelper gem will return the following payload
 }
 ```
 
+## Using in Models or Services
+
+If your complex queries are defined in a model or service, you can still use QueryHelper to automatically paginate, filter, and sort api calls that reference the given model/service.  
+
+Example
+
+### Model
+
+```ruby
+class MyModel < ApplicationRecord
+
+  def complex_sql_function(query_helper=QueryHelper.new)
+    query = "select * from resource"
+    query_helper.update(
+      model: Resource,
+      query: query,
+    )
+  end
+end
+```
+
+When calling this model from outside a controller, you will get the full result set without the api wrapping. (i.e. `MyModel.first.complex_sql_function` will return an array)
+
+### Controller
+
+```ruby
+class MyModelsController < ApplicationController
+
+  def get_complex_query
+    @object = MyModel.find(params[:id])
+    response = @object.complex_sql_function(@query_helper)
+    render json: response
+  end
+end
+```
+
+When you pass in the `@query_helper` object from the controller, QueryHelper will paginate, sort, and filter as expected.
+
 ## Advanced Options
 
 ### Associations
