@@ -74,13 +74,14 @@ class QueryHelper
     @as_json_options = as_json_options if as_json_options
     @custom_mappings = custom_mappings if custom_mappings
     @preload = preload if preload
+    return self
   end
 
   def add_filter(operator_code:, criterion:, comparate:)
     @sql_filter.filter_values["comparate"] = { operator_code => criterion }
   end
 
-  def execute_query
+  def build_query
     # Correctly set the query and model based on query type
     determine_query_type()
 
@@ -105,8 +106,16 @@ class QueryHelper
       include_limit_clause: @page && @per_page ? true : false,
       additional_select_clauses:  @sql_sort.select_strings
     )
-    @executed_query = manipulator.build()
-    @results = @model.find_by_sql([@executed_query, @bind_variables]) # Execute Sql Query
+    manipulator.build()
+  end
+
+  def view_query
+    query = build_query()
+    @model.sanitize_sql_array([query, @bind_variables])
+  end
+
+  def execute_query
+    @results = @model.find_by_sql([build_query(), @bind_variables]) # Execute Sql Query
     @results = @results.first if @single_record # Return a single result if requested
 
     determine_count()
@@ -143,7 +152,11 @@ class QueryHelper
 
     def determine_count
       # Determine total result count (unpaginated)
-      @count = @page && @per_page && @results.length > 0 ? @results.first["_query_full_count"] : @results.length
+      if @single_record
+        @count = 1
+      else
+        @count = @page && @per_page && @results.length > 0 ? @results.first["_query_full_count"] : @results.length
+      end
     end
 
     def load_associations
