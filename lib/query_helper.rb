@@ -115,7 +115,8 @@ class QueryHelper
   end
 
   def execute_query
-    @results = @model.find_by_sql([build_query(), @bind_variables]) # Execute Sql Query
+    query = build_query()
+    @results = @model.find_by_sql([query, @bind_variables]) # Execute Sql Query
     @results = @results.first if @single_record # Return a single result if requested
 
     determine_count()
