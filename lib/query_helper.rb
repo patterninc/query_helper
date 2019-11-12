@@ -30,8 +30,8 @@ class QueryHelper
     api_payload: false, # Return the paginated payload or simply return the result array
     preload: [] # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
   )
-    @model = model
-    @query = query
+    @query = query.class < ActiveRecord::Relation ? query.to_sql : query
+    @model = query.class < ActiveRecord::Relation ? query.model : model
     @bind_variables = bind_variables
     @sql_filter = sql_filter
     @sql_sort = sql_sort
@@ -65,8 +65,8 @@ class QueryHelper
     custom_mappings: nil,
     preload: []
   )
-    @model = model if model
-    @query = query if query
+    @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
+    @model = query.class < ActiveRecord::Relation ? query.model : model if model
     @bind_variables.merge!(bind_variables)
     filters.each{ |f| add_filter(**f) }
     @associations = @associations | associations
@@ -82,9 +82,6 @@ class QueryHelper
   end
 
   def build_query
-    # Correctly set the query and model based on query type
-    determine_query_type()
-
     # Create column maps to be used by the filter and sort objects
     column_maps = create_column_maps()
 
@@ -144,19 +141,6 @@ class QueryHelper
     def paginated_results
       { pagination: pagination_results(),
         data: @results }
-    end
-
-    def determine_query_type
-      # If a custom sql string is passed in, make sure a valid model is passed in as well
-      if @query.class == String
-        raise InvalidQueryError.new("a valid model must be included to run a custom SQL query") unless @model < ActiveRecord::Base
-      # If an active record query is passed in, find the model and sql from the query
-      elsif @query.class < ActiveRecord::Relation
-        @model ||= @query.model
-        @query = @query.to_sql
-      else
-        raise InvalidQueryError.new("unable to determine query type")
-      end
     end
 
     def determine_count
