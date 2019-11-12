@@ -35,7 +35,7 @@ Adding this code creates a `QueryHelper` object preloaded with pagination, filte
 
 ### Step 2: Use QueryHelper to run active record and sql queries within your controller
 
-#### Active Record Example
+#### Raw SQL Example
 
 ```ruby
 class ResourceController < ApplicationController
@@ -53,20 +53,20 @@ class ResourceController < ApplicationController
 end
 ```
 
-#### Raw SQL Example
+#### ActiveRecord Example
 
 ```ruby
 class ResourceController < ApplicationController
 
   def index
-    @query_helper.query = Resource.all
+    @query_helper.update(query: Resource.all)
     render json: @query_helper.results()
   end
 
 end
 ```
 
-You can also use the `@query_helper.update()` method to update the QueryHelper with an ActiveRecord object
+*NOTE: Previous documentation stated you could simply run `@query_helper.query = Resource.all`.  While this method still works, it will evaluate the ActiveRecord query causing it to hit the database twice.  It is recommended that you always use the update method to avoid this inefficiency*
 
 ```ruby
 @query_helper.update(
