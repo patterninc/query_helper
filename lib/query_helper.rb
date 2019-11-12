@@ -13,7 +13,8 @@ require "query_helper/invalid_query_error"
 
 class QueryHelper
 
-  attr_accessor :model, :query, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload
+  attr_accessor :model, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload
+  attr_reader :query
 
   def initialize(
     model: nil, # the model to run the query against
@@ -66,7 +67,7 @@ class QueryHelper
     preload: []
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
-    @model = query.class < ActiveRecord::Relation ? query.model : model if model
+    @model = query.class < ActiveRecord::Relation ? query.model : model if model || query
     @bind_variables.merge!(bind_variables)
     filters.each{ |f| add_filter(**f) }
     @associations = @associations | associations
@@ -79,6 +80,16 @@ class QueryHelper
 
   def add_filter(operator_code:, criterion:, comparate:)
     @sql_filter.filter_values["comparate"] = { operator_code => criterion }
+  end
+
+  def query=(value)
+    if value.class < ActiveRecord::Relation
+      @query = value.to_sql
+      @model = value.model
+    else
+      @query = value
+    end
+    return ""
   end
 
   def build_query
