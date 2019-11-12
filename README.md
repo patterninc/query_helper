@@ -68,12 +68,6 @@ end
 
 *NOTE: Previous documentation stated you could simply run `@query_helper.query = Resource.all`.  While this method still works, it will evaluate the ActiveRecord query causing it to hit the database twice.  It is recommended that you always use the update method to avoid this inefficiency*
 
-```ruby
-@query_helper.update(
-  query: Resource.all
-)
-```
-
 ### Step 3: Paginate, Sort, Filter, and Include Associations using URL params
 
 #### Pagination
