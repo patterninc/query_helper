@@ -109,9 +109,17 @@ class QueryHelper
     manipulator.build()
   end
 
-  def view_query
+  def to_json(args)
+    results.to_json
+  end
+
+  def to_sql
     query = build_query()
     @model.sanitize_sql_array([query, @bind_variables])
+  end
+
+  def view_query
+    to_sql
   end
 
   def execute_query
@@ -125,7 +133,7 @@ class QueryHelper
     clean_results()
   end
 
-  def results()
+  def results
     execute_query()
     return paginated_results() if @api_payload
     return @results
