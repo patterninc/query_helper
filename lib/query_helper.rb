@@ -32,7 +32,7 @@ class QueryHelper
     preload: [] # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query
-    @model = query.class < ActiveRecord::Relation ? query.model : model
+    @model = query.class < ActiveRecord::Relation ? query.base_class : model
     @bind_variables = bind_variables
     @sql_filter = sql_filter
     @sql_sort = sql_sort
@@ -67,7 +67,7 @@ class QueryHelper
     preload: []
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
-    @model = query.class < ActiveRecord::Relation ? query.model : model if model || query
+    @model = query.class < ActiveRecord::Relation ? query.base_class : model if model || query
     @bind_variables.merge!(bind_variables)
     filters.each{ |f| add_filter(**f) }
     @associations = @associations | associations
