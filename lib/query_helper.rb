@@ -85,7 +85,7 @@ class QueryHelper
   def query=(value)
     if value.class < ActiveRecord::Relation
       @query = value.to_sql
-      @model = value.model
+      @model = value.base_class
     else
       @query = value
     end
