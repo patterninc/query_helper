@@ -123,7 +123,12 @@ class QueryHelper
 
   def to_sql
     query = build_query()
-    @model.sanitize_sql_array([query, @bind_variables])
+    begin
+      return @model.sanitize_sql_array([query, @bind_variables])
+    rescue NoMethodError 
+      # sanitize_sql_array is a protected method before Rails v5.2.3
+      return @model.send(:sanitize_sql_array, [query, @bind_variables])
+    end
   end
 
   def view_query
