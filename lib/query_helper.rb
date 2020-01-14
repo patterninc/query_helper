@@ -184,7 +184,7 @@ class QueryHelper
     end
 
     def clean_results
-      @results.map!{ |r| r.except("_query_full_count") } if @page && @per_page
+      @results.map!{ |r| r.except("_query_full_count") } if @page && @per_page && !@single_record
     end
 
     def pagination_results
