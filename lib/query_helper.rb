@@ -118,7 +118,7 @@ class QueryHelper
   end
 
   def to_json(args)
-    results.to_json
+    JSON.generate(results)
   end
 
   def to_sql
