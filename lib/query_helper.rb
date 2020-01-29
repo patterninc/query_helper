@@ -123,6 +123,7 @@ class QueryHelper
 
   def to_sql
     query = build_query()
+    return query if @bind_variables.length == 0
     begin
       return @model.sanitize_sql_array([query, @bind_variables])
     rescue NoMethodError 
