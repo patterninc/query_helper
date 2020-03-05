@@ -81,7 +81,13 @@ class QueryHelper
 
     def modify_comparate
       # lowercase strings for comparison
-      @comparate = "lower(#{@comparate})" if criterion.class == String && criterion.scan(/[a-zA-Z]/).any? && !["true", "false"].include?(criterion)
+      if (criterion.class == String && 
+          criterion.scan(/[a-zA-Z]/).any? && 
+          !["true", "false"].include?(criterion)) ||
+          (criterion.class == Array && 
+          criterion.to_s.scan(/[a-zA-Z]/).any?)
+        @comparate = "lower(#{@comparate})" 
+      end 
     end
 
     def validate_criterion
