@@ -36,8 +36,8 @@ class QueryHelper
     @bind_variables = bind_variables
     @sql_filter = sql_filter
     @sql_sort = sql_sort
-    @page = page.to_i if page
-    @per_page = per_page.to_i if per_page
+    @page = (page.to_i if page) || 1
+    @per_page = (per_page.to_i if per_page) || 100
     @single_record = single_record
     @associations = associations
     @as_json_options = as_json_options
