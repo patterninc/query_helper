@@ -36,8 +36,8 @@ class QueryHelper
     @bind_variables = bind_variables
     @sql_filter = sql_filter
     @sql_sort = sql_sort
-    @page = (page.to_i if page) || 1
-    @per_page = (per_page.to_i if per_page) || 100
+    @page = determine_page(page: page, per_page: per_page)
+    @per_page = determine_per_page(page: page, per_page: per_page)
     @single_record = single_record
     @associations = associations
     @as_json_options = as_json_options
@@ -154,6 +154,18 @@ class QueryHelper
   end
 
   private
+
+    def determine_page(page:, per_page:)
+      return page.to_i if page 
+      return 1 if !page && per_page 
+      return nil
+    end 
+
+    def determine_per_page(page:, per_page:)
+      return per_page.to_i if per_page 
+      return 100 if !per_page && page 
+      return nil
+    end 
 
     def paginated_results
       { pagination: pagination_results(),
