@@ -113,7 +113,7 @@ Note: For the null operator code, toggle *is null* operator with true and *is no
 
 #### Search
 
-QueryHelper supports searching across multiple fields.  To implement pass an array of column aliases into the `search_fields` argument to the `QueryHelper` object.
+QueryHelper supports searching across multiple fields.  To implement pass an array of column aliases into the `search_fields` argument when creating or updating a `QueryHelper` object.
 
 ```ruby
 @query_helper.update(search_fields: ["column1", "column2"])
@@ -121,8 +121,6 @@ render json: @query_helper.results()
 ```
 
 You can then take advantage of the `search` url param to do text matching in any of the columns included
-
-#### Example
 
 Request: `http://www.example.com/resources?search=foo`
 
