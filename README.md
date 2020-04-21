@@ -120,9 +120,9 @@ QueryHelper supports searching across multiple fields.  To implement pass an arr
 render json: @query_helper.results()
 ```
 
-You can then take advantage of the `search` url param to do text matching in any of the columns included
+You can then take advantage of the `search_for` url param to do text matching in any of the columns included
 
-Request: `http://www.example.com/resources?search=foo`
+Request: `http://www.example.com/resources?search_for=foo`
 
 Results: 
 ```json

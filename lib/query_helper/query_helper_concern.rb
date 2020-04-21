@@ -33,7 +33,7 @@ class QueryHelper
         helpers[:sql_filter] = create_query_helper_filter() if params[:filter]
         helpers[:sql_sort] = create_query_helper_sort() if params[:sort]
         helpers[:associations] = create_query_helper_associations() if params[:include]
-        helpers[:search_string] = params[:search] if params[:search]
+        helpers[:search_string] = params[:search_for] if params[:search_for]
         helpers
       end
     end

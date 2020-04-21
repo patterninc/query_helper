@@ -107,9 +107,20 @@ class QueryHelper
 
     # create the filters from the column maps
     @sql_filter.create_filters()
+
     having_clauses = @sql_filter.having_clauses
     where_clauses = @sql_filter.where_clauses 
-    where_clauses << search_filter(column_maps) if @search_string
+
+    if @search_string
+      search_filter = search_filter(column_maps)
+      if search_filter[:placement] == :where
+        where_clauses << search_filter[:filter]
+      else 
+        having_clauses << search_filter[:filter]
+      end
+    end 
+
+
     # merge the filter bind variables into the query bind variables
     @bind_variables.merge!(@sql_filter.bind_variables)
 
@@ -240,11 +251,18 @@ class QueryHelper
     end
 
     def search_filter(column_maps)
-      maps = column_maps.select do |cm|
+      raise ArgumentError.new("search_fields not defined") unless @search_fields.length > 0
+      placement = :where
+      maps = column_maps.select do |cm| 
+        placement = :having if cm.aggregate
         @search_fields.include? cm.alias_name
       end 
       bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
       @bind_variables[bind_variable] = "%#{@search_string}%"
-      "lower(#{maps.map{|m| "#{m.sql_expression}::varchar"}.join(" || ")}) like lower(:#{bind_variable})"
+      filter = "#{maps.map{|m| "#{m.sql_expression}::varchar"}.join(" || ")} ilike :#{bind_variable}"
+      return {
+        filter: filter,
+        placement: placement
+      }
     end 
 end
