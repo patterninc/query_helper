@@ -111,6 +111,35 @@ null | is null *or* is not null
 
 Note: For the null operator code, toggle *is null* operator with true and *is not null* operator with false
 
+#### Search
+
+QueryHelper supports searching across multiple fields.  To implement pass an array of column aliases into the `search_fields` argument to the `QueryHelper` object.
+
+```ruby
+@query_helper.update(search_fields: ["column1", "column2"])
+render json: @query_helper.results()
+```
+
+You can then take advantage of the `search` url param to do text matching in any of the columns included
+
+#### Example
+
+Request: `http://www.example.com/resources?search=foo`
+
+Results: 
+```json
+[
+  {
+    "column1": "foobar",
+    "column2": "bar"
+  },
+  {
+    "column1": "bar",
+    "column2": "barfoo"
+  }
+]
+```
+
 #### Associations
 
 Include ActiveRecord associations in the payload.  The association must be defined in the model.

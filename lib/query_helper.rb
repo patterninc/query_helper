@@ -29,7 +29,9 @@ class QueryHelper
     as_json_options: nil, # a list of as_json options you'd like run before returning the payload
     custom_mappings: {}, # custom keyword => sql_expression mappings
     api_payload: false, # Return the paginated payload or simply return the result array
-    preload: [] # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
+    preload: [], # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
+    search_fields: [],
+    search_string: nil
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model
@@ -44,6 +46,8 @@ class QueryHelper
     @custom_mappings = custom_mappings
     @api_payload = api_payload
     @preload = preload
+    @search_fields = search_fields
+    @search_string = search_string
 
     if @page && @per_page
       # Determine limit and offset
@@ -64,7 +68,8 @@ class QueryHelper
     as_json_options: nil,
     single_record: nil,
     custom_mappings: nil,
-    preload: []
+    preload: [],
+    search_fields: nil
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model if model || query
@@ -75,6 +80,7 @@ class QueryHelper
     @as_json_options = as_json_options if as_json_options
     @custom_mappings = custom_mappings if custom_mappings
     @preload = preload if preload
+    @search_fields = search_fields if search_fields 
     return self
   end
 
@@ -101,15 +107,17 @@ class QueryHelper
 
     # create the filters from the column maps
     @sql_filter.create_filters()
-
+    having_clauses = @sql_filter.having_clauses
+    where_clauses = @sql_filter.where_clauses 
+    where_clauses << search_filter(column_maps) if @search_string
     # merge the filter bind variables into the query bind variables
     @bind_variables.merge!(@sql_filter.bind_variables)
 
     # Execute Sql Query
     manipulator = SqlManipulator.new(
       sql: @query,
-      where_clauses: @sql_filter.where_clauses,
-      having_clauses:  @sql_filter.having_clauses,
+      where_clauses: where_clauses,
+      having_clauses: having_clauses,
       order_by_clauses: @sql_sort.parse_sort_string,
       include_limit_clause: @page && @per_page ? true : false,
       additional_select_clauses:  @sql_sort.select_strings
@@ -230,4 +238,13 @@ class QueryHelper
         model: @model
       )
     end
+
+    def search_filter(column_maps)
+      maps = column_maps.select do |cm|
+        @search_fields.include? cm.alias_name
+      end 
+      bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
+      @bind_variables[bind_variable] = "%#{@search_string}%"
+      "lower(#{maps.map{|m| "#{m.sql_expression}::varchar"}.join(" || ")}) like lower(:#{bind_variable})"
+    end 
 end
