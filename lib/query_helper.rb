@@ -40,6 +40,7 @@ class QueryHelper
     @sql_sort = sql_sort
     @page = determine_page(page: page, per_page: per_page)
     @per_page = determine_per_page(page: page, per_page: per_page)
+    set_limit_and_offset()
     @single_record = single_record
     @associations = associations
     @as_json_options = as_json_options
@@ -48,15 +49,6 @@ class QueryHelper
     @preload = preload
     @search_fields = search_fields
     @search_string = search_string
-
-    if @page && @per_page
-      # Determine limit and offset
-      limit = @per_page
-      offset = (@page - 1) * @per_page
-
-      # Merge limit/offset variables into bind_variables
-      @bind_variables.merge!({limit: limit, offset: offset})
-    end
   end
 
   def update(
@@ -69,7 +61,12 @@ class QueryHelper
     single_record: nil,
     custom_mappings: nil,
     preload: [],
-    search_fields: nil
+    search_fields: nil,
+    sql_filter: nil,
+    sql_sort: nil,
+    page: nil,
+    per_page: nil,
+    search_string: nil
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model if model || query
@@ -81,6 +78,12 @@ class QueryHelper
     @custom_mappings = custom_mappings if custom_mappings
     @preload = preload if preload
     @search_fields = search_fields if search_fields 
+    @sql_filter = sql_filter if sql_filter 
+    @sql_sort = sql_sort if sql_sort 
+    @search_string = search_string if search_string 
+    @page = determine_page(page: page, per_page: per_page) if page
+    @per_page = determine_per_page(page: page, per_page: per_page) if per_page
+    set_limit_and_offset()
     return self
   end
 
@@ -110,7 +113,7 @@ class QueryHelper
 
     having_clauses = @sql_filter.having_clauses
     where_clauses = @sql_filter.where_clauses 
-
+    
     if @search_string
       search_filter = search_filter(column_maps)
       if search_filter[:placement] == :where
@@ -123,7 +126,7 @@ class QueryHelper
 
     # merge the filter bind variables into the query bind variables
     @bind_variables.merge!(@sql_filter.bind_variables)
-
+    
     # Execute Sql Query
     manipulator = SqlManipulator.new(
       sql: @query,
@@ -186,6 +189,18 @@ class QueryHelper
       return nil
     end 
 
+    def set_limit_and_offset
+      if @page && @per_page
+        # Determine limit and offset
+        limit = @per_page
+        offset = (@page - 1) * @per_page
+
+        # Merge limit/offset variables into bind_variables
+        @bind_variables[:limit] = limit
+        @bind_variables[:offset] = offset
+      end
+    end 
+
     def paginated_results
       { pagination: pagination_results(),
         data: @results }
@@ -221,22 +236,22 @@ class QueryHelper
 
     def pagination_results
       # Set pagination params if they aren't provided
-      @per_page = @count unless @per_page
-      @page = 1 unless @page
+      results_per_page = @per_page || @count 
+      results_page = @page || 1 
 
-      total_pages = (@count/(@per_page.nonzero? || 1).to_f).ceil
-      next_page = @page + 1 if @page.between?(1, total_pages - 1)
-      previous_page = @page - 1 if @page.between?(2, total_pages)
-      first_page = @page == 1
-      last_page = @page == total_pages
-      out_of_range = !@page.between?(1,total_pages)
+      total_pages = (@count/(results_per_page.nonzero? || 1).to_f).ceil
+      next_page = results_page + 1 if results_page.between?(1, total_pages - 1)
+      previous_page = results_page - 1 if results_page.between?(2, total_pages)
+      first_page = results_page == 1
+      last_page = results_page == total_pages
+      out_of_range = !results_page.between?(1,total_pages)
 
       { count: @count,
-        current_page: @page,
+        current_page: results_page,
         next_page: next_page,
         previous_page: previous_page,
         total_pages: total_pages,
-        per_page: @per_page,
+        per_page: results_per_page,
         first_page: first_page,
         last_page: last_page,
         out_of_range: out_of_range }
