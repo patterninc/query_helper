@@ -17,6 +17,10 @@ class QueryHelper
         @query_helper = QueryHelper.new(**query_helper_params, api_payload: true)
       end
 
+      def create_query_helper_with_no_pagination
+        @query_helper = query_helper_with_no_pagination()
+      end
+
       def reload_query_params(query_helper=@query_helper)
         query_helper.update(**query_helper_params)
       end 
