@@ -13,7 +13,7 @@ require "query_helper/invalid_query_error"
 
 class QueryHelper
 
-  attr_accessor :model, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload
+  attr_accessor :model, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload, :search_field, :search_string
   attr_reader :query
 
   def initialize(
