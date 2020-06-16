@@ -13,7 +13,7 @@ require "query_helper/invalid_query_error"
 
 class QueryHelper
 
-  attr_accessor :model, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload, :search_field, :search_string
+  attr_accessor :model, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload, :search_field, :search_string, :metadata
   attr_reader :query
 
   def initialize(
@@ -31,7 +31,8 @@ class QueryHelper
     api_payload: false, # Return the paginated payload or simply return the result array
     preload: [], # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
     search_fields: [],
-    search_string: nil
+    search_string: nil,
+    metadata: {}
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model
@@ -49,6 +50,7 @@ class QueryHelper
     @preload = preload
     @search_fields = search_fields
     @search_string = search_string
+    @metadata = metadata
   end
 
   def update(
@@ -66,7 +68,8 @@ class QueryHelper
     sql_sort: nil,
     page: nil,
     per_page: nil,
-    search_string: nil
+    search_string: nil,
+    metadata: nil
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model if model || query
@@ -83,6 +86,7 @@ class QueryHelper
     @search_string = search_string if search_string 
     @page = determine_page(page: page, per_page: per_page) if page
     @per_page = determine_per_page(page: page, per_page: per_page) if per_page
+    @metadata = metadata if metadata 
     set_limit_and_offset()
     return self
   end
@@ -203,7 +207,8 @@ class QueryHelper
 
     def paginated_results
       { pagination: pagination_results(),
-        data: @results }
+        data: @results,
+        metadata: @metadata }
     end
 
     def determine_count
