@@ -55,7 +55,7 @@ class QueryHelper
 
     def insert_order_by_and_limit_clause
       @sql.slice!(@parser.limit_clause) if @parser.limit_included? # remove existing limit clause
-      @sql.slice!(@parser.order_by_clause) if @parser.order_by_included? # remove existing order by clause
+      @sql.slice!(@parser.order_by_clause) if @parser.order_by_included? && @order_by_clauses.length > 0 # remove existing order by clause
       @sql += " order by #{@order_by_clauses.join(", ")} " if @order_by_clauses.length > 0
       @sql += " limit :limit offset :offset " if @include_limit_clause
     end
