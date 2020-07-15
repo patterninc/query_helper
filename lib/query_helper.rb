@@ -179,6 +179,29 @@ class QueryHelper
     return @results
   end
 
+  def pagination_results(count=@count)
+    # Set pagination params if they aren't provided
+    results_per_page = @per_page || count 
+    results_page = @page || 1 
+
+    total_pages = (count/(results_per_page.nonzero? || 1).to_f).ceil
+    next_page = results_page + 1 if results_page.between?(1, total_pages - 1)
+    previous_page = results_page - 1 if results_page.between?(2, total_pages)
+    first_page = results_page == 1
+    last_page = results_page == total_pages
+    out_of_range = !results_page.between?(1,total_pages)
+
+    { count: count,
+      current_page: results_page,
+      next_page: next_page,
+      previous_page: previous_page,
+      total_pages: total_pages,
+      per_page: results_per_page,
+      first_page: first_page,
+      last_page: last_page,
+      out_of_range: out_of_range }
+  end
+
   private
 
     def determine_page(page:, per_page:)
@@ -237,29 +260,6 @@ class QueryHelper
 
     def clean_results
       @results.map!{ |r| r.except("_query_full_count") } if @page && @per_page && !@single_record
-    end
-
-    def pagination_results
-      # Set pagination params if they aren't provided
-      results_per_page = @per_page || @count 
-      results_page = @page || 1 
-
-      total_pages = (@count/(results_per_page.nonzero? || 1).to_f).ceil
-      next_page = results_page + 1 if results_page.between?(1, total_pages - 1)
-      previous_page = results_page - 1 if results_page.between?(2, total_pages)
-      first_page = results_page == 1
-      last_page = results_page == total_pages
-      out_of_range = !results_page.between?(1,total_pages)
-
-      { count: @count,
-        current_page: results_page,
-        next_page: next_page,
-        previous_page: previous_page,
-        total_pages: total_pages,
-        per_page: results_per_page,
-        first_page: first_page,
-        last_page: last_page,
-        out_of_range: out_of_range }
     end
 
     def create_column_maps
