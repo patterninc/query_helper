@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    query_helper (0.2.15)
+    query_helper (0.2.16)
       activerecord (> 5)
       activesupport (> 5)
 
