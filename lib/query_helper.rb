@@ -188,7 +188,7 @@ class QueryHelper
     next_page = results_page + 1 if results_page.between?(1, total_pages - 1)
     previous_page = results_page - 1 if results_page.between?(2, total_pages)
     first_page = results_page == 1
-    last_page = results_page == total_pages
+    last_page = results_page >= total_pages
     out_of_range = !results_page.between?(1,total_pages)
 
     { count: count,
