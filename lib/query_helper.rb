@@ -184,7 +184,7 @@ class QueryHelper
     results_per_page = @per_page || count 
     results_page = @page || 1 
 
-    total_pages = (count/(results_per_page.nonzero? || 1).to_f).ceil
+    total_pages = (count.to_i/(results_per_page.nonzero? || 1).to_f).ceil
     next_page = results_page + 1 if results_page.between?(1, total_pages - 1)
     previous_page = results_page - 1 if results_page.between?(2, total_pages)
     first_page = results_page == 1
