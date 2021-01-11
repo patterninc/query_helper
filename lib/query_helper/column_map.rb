@@ -13,7 +13,7 @@ class QueryHelper
 
       model.attribute_names.each do |attribute|
         if maps.select{|x| x.alias_name == attribute}.empty?
-          maps << ColumnMap.new(alias_name: attribute, sql_expression: "#{model.to_s.underscore.pluralize}.#{attribute}")
+          maps << ColumnMap.new(alias_name: attribute, sql_expression: "#{model.table_name.pluralize}.#{attribute}")
         end
       end
 

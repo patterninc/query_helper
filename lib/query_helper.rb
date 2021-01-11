@@ -80,13 +80,13 @@ class QueryHelper
     @as_json_options = as_json_options if as_json_options
     @custom_mappings = custom_mappings if custom_mappings
     @preload = preload if preload
-    @search_fields = search_fields if search_fields 
-    @sql_filter = sql_filter if sql_filter 
-    @sql_sort = sql_sort if sql_sort 
-    @search_string = search_string if search_string 
+    @search_fields = search_fields if search_fields
+    @sql_filter = sql_filter if sql_filter
+    @sql_sort = sql_sort if sql_sort
+    @search_string = search_string if search_string
     @page = determine_page(page: page, per_page: per_page) if page
     @per_page = determine_per_page(page: page, per_page: per_page) if per_page
-    @metadata = metadata if metadata 
+    @metadata = metadata if metadata
     set_limit_and_offset()
     return self
   end
@@ -116,21 +116,21 @@ class QueryHelper
     @sql_filter.create_filters()
 
     having_clauses = @sql_filter.having_clauses
-    where_clauses = @sql_filter.where_clauses 
-    
+    where_clauses = @sql_filter.where_clauses
+
     if @search_string
       search_filter = search_filter(column_maps)
       if search_filter[:placement] == :where
         where_clauses << search_filter[:filter]
-      else 
+      else
         having_clauses << search_filter[:filter]
       end
-    end 
+    end
 
 
     # merge the filter bind variables into the query bind variables
     @bind_variables.merge!(@sql_filter.bind_variables)
-    
+
     # Execute Sql Query
     manipulator = SqlManipulator.new(
       sql: @query,
@@ -152,7 +152,7 @@ class QueryHelper
     return query if @bind_variables.length == 0
     begin
       return @model.sanitize_sql_array([query, @bind_variables])
-    rescue NoMethodError 
+    rescue NoMethodError
       # sanitize_sql_array is a protected method before Rails v5.2.3
       return @model.send(:sanitize_sql_array, [query, @bind_variables])
     end
@@ -181,8 +181,8 @@ class QueryHelper
 
   def pagination_results(count=@count)
     # Set pagination params if they aren't provided
-    results_per_page = @per_page || count 
-    results_page = @page || 1 
+    results_per_page = @per_page || count
+    results_page = @page || 1
 
     total_pages = (count.to_i/(results_per_page.nonzero? || 1).to_f).ceil
     next_page = results_page + 1 if results_page.between?(1, total_pages - 1)
@@ -205,16 +205,16 @@ class QueryHelper
   private
 
     def determine_page(page:, per_page:)
-      return page.to_i if page 
-      return 1 if !page && per_page 
+      return page.to_i if page
+      return 1 if !page && per_page
       return nil
-    end 
+    end
 
     def determine_per_page(page:, per_page:)
-      return per_page.to_i if per_page 
-      return 100 if !per_page && page 
+      return per_page.to_i if per_page
+      return 100 if !per_page && page
       return nil
-    end 
+    end
 
     def set_limit_and_offset
       if @page && @per_page
@@ -226,7 +226,7 @@ class QueryHelper
         @bind_variables[:limit] = limit
         @bind_variables[:offset] = offset
       end
-    end 
+    end
 
     def paginated_results
       { pagination: pagination_results(),
@@ -273,16 +273,16 @@ class QueryHelper
     def search_filter(column_maps)
       raise ArgumentError.new("search_fields not defined") unless @search_fields.length > 0
       placement = :where
-      maps = column_maps.select do |cm| 
+      maps = column_maps.select do |cm|
         placement = :having if cm.aggregate
         @search_fields.include? cm.alias_name
-      end 
+      end
       bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
       @bind_variables[bind_variable] = "%#{@search_string}%"
-      filter = "#{maps.map{|m| "#{m.sql_expression}::varchar"}.join(" || ")} ilike :#{bind_variable}"
+      filter = "#{maps.map{|m| "coalesce(#{m.sql_expression}::varchar, '')"}.join(" || ")} ilike :#{bind_variable}"
       return {
         filter: filter,
         placement: placement
       }
-    end 
+    end
 end
