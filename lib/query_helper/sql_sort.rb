@@ -13,16 +13,14 @@ class QueryHelper
     end
 
     def parse_sort_string
-      if @sort_string.present?
-        sql_strings = attributes_sql_expression(@sort_string)
-        return sql_strings unless @tie_breaker.present?
+      return [] if @sort_string.blank? && @tie_breaker.blank?
 
-        sql_strings + attributes_sql_expression(@tie_breaker)
-      elsif @tie_breaker.present?
-        attributes_sql_expression(@tie_breaker)
-      else
-        []
-      end
+      return attributes_sql_expression(@tie_breaker) if @sort_string.blank?
+
+      sql_strings = attributes_sql_expression(@sort_string)
+      return sql_strings if @tie_breaker.blank?
+
+      sql_strings + attributes_sql_expression(@tie_breaker)
     end
 
     def attributes_sql_expression(sort_attribute)
