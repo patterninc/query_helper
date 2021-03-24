@@ -5,20 +5,33 @@ class QueryHelper
 
     attr_accessor :column_maps, :select_strings
 
-    def initialize(sort_string: "", column_maps: [])
+    def initialize(sort_string: "", tie_breaker: "", column_maps: [])
       @sort_string = sort_string
       @column_maps = column_maps
+      @tie_breaker = tie_breaker
       @select_strings = []
     end
 
     def parse_sort_string
+      if @sort_string.present?
+        sql_strings = attributes_sql_expression(@sort_string)
+        return sql_strings unless @tie_breaker.present?
+
+        sql_strings + attributes_sql_expression(@tie_breaker)
+      elsif @tie_breaker.present?
+        attributes_sql_expression(@tie_breaker)
+      else
+        []
+      end
+    end
+
+    def attributes_sql_expression(sort_attribute)
       sql_strings = []
-      sorts = @sort_string.split(",")
+      sorts = sort_attribute.split(",")
       sorts.each_with_index do |sort, index|
         sort_alias = sort.split(":")[0]
         direction = sort.split(":")[1]
         modifier = sort.split(":")[2]
-
         begin
           sql_expression = @column_maps.find{ |m| m.alias_name == sort_alias }.sql_expression
         rescue NoMethodError => e
@@ -45,8 +58,7 @@ class QueryHelper
 
         sql_strings << "#{sql_expression} #{direction}"
       end
-
-      return sql_strings
+      sql_strings
     end
   end
 end
