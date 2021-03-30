@@ -3,22 +3,33 @@ require "query_helper/invalid_query_error"
 class QueryHelper
   class SqlSort
 
-    attr_accessor :column_maps, :select_strings
+    attr_accessor :column_maps, :select_strings, :sort_tiebreak
 
-    def initialize(sort_string: "", column_maps: [])
+    def initialize(sort_string: "", sort_tiebreak: "", column_maps: [])
       @sort_string = sort_string
       @column_maps = column_maps
+      @sort_tiebreak = sort_tiebreak
       @select_strings = []
     end
 
     def parse_sort_string
+      return [] if @sort_string.blank? && @sort_tiebreak.blank?
+
+      return attributes_sql_expression(@sort_tiebreak) if @sort_string.blank?
+
+      sql_strings = attributes_sql_expression(@sort_string)
+      return sql_strings if @sort_tiebreak.blank?
+
+      sql_strings + attributes_sql_expression(@sort_tiebreak)
+    end
+
+    def attributes_sql_expression(sort_attribute)
       sql_strings = []
-      sorts = @sort_string.split(",")
+      sorts = sort_attribute.split(",")
       sorts.each_with_index do |sort, index|
         sort_alias = sort.split(":")[0]
         direction = sort.split(":")[1]
         modifier = sort.split(":")[2]
-
         begin
           sql_expression = @column_maps.find{ |m| m.alias_name == sort_alias }.sql_expression
         rescue NoMethodError => e
@@ -45,8 +56,7 @@ class QueryHelper
 
         sql_strings << "#{sql_expression} #{direction}"
       end
-
-      return sql_strings
+      sql_strings
     end
   end
 end
