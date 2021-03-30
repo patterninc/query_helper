@@ -66,6 +66,7 @@ class QueryHelper
     search_fields: nil,
     sql_filter: nil,
     sql_sort: nil,
+    sort_tiebreak: nil,
     page: nil,
     per_page: nil,
     search_string: nil,
@@ -83,6 +84,7 @@ class QueryHelper
     @search_fields = search_fields if search_fields
     @sql_filter = sql_filter if sql_filter
     @sql_sort = sql_sort if sql_sort
+    @sql_sort.sort_tiebreak = sort_tiebreak if sort_tiebreak
     @search_string = search_string if search_string
     @page = determine_page(page: page, per_page: per_page) if page
     @per_page = determine_per_page(page: page, per_page: per_page) if per_page

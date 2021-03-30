@@ -3,24 +3,24 @@ require "query_helper/invalid_query_error"
 class QueryHelper
   class SqlSort
 
-    attr_accessor :column_maps, :select_strings
+    attr_accessor :column_maps, :select_strings, :sort_tiebreak
 
-    def initialize(sort_string: "", tie_breaker: "", column_maps: [])
+    def initialize(sort_string: "", sort_tiebreak: "", column_maps: [])
       @sort_string = sort_string
       @column_maps = column_maps
-      @tie_breaker = tie_breaker
+      @sort_tiebreak = sort_tiebreak
       @select_strings = []
     end
 
     def parse_sort_string
-      return [] if @sort_string.blank? && @tie_breaker.blank?
+      return [] if @sort_string.blank? && @sort_tiebreak.blank?
 
-      return attributes_sql_expression(@tie_breaker) if @sort_string.blank?
+      return attributes_sql_expression(@sort_tiebreak) if @sort_string.blank?
 
       sql_strings = attributes_sql_expression(@sort_string)
-      return sql_strings if @tie_breaker.blank?
+      return sql_strings if @sort_tiebreak.blank?
 
-      sql_strings + attributes_sql_expression(@tie_breaker)
+      sql_strings + attributes_sql_expression(@sort_tiebreak)
     end
 
     def attributes_sql_expression(sort_attribute)
