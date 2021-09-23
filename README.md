@@ -1,5 +1,5 @@
 # QueryHelper
-[![TravisCI](https://travis-ci.org/iserve-products/query_helper.svg?branch=master)](https://travis-ci.org/iserve-products/query_helper)
+[![TravisCI](https://travis-ci.org/patterninc/query_helper.svg?branch=master)](https://travis-ci.org/patterninc/query_helper)
 [![Gem Version](https://badge.fury.io/rb/query_helper.svg)](https://badge.fury.io/rb/query_helper)
 
 QueryHelper is a ruby gem used to paginate, sort, and filter your API calls in Ruby on Rails using URL params in your HTTP requests.  It currently only supports Postgres.  
@@ -316,7 +316,7 @@ or
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/iserve_products/query_helper. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/patterninc/query_helper. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 
