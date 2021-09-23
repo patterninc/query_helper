@@ -1,5 +1,4 @@
 # QueryHelper
-[![TravisCI](https://travis-ci.com/patterninc/query_helper.svg?branch=master)](https://travis-ci.com/patterninc/query_helper)
 [![Gem Version](https://badge.fury.io/rb/query_helper.svg)](https://badge.fury.io/rb/query_helper)
 
 QueryHelper is a ruby gem used to paginate, sort, and filter your API calls in Ruby on Rails using URL params in your HTTP requests.  It currently only supports Postgres.  
