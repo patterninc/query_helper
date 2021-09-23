@@ -43,7 +43,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "faker", "~> 1.9.3"
   spec.add_development_dependency "byebug"
   spec.add_development_dependency 'rspec-rails'
-  spec.add_development_dependency 'actionpack'
+  spec.add_development_dependency 'actionpack', '>= 6.0.4.1'
   spec.add_development_dependency 'activesupport'
 
   spec.add_dependency "activerecord", "> 5"
