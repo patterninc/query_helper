@@ -101,6 +101,25 @@ require 'rspec/rails'
 
       end
     end
+
+    url_params = {
+      filter: {
+        "id" => {
+          "gte" => 20,
+          "lt" => 40
+        }
+      },
+      page: Faker::Number.between(5,15).to_s,
+      per_page: Faker::Number.between(2,5).to_s,
+      sort: "name:desc",
+      include: "children"
+    }
+
+    it "test include query" do
+      get :index, params: url_params
+      expect(response.status).to eq(200)
+    end
+
   end
 end
 
