@@ -3,12 +3,13 @@ require "query_helper/invalid_query_error"
 class QueryHelper
   class SqlSort
 
-    attr_accessor :column_maps, :select_strings, :sort_tiebreak
+    attr_accessor :column_maps, :select_strings, :sort_tiebreak, :column_sort_order
 
-    def initialize(sort_string: "", sort_tiebreak: "", column_maps: [])
+    def initialize(sort_string: "", sort_tiebreak: "", column_maps: [], column_sort_order: [])
       @sort_string = sort_string
       @column_maps = column_maps
       @sort_tiebreak = sort_tiebreak
+      @column_sort_order = column_sort_order
       @select_strings = []
     end
 
@@ -31,7 +32,15 @@ class QueryHelper
         direction = sort.split(":")[1]
         modifier = sort.split(":")[2]
         begin
-          sql_expression = @column_maps.find{ |m| m.alias_name.casecmp?(sort_alias) }.sql_expression
+          if @column_sort_order.present?
+            sql_expression = '(CASE'
+            @column_sort_order.each_with_index do |type, index|
+              sql_expression << "WHEN #{sort_alias}=#{type} THEN #{index}"
+            end
+            sql_expression << 'END)' 
+          else
+            sql_expression = @column_maps.find{ |m| m.alias_name.casecmp?(sort_alias) }.sql_expression
+          end
         rescue NoMethodError => e
           raise InvalidQueryError.new("Sorting not allowed on column '#{sort_alias}'")
         end
