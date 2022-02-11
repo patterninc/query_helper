@@ -31,7 +31,7 @@ class QueryHelper
       end
 
       def create_query_helper_sort
-        QueryHelper::SqlSort.new(sort_string: params[:sort], sort_tiebreak: params[:sort_tiebreak])
+        QueryHelper::SqlSort.new(sort_string: params[:sort], sort_tiebreak: params[:sort_tiebreak], column_sort_order: params[:column_sort_order])
       end
 
       def create_query_helper_associations
