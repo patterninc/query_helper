@@ -48,7 +48,7 @@ class QueryHelper
       def query_helper_params_no_pagination
         helpers = {}
         helpers[:sql_filter] = create_query_helper_filter() if params[:filter]
-        helpers[:sql_sort] = create_query_helper_sort() if params[:sort] || params[:sort_tiebreak]
+        helpers[:sql_sort] = create_query_helper_sort() if params[:sort] || params[:sort_tiebreak] || params[:custom_sort]
         helpers[:associations] = create_query_helper_associations() if params[:include]
         helpers[:search_string] = params[:search_for] if params[:search_for]
         helpers
