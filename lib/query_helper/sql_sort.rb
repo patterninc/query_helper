@@ -59,13 +59,13 @@ class QueryHelper
           sql_strings << "#{sql_expression} #{direction}"
         end
       end
-      sql_strings << parse_custom_sort_string if @column_sort_order
+      sql_strings << parse_custom_sort_string
       sql_strings
     end
 
     # This method is used for sorting enum based column
     def parse_custom_sort_string
-      return '' unless @column_sort_order || @column_sort_order[:sort_values].present?
+      return '' if @column_sort_order.blank? || @column_sort_order[:sort_values].blank?
 
       sort_column = @column_sort_order[:column_name]
       sort_values = @column_sort_order[:sort_values]

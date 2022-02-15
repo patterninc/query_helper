@@ -87,6 +87,37 @@ Multiple Sorts: `http://www.example.com/resources?sort=resource_name:desc,resour
 
 Lowercase Sort: `http://www.example.com/resources?sort=resource_name:desc:lowercase`
 
+Custom Sort: `http://www.example.com/resources?custom_sort=resource_name:desc`
+Example:
+  Custom Sort is basically used for enum based column.
+  ```
+  class Customer < ApplicationRecord
+    enum customer_type: {
+      enum1: 0,
+      enum2: 1,
+      enum3: 3
+    }
+  end
+  ```
+
+  Usage at Controller
+
+  ```
+  class SomeController
+
+    def index
+      sort_column, sort_direction = params[:custom_sort]&.split(':')  
+
+      column_sort_order = {
+        column_name: sort_column,
+        direction: sort_direction,
+        sort_values: Customer.send(sort_column.pluralize).values
+      }
+
+      @query_helper.update(query: query, column_sort_order: column_sort_order)
+    end
+  end
+  ```
 #### Filtering
 
 `filter[column][operator_code]=value`
