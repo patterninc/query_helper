@@ -59,7 +59,7 @@ class QueryHelper
           sql_strings << "#{sql_expression} #{direction}"
         end
       end
-      sql_strings << parse_custom_sort_string if @column_sort_order.present?
+      sql_strings << parse_custom_sort_string
       sql_strings
     end
 
