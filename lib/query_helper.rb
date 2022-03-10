@@ -32,6 +32,7 @@ class QueryHelper
     preload: [], # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
     search_fields: [],
     search_string: nil,
+    qualify_clause: false,
     metadata: {}
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query
@@ -51,6 +52,7 @@ class QueryHelper
     @search_fields = search_fields
     @search_string = search_string
     @metadata = metadata
+    @qualify_clause = qualify_clause
   end
 
   def update(
@@ -71,6 +73,7 @@ class QueryHelper
     page: nil,
     per_page: nil,
     search_string: nil,
+    qualify_clause: false,
     metadata: nil
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
@@ -92,6 +95,7 @@ class QueryHelper
     @per_page = determine_per_page(page: page, per_page: per_page) if per_page
     @metadata = metadata if metadata
     set_limit_and_offset()
+    @qualify_clause = qualify_clause
     return self
   end
 
@@ -121,6 +125,7 @@ class QueryHelper
 
     having_clauses = @sql_filter.having_clauses
     where_clauses = @sql_filter.where_clauses
+    qualify_clauses = @sql_filter.qualify_clauses if @qualify_clause
 
     if @search_string
       search_filter = search_filter(column_maps)
@@ -140,6 +145,7 @@ class QueryHelper
       sql: @query,
       where_clauses: where_clauses,
       having_clauses: having_clauses,
+      qualify_clauses: qualify_clauses,
       order_by_clauses: @sql_sort.parse_sort_string,
       include_limit_clause: @page && @per_page ? true : false,
       additional_select_clauses:  @sql_sort.select_strings
