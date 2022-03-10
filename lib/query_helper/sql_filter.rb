@@ -3,12 +3,13 @@ require "query_helper/invalid_query_error"
 class QueryHelper
   class SqlFilter
 
-    attr_accessor :filter_values, :column_maps, :options
+    attr_accessor :filter_values, :column_maps, :options, :qualify_filters
 
-    def initialize(filter_values: [], column_maps: [], options: {})
+    def initialize(filter_values: [], column_maps: [], qualify_filters: [], options: {})
       @column_maps = column_maps
       @filter_values = filter_values
       @options = options
+      @qualify_filters = qualify_filters
     end
 
     def create_filters
@@ -31,11 +32,10 @@ class QueryHelper
     end
 
     def aggregated_attribute?(comparate:)
-      @options['qualify_clause'] && comparate.starts_with?('pct_')
+      @options['qualify_clause'] && qualify_filters.include?(comparate)
     end
 
     def qualify_clauses
-      # @options.select{ |f| f.qualify_clause == true }.map(&:sql_string)
       @filters.select{ |f| aggregated_attribute?(comparate: f.comparate) }.map(&:sql_string)
     end
 

@@ -125,7 +125,7 @@ class QueryHelper
 
     having_clauses = @sql_filter.having_clauses
     where_clauses = @sql_filter.where_clauses
-    qualify_clauses = @sql_filter.qualify_clauses if @qualify_clause
+    qualify_clauses = @sql_filter.qualify_clauses
 
     if @search_string
       search_filter = search_filter(column_maps)
