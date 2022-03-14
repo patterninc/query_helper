@@ -45,7 +45,6 @@ class QueryHelper
       return unless @where_clauses.length > 0
       begin_string = @parser.where_included? ? "and" : "where"
       filter_string = @where_clauses.join(" and ")
-      "  #{begin_string} #{filter_string}  "
       @sql.insert(@parser.insert_where_index, " #{begin_string} #{filter_string} ")
     end
 
@@ -53,7 +52,6 @@ class QueryHelper
       return unless @qualify_clauses.length > 0
       begin_string = @parser.qualify_included? ? "and" : "qualify"
       filter_string = @qualify_clauses.join(" and ")
-      "  #{begin_string} #{filter_string}  "
       @sql.insert(@parser.insert_where_index, " #{begin_string} #{filter_string} ")
     end
 
