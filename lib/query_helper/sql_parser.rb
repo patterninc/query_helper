@@ -48,6 +48,11 @@ class QueryHelper
       find_index(regex, position)
     end
 
+    def qualify_index(position=:start)
+      regex = / [Qq][Uu][Aa][Ll][Ii][Ff][Yy] /
+      find_index(regex, position)
+    end
+
     def group_by_index(position=:start)
       regex = / [Gg][Rr][Oo][Uu][Pp] [Bb][Yy] /
       find_index(regex, position)
@@ -78,6 +83,10 @@ class QueryHelper
 
     def where_included?
       !where_index.nil?
+    end
+
+    def qualify_included?
+      !qualify_index.nil?
     end
 
     def group_by_included?

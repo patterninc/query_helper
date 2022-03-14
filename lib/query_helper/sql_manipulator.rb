@@ -9,6 +9,7 @@ class QueryHelper
       sql:,
       where_clauses: nil,
       having_clauses: nil,
+      qualify_clauses: nil,
       order_by_clauses: nil,
       include_limit_clause: false,
       additional_select_clauses: []
@@ -17,6 +18,7 @@ class QueryHelper
       @sql = @parser.sql.dup
       @where_clauses = where_clauses
       @having_clauses = having_clauses
+      @qualify_clauses = qualify_clauses
       @order_by_clauses = order_by_clauses
       @include_limit_clause = include_limit_clause
       @additional_select_clauses = additional_select_clauses
@@ -24,6 +26,7 @@ class QueryHelper
 
     def build
       insert_having_clauses()
+      insert_qualify_clauses()
       insert_where_clauses()
       insert_select_clauses()
       insert_order_by_and_limit_clause()
@@ -42,7 +45,13 @@ class QueryHelper
       return unless @where_clauses.length > 0
       begin_string = @parser.where_included? ? "and" : "where"
       filter_string = @where_clauses.join(" and ")
-      "  #{begin_string} #{filter_string}  "
+      @sql.insert(@parser.insert_where_index, " #{begin_string} #{filter_string} ")
+    end
+
+    def insert_qualify_clauses
+      return unless @qualify_clauses.length > 0
+      begin_string = @parser.qualify_included? ? "and" : "qualify"
+      filter_string = @qualify_clauses.join(" and ")
       @sql.insert(@parser.insert_where_index, " #{begin_string} #{filter_string} ")
     end
 

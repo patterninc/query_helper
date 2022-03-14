@@ -121,6 +121,7 @@ class QueryHelper
 
     having_clauses = @sql_filter.having_clauses
     where_clauses = @sql_filter.where_clauses
+    qualify_clauses = @sql_filter.qualify_clauses
 
     if @search_string
       search_filter = search_filter(column_maps)
@@ -140,6 +141,7 @@ class QueryHelper
       sql: @query,
       where_clauses: where_clauses,
       having_clauses: having_clauses,
+      qualify_clauses: qualify_clauses,
       order_by_clauses: @sql_sort.parse_sort_string,
       include_limit_clause: @page && @per_page ? true : false,
       additional_select_clauses:  @sql_sort.select_strings

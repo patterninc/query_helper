@@ -3,18 +3,20 @@ require "query_helper/invalid_query_error"
 class QueryHelper
   class Filter
 
-    attr_accessor :operator, :criterion, :comparate, :operator_code, :bind_variable, :aggregate
+    attr_accessor :operator, :criterion, :comparate, :operator_code, :bind_variable, :aggregate, :qualify_clause
 
     def initialize(
       operator_code:,
       criterion:,
       comparate:,
-      aggregate: false
+      aggregate: false,
+      qualify_clause: false
     )
       @operator_code = operator_code
       @criterion = criterion # Converts to a string to be inserted into sql.
       @comparate = comparate
       @aggregate = aggregate
+      @qualify_clause = qualify_clause
       @bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
 
       translate_operator_code()
