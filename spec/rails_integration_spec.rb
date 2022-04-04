@@ -37,8 +37,6 @@ require 'rspec/rails'
             test_number: index
           }
 
-          puts "INDEX: #{index} --- QUERY: #{q[:query].squish} --- SORT: #{sort}"
-
           get :test, params: url_params
 
           rsp = JSON.parse(response.body)
@@ -88,8 +86,6 @@ require 'rspec/rails'
               filter: filter_url_param,
               test_number: index
             }
-
-            puts "INDEX: #{index} --- QUERY: #{q[:query].squish} --- filter: #{filter_url_param}"
 
             get :test, params: url_params
 

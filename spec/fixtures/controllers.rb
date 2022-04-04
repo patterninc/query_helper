@@ -18,7 +18,6 @@ class ParentsController < ApplicationController
     @query_helper.query = test_query[:query]
     @query_helper.model = test_query[:model]
     results = @query_helper.results()
-    puts "EXECUTED QUERY: #{@query_helper.executed_query()}"
     render json: @query_helper.results()
   end
 end
