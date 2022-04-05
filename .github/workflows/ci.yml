@@ -1,0 +1,24 @@
+name: CI
+
+on: [push]
+
+env:
+  RAILS_ENV: test
+  GEMFILE_RUBY_VERSION: 2.7.2
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Ruby 2.7.2
+        uses: ruby/setup-ruby@v1
+        with:
+          # Not needed with a .ruby-version file
+          ruby-version: 2.7.2
+          # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true
+
+      - name: Run tests
+        run: bundle exec rspec spec

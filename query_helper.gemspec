@@ -35,11 +35,11 @@ Gem::Specification.new do |spec|
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
+  spec.required_ruby_version = ">= 2.6.0"
 
   spec.add_development_dependency "bundler", "~> 2.2.27"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "sqlite3", "~> 1.3.6"
   spec.add_development_dependency "faker", "~> 1.9.3"
   spec.add_development_dependency "byebug"
   spec.add_development_dependency 'rspec-rails'
@@ -48,4 +48,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activerecord", "> 5"
   spec.add_dependency "activesupport", "> 5"
+  spec.add_dependency "sqlite3"
 end
