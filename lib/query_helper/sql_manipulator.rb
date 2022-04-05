@@ -14,7 +14,7 @@ class QueryHelper
       include_limit_clause: false,
       additional_select_clauses: []
     )
-      sql = remove_qualified_count(sql.dup)
+      sql = remove_qualified_count(sql)
       @parser = SqlParser.new(sql)
       @sql = @parser.sql.dup
       @where_clauses = where_clauses
@@ -29,14 +29,9 @@ class QueryHelper
       insert_having_clauses()
       insert_qualify_clauses()
       insert_where_clauses()
-
-      if qualify_clause_applicable? || @qualify_present
-        insert_order_by_and_limit_clause()
-        insert_qualified_count_clauses() if @include_limit_clause
-      else
-        insert_select_clauses()
-        insert_order_by_and_limit_clause()
-      end
+      insert_select_clauses()
+      insert_order_by_and_limit_clause()
+      insert_qualified_count_clauses if (qualify_clause_applicable? || @qualify_present) && @include_limit_clause
 
       @sql.squish
     end
@@ -44,7 +39,7 @@ class QueryHelper
     private
 
     def insert_select_clauses
-      @additional_select_clauses << count_sql if @include_limit_clause
+      @additional_select_clauses << count_sql if @include_limit_clause && !(qualify_clause_applicable? || @qualify_present)
       @sql.insert(@parser.insert_select_index, " , #{@additional_select_clauses.join(", ")} ") if @additional_select_clauses.length > 0
     end
 
@@ -68,11 +63,11 @@ class QueryHelper
 
     # If modifying something please check insert_qualified_count_clauses method too
     def remove_qualified_count(unparsed_sql)
-      @qualify_present = unparsed_sql.include?("qualified_results")
+      @qualify_present = unparsed_sql.include?("qualified_results") || unparsed_sql.include?(" qualify ")
       return unparsed_sql unless @qualify_present
 
-      unparsed_sql.gsub!(/[\,\s]?qualified_results AS \( /, '')
-      unparsed_sql.gsub!(") SELECT qualified_results.*, count(*) over () as _query_full_count FROM qualified_results", '')
+      unparsed_sql = unparsed_sql.gsub(/[\,\s]?qualified_results AS \( /, '')
+      unparsed_sql = unparsed_sql.gsub(") SELECT qualified_results.*, count(*) over () as _query_full_count FROM qualified_results", '')
       unparsed_sql
     end
 
