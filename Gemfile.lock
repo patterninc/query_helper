@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    query_helper (0.2.28)
+    query_helper (0.2.29)
       activerecord (> 5)
       activesupport (> 5)
       sqlite3

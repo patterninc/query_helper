@@ -117,6 +117,10 @@ class QueryHelper
       group_by_index() || order_by_index() || limit_index() || @sql.length
     end
 
+    def insert_qualify_index
+      order_by_index() || limit_index() || @sql.length
+    end
+
     def insert_having_index
       # raise InvalidQueryError.new("Cannot calculate insert_having_index because the query has no group by clause") unless group_by_included?
       order_by_index() || limit_index() || @sql.length
