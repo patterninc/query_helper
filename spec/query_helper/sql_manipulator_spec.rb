@@ -17,6 +17,7 @@ RSpec.describe QueryHelper::SqlManipulator do
   let(:order_by_clauses) { [] }
   let(:include_limit_clause) { false }
   let(:additional_select_clauses) { [] }
+  let(:parser) { QueryHelper::SqlParser.new(sql) }
 
   describe "#build" do
     context "add where_clauses" do
@@ -80,6 +81,10 @@ RSpec.describe QueryHelper::SqlManipulator do
 
       it "adds qualify clause to query" do
         expect(manipulator).to eq("SELECT * FROM TESTING qualify percentage > 1.0")
+      end
+
+      it "verifies qualify clause to query at the correct position, as per the query life cycle" do
+        expect(parser.insert_qualify_index).to eq(manipulator.index(' qualify'))
       end
 
       context "when paginated results" do
