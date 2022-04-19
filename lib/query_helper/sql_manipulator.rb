@@ -83,7 +83,7 @@ class QueryHelper
 
       begin_string = @parser.qualify_included? ? "and" : "qualify"
       filter_string = @qualify_clauses.join(" and ")
-      @sql.insert(@parser.insert_where_index, " #{begin_string} #{filter_string} ")
+      @sql.insert(@parser.insert_qualify_index, " #{begin_string} #{filter_string} ")
     end
 
     def qualify_clause_applicable?
