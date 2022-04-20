@@ -6,12 +6,10 @@ require "query_helper/version"
 Gem::Specification.new do |spec|
   spec.name          = "query_helper"
   spec.version       = QueryHelper::VERSION
-  spec.authors       = ["Evan McDaniel"]
-  spec.email         = ["eamigo13@gmail.com"]
-
+  spec.authors       = ["Patterninc"]
   spec.summary       = %q{Ruby Gem to help with pagination and data formatting at Pattern, Inc.}
   spec.description   = %q{Ruby gem developed to help with pagination, filtering, sorting, and including associations on both active record queries and custom sql queries}
-  spec.homepage      = "https://github.com/iserve-products/query_helper"
+  spec.homepage      = "https://github.com/patterninc/query_helper"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
