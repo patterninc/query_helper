@@ -7,6 +7,8 @@ Gem::Specification.new do |spec|
   spec.name          = "query_helper"
   spec.version       = QueryHelper::VERSION
   spec.authors       = ["Patterninc"]
+  spec.email         = ["jason@pattern.com"]
+
   spec.summary       = %q{Ruby Gem to help with pagination and data formatting at Pattern, Inc.}
   spec.description   = %q{Ruby gem developed to help with pagination, filtering, sorting, and including associations on both active record queries and custom sql queries}
   spec.homepage      = "https://github.com/patterninc/query_helper"
