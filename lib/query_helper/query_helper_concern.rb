@@ -26,7 +26,8 @@ class QueryHelper
       end 
 
       def create_query_helper_filter
-        filter_values = params[:filter].permit!.to_h
+        # Here we get dynamic filter variable and hence we can't define permit.
+        filter_values = params[:filter].to_unsafe_h
         QueryHelper::SqlFilter.new(filter_values: filter_values)
       end
 
