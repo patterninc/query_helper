@@ -1,0 +1,26 @@
+name: Brakeman
+
+on: [push]
+
+jobs:
+  brakeman:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Ruby 2.7.2
+        uses: ruby/setup-ruby@v1
+        with:
+          # Not needed with a .ruby-version file
+          ruby-version: 2.7.2
+          # runs 'bundle install' and caches installed gems automatically
+          bundler-cache: true
+
+      - name: Brakeman install
+        run: gem install brakeman
+
+      - name: brakeman
+        id: brakeman
+        run: |
+          brakeman --color --force -q
+          if [ $? -ne 0 ]; then return 1; fi
