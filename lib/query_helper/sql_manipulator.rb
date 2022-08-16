@@ -49,7 +49,7 @@ class QueryHelper
 
     def qualify_clauses(index)
       if index == 0
-        "qualified_results AS ( "
+        "WITH qualified_results AS ( "
       else
         ", qualified_results AS ( "
       end
