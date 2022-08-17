@@ -102,7 +102,7 @@ RSpec.describe QueryHelper::SqlManipulator do
           let(:sql) { "qualified_results AS ( SELECT report.* FROM report qualify percentage > 1.0 limit :limit offset :offset ) SELECT qualified_results.*, count(*) over () as _query_full_count FROM qualified_results" }
 
           it "adds qualify clause to query" do
-            expect(manipulator).to eq(sql)
+            expect(manipulator).to eq("WITH qualified_results AS ( SELECT report.* FROM report qualify percentage > 1.0 limit :limit offset :offset ) SELECT qualified_results.*, count(*) over () as _query_full_count FROM qualified_results")
           end
         end
 
@@ -110,7 +110,7 @@ RSpec.describe QueryHelper::SqlManipulator do
           let(:sql) { "SELECT * FROM TESTING" }
 
           it "adds qualify clause to query" do
-            expect(manipulator).to eq("qualified_results AS ( SELECT * FROM TESTING qualify percentage > 1.0 limit :limit offset :offset ) SELECT qualified_results.*, count(*) over () as _query_full_count FROM qualified_results")
+            expect(manipulator).to eq("WITH qualified_results AS ( SELECT * FROM TESTING qualify percentage > 1.0 limit :limit offset :offset ) SELECT qualified_results.*, count(*) over () as _query_full_count FROM qualified_results")
           end
         end
       end

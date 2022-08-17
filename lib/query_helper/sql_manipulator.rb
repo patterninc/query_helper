@@ -26,8 +26,8 @@ class QueryHelper
     end
 
     def build
-      insert_having_clauses()
       insert_qualify_clauses()
+      insert_having_clauses()
       insert_where_clauses()
       insert_select_clauses()
       insert_order_by_and_limit_clause()
@@ -49,7 +49,7 @@ class QueryHelper
 
     def qualify_clauses(index)
       if index == 0
-        "qualified_results AS ( "
+        "WITH qualified_results AS ( "
       else
         ", qualified_results AS ( "
       end
