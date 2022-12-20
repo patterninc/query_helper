@@ -8,12 +8,24 @@ class QueryHelper
     def self.load_associations(payload:, associations: [], as_json_options: {})
       as_json_options ||= {}
       as_json_options[:include] = as_json_options[:include] || json_associations(associations)
-      ActiveRecord::Associations::Preloader.new.preload(payload, associations)
+      begin
+        # Preloader have been changed in Rails 7, which is giving error on upgrade.
+        # This should be updated to latest API once all repos have been upgraded to Rails 7
+        ActiveRecord::Associations::Preloader.new.preload(payload, associations)
+      rescue
+        ActiveRecord::Associations::Preloader.new(records: payload, associations: associations).call
+      end
       payload.as_json(as_json_options)
     end
 
     def self.preload_associations(payload:, preload: [])
-      ActiveRecord::Associations::Preloader.new.preload(payload, preload)
+      begin
+        # Preloader have been changed in Rails 7, which is giving error on upgrade.
+        # This should be updated to latest API once all repos have been upgraded to Rails 7
+        ActiveRecord::Associations::Preloader.new.preload(payload, preload)
+      rescue
+        ActiveRecord::Associations::Preloader.new(records: payload, associations: preload).call
+      end
     end
 
     def self.json_associations(associations)
