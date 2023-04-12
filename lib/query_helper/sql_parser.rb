@@ -114,7 +114,7 @@ class QueryHelper
     end
 
     def insert_where_index
-      group_by_index() || order_by_index() || limit_index() || @sql.length
+      qualify_index() || group_by_index() || order_by_index() || limit_index() || @sql.length
     end
 
     def insert_qualify_index
