@@ -5,12 +5,13 @@ class QueryHelper
 
     attr_accessor :column_maps, :select_strings, :sort_tiebreak, :column_sort_order
 
-    def initialize(sort_string: "", sort_tiebreak: "", column_maps: [], column_sort_order: {})
+    def initialize(sort_string: "", sort_tiebreak: "", column_maps: [], column_sort_order: {}, keep_nulls_last: false)
       @sort_string = sort_string
       @column_maps = column_maps
       @sort_tiebreak = sort_tiebreak
       @column_sort_order = column_sort_order
       @select_strings = []
+      @keep_nulls_last = keep_nulls_last
     end
 
     def parse_sort_string
@@ -41,12 +42,12 @@ class QueryHelper
           if direction == "desc"
             case ActiveRecord::Base.connection.adapter_name
             when "SQLite" # SQLite is used in the test suite
-              direction = "desc"
+              direction = @keep_nulls_last ? "desc nulls last" : "desc"
             else
               direction = "desc nulls last"
             end
           else
-            direction = "asc"
+            direction = @keep_nulls_last ? "asc nulls last" : "asc"
           end
 
           case modifier
