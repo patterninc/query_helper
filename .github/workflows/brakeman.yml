@@ -17,7 +17,7 @@ jobs:
           bundler-cache: true
 
       - name: Brakeman install
-        run: gem install brakeman
+        run: gem install brakeman -v 5.4.1
 
       - name: brakeman
         id: brakeman
