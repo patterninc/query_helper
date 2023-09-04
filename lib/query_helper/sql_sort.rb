@@ -42,12 +42,12 @@ class QueryHelper
           if direction == "desc"
             case ActiveRecord::Base.connection.adapter_name
             when "SQLite" # SQLite is used in the test suite
-              direction = keep_nulls_last ? "desc nulls last" : "desc"
+              direction = @keep_nulls_last ? "desc nulls last" : "desc"
             else
               direction = "desc nulls last"
             end
           else
-            direction = keep_nulls_last ? "asc nulls last" : "asc"
+            direction = @keep_nulls_last ? "asc nulls last" : "asc"
           end
 
           case modifier
