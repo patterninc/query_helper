@@ -281,7 +281,7 @@ class QueryHelper
       placement = :where
       maps = column_maps.select do |cm|
         placement = :having if cm.aggregate
-        @search_fields.include? cm.alias_name
+        @search_fields.map(&:downcase).include? cm.alias_name.downcase
       end
       bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
       @bind_variables[bind_variable] = "%#{@search_string}%"
