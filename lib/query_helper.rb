@@ -10,6 +10,7 @@ require "query_helper/sql_manipulator"
 require "query_helper/sql_filter"
 require "query_helper/sql_sort"
 require "query_helper/invalid_query_error"
+require "query_helper/invalid_sort_param_error"
 
 class QueryHelper
 
