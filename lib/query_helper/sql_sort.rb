@@ -34,7 +34,9 @@ class QueryHelper
           direction = sort.split(":")[1]
           modifier = sort.split(":")[2]
           begin
-            sql_expression = @column_maps.find{ |m| m.alias_name.casecmp?(sort_alias) }.sql_expression
+            sort_col = @column_maps.find{ |m| m.alias_name.casecmp?(sort_alias) }
+            raise InvalidSortParamError.new("Invalid sort param", sort_alias) if sort_col.nil?
+            sql_expression = sort_col.sql_expression
           rescue NoMethodError => e
             raise InvalidQueryError.new("Sorting not allowed on column '#{sort_alias}'")
           end
