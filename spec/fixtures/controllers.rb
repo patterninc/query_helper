@@ -5,6 +5,7 @@ class ApplicationController < ActionController::API
   include Rails.application.routes.url_helpers
   include QueryHelper::QueryHelperConcern
   before_action :create_query_helper
+  protect_from_forgery with: :exception
 end
 
 class ParentsController < ApplicationController
