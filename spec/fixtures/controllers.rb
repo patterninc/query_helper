@@ -4,6 +4,7 @@ require 'fixtures/models'
 class ApplicationController < ActionController::API
   include Rails.application.routes.url_helpers
   include QueryHelper::QueryHelperConcern
+  include ActionController::RequestForgeryProtection
   before_action :create_query_helper
   protect_from_forgery with: :exception
 end
