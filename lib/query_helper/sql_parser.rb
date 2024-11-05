@@ -18,8 +18,9 @@ class QueryHelper
 
     def remove_comments
       # Remove SQL inline comments (/* */) and line comments (--)
-      @sql = @sql.gsub(%r{/\*.*?\*/}m, '')   # Removes multi-line comments (/* ... */)
-           .gsub(/--[^\n]*$/, '')       # Removes single-line comments (-- ... until end of line)
+      @sql = @sql.gsub(%r{/\*[^/]*?\*/}m, '')  # Removes multi-line comments (/* ... */)
+              .gsub(/--[^\n]*/, '')            # Removes single-line comments (--)
+
       @sql.squish!
     end
 
