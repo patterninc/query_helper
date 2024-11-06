@@ -18,7 +18,9 @@ class QueryHelper
 
     def remove_comments
       # Remove SQL inline comments (/* */) and line comments (--)
-      @sql = @sql.gsub(/\/\*(.*?)\*\//, '').gsub(/--(.*)$/, '')
+      @sql = @sql.gsub(%r{/\*[^/]*?\*/}m, '')  # Removes multi-line comments (/* ... */)
+              .gsub(/--[^\n]*/, '')            # Removes single-line comments (--)
+
       @sql.squish!
     end
 
@@ -186,7 +188,7 @@ class QueryHelper
         ColumnMap.new(
           alias_name: sql_alias,
           sql_expression: sql_expression.squish,
-          aggregate: /(array_agg|avg|bit_and|bit_or|bool_and|bool_or|boolor_agg|booland_agg|count|every|json_agg|jsonb_agg|json_object_agg|jsonb_object_agg|max|min|string_agg|sum|xmlagg)\((.*)\)/.match?(sql_expression)
+          aggregate: /\b(array_agg|avg|bit_and|bit_or|bool_and|bool_or|boolor_agg|booland_agg|count|every|json_agg|jsonb_agg|json_object_agg|jsonb_object_agg|max|min|string_agg|sum|xmlagg)\((.*)\)/.match?(sql_expression)
         ) if sql_alias
       end
       column_maps.compact
