@@ -169,8 +169,8 @@ class QueryHelper
   end
 
   def execute_query
-    query = build_query()
-    @results = @model.find_by_sql([query, @bind_variables]) # Execute Sql Query
+    query = to_sql
+    @results = @model.connection.select_all(query).as_json # Execute Sql Query
     @results = @results.first if @single_record # Return a single result if requested
 
     determine_count()
