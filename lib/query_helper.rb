@@ -171,7 +171,7 @@ class QueryHelper
   def execute_query
     query = build_query()
     @results = @model.find_by_sql([query, @bind_variables]) # Execute Sql Query
-    @results = @results.first if @single_record # Return a single result if requested
+    @results = @single_record ? @results.first : @results
 
     determine_count()
     preload_associations()
@@ -250,16 +250,18 @@ class QueryHelper
     end
 
     def load_associations
-      @results = Associations.load_associations(
-        payload: @results,
+      result = Associations.load_associations(
+        payload: Array(@results),
         associations: @associations,
         as_json_options: @as_json_options
       )
+
+      @results = @single_record ? result.first : result
     end
 
     def preload_associations
       Associations.preload_associations(
-        payload: @results,
+        payload: Array(@results),
         preload: @preload
       )
     end
