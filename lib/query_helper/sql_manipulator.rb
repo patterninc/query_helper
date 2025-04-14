@@ -40,7 +40,7 @@ class QueryHelper
 
     def insert_select_clauses
       @additional_select_clauses << count_sql if @include_limit_clause && !(qualify_clause_applicable? || @qualify_present)
-      @sql.insert(@parser.insert_select_index, " , #{@additional_select_clauses.join(", ")} ") if @additional_select_clauses.length > 0
+      @sql.insert(@parser.insert_select_index, " , #{@additional_select_clauses.uniq.join(", ")} ") if @additional_select_clauses.length > 0
     end
 
     def count_sql
