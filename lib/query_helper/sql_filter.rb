@@ -21,13 +21,15 @@ class QueryHelper
         raise InvalidQueryError.new("cannot filter by #{comparate_alias}") unless map
 
         # create the filter
-        @filters << QueryHelper::Filter.new(
-          operator_code: criteria.keys.first,
-          criterion: criteria.values.first,
-          comparate: map.sql_expression,
-          aggregate: map.aggregate,
-          qualify_clause: aggregated_attribute?(comparate: map.sql_expression)
-        )
+        criteria.each do |k, v|
+          @filters << QueryHelper::Filter.new(
+            operator_code: k,
+            criterion: v,
+            comparate: map.sql_expression,
+            aggregate: map.aggregate,
+            qualify_clause: aggregated_attribute?(comparate: map.sql_expression)
+          )
+        end
       end
     end
 
