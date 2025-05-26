@@ -188,7 +188,7 @@ class QueryHelper
         ColumnMap.new(
           alias_name: sql_alias,
           sql_expression: sql_expression.squish,
-          aggregate: /\b(array_agg|avg|bit_and|bit_or|bool_and|bool_or|boolor_agg|booland_agg|count|every|json_agg|jsonb_agg|json_object_agg|jsonb_object_agg|max|min|string_agg|sum|xmlagg)\((.*)\)/.match?(sql_expression)
+          aggregate: /(?i)\b(array_agg|avg|bit_and|bit_or|bool_and|bool_or|boolor_agg|booland_agg|count|every|json_agg|jsonb_agg|json_object_agg|jsonb_object_agg|max|min|string_agg|sum|xmlagg|any_value|ANY_VALUE)\((.*)\)/.match?(sql_expression)
         ) if sql_alias
       end
       column_maps.compact

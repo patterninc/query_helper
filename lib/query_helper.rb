@@ -282,12 +282,8 @@ class QueryHelper
       raise ArgumentError.new("search_fields not defined") unless @search_fields.length > 0
       placement = :where
       maps = column_maps.select do |cm|
-        if @search_fields.include? cm.alias_name
           placement = :having if cm.aggregate
-          true
-        else
-          false
-        end
+          @search_fields.include? cm.alias_name
       end
       bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
       @bind_variables[bind_variable] = "%#{@search_string}%"
