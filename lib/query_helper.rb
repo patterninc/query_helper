@@ -169,6 +169,7 @@ class QueryHelper
   end
 
   def execute_query
+    retry_count ||= 0
     begin
       query = build_query()
       @results = @model.find_by_sql([query, @bind_variables]) # Execute Sql Query
@@ -179,8 +180,14 @@ class QueryHelper
       load_associations()
       clean_results()
     rescue ActiveRecord::SerializationFailure => e
-      Rails.logger.warn("Retrying after serialization failure: #{e.message}")
-      retry
+      retry_count += 1
+      if retry_count < 3
+        Rails.logger.warn("Retrying after serialization failure (attempt #{retry_count}/3): #{e.message}")
+        retry
+      else
+        Rails.logger.error("Max retries reached after serialization failure: #{e.message}")
+        raise
+      end
     end
   end
 
