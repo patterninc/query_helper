@@ -17,7 +17,7 @@ class QueryHelper
 
       @filter_values.each do |comparate_alias, criteria|
         # Find the sql mapping if it exists
-        map = @column_maps.find { |m| m.alias_name == comparate_alias }
+        map = @column_maps.find { |m| m.alias_name.downcase == comparate_alias.downcase }
         raise InvalidQueryError.new("cannot filter by #{comparate_alias}") unless map
 
         # create the filter
