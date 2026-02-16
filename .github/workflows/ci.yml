@@ -9,6 +9,8 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      BUNDLE_DEPLOYMENT: false
     steps:
       - uses: actions/checkout@v2
 
@@ -18,13 +20,7 @@ jobs:
           # Not needed with a .ruby-version file
           ruby-version: 2.7.2
           # runs 'bundle install' and caches installed gems automatically
-          # bundler-cache: true
-
-      - name: unset deployment
-        run: bundle config unset deployment
-
-      - name: Install dependencies
-        run: bundle install
+          bundler-cache: true
 
       - name: Run tests
         run: bundle exec rspec spec
