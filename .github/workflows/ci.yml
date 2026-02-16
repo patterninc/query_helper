@@ -18,7 +18,13 @@ jobs:
           # Not needed with a .ruby-version file
           ruby-version: 2.7.2
           # runs 'bundle install' and caches installed gems automatically
-          bundler-cache: true
+          # bundler-cache: true
+
+      - name: unset deployment
+        run: bundle config unset deployment
+
+      - name: Install dependencies
+        run: bundle install
 
       - name: Run tests
         run: bundle exec rspec spec
