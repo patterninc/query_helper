@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: query-helper
+  description: 'A Onboard an Existing Repo to Backstage created via Backstage'
+  annotations:
+    repo: patterninc/query_helper
+  labels:
+    CostCenter: PXM
+    Environment: stage
+    Name: query-helper
+    Owner: dev-pxm
+    Department: PXM
+    CreatedBy: Backstage
+spec:
+  type: service
+  system: pxm
