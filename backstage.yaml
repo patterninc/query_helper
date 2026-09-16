@@ -6,10 +6,10 @@ metadata:
   annotations:
     repo: patterninc/query_helper
   labels:
-    CostCenter: PXM
+    CostCenter: PREDICT
     Environment: stage
     Name: query-helper
-    Owner: dev-pxm
+    Owner: dev-core
     Department: PXM
     CreatedBy: Backstage
 spec:
