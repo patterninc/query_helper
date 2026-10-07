@@ -282,7 +282,7 @@ class QueryHelper
       raise ArgumentError.new("search_fields not defined") unless @search_fields.length > 0
       placement = :where
       maps = column_maps.select do |cm|
-        if @search_fields.include? cm.alias_name
+        if @search_fields.any? { |sf| sf.casecmp?(cm.alias_name) }
           placement = :having if cm.aggregate
           true
         else
