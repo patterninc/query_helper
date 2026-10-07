@@ -169,14 +169,31 @@ class QueryHelper
   end
 
   def execute_query
-    query = build_query()
-    @results = @model.find_by_sql([query, @bind_variables]) # Execute Sql Query
-    @results = @single_record ? @results.first : @results
+    max_retries = 3
+    attempts = 0
 
-    determine_count()
-    preload_associations()
-    load_associations()
-    clean_results()
+    begin
+      query = build_query
+      @results = @model.find_by_sql([query, @bind_variables])
+      @results = @single_record ? @results.first : @results
+
+      determine_count
+      preload_associations
+      load_associations
+      clean_results
+
+    rescue ActiveRecord::SerializationFailure => e
+      attempts += 1
+      if attempts <= max_retries
+        sleep_time = 0.2 * (2 ** (attempts - 1)) # exponential backoff: 0.2s, 0.4s, 0.8s
+        Rails.logger.warn("Retry #{attempts}/#{max_retries} after serialization failure: #{e.message}")
+        sleep(sleep_time)
+        retry
+      else
+        Rails.logger.error("Query failed after #{max_retries} retries: #{e.message}")
+        raise
+      end
+    end
   end
 
   def results
