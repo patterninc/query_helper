@@ -211,13 +211,19 @@ class QueryHelper
   private
 
     def determine_page(page:, per_page:)
-      return page.to_i if page
+      if page
+        raise InvalidQueryError.new("page must be greater than 0") if page.to_i < 1
+        return page.to_i
+      end
       return 1 if !page && per_page
       return nil
     end
 
     def determine_per_page(page:, per_page:)
-      return per_page.to_i if per_page
+      if per_page
+        raise InvalidQueryError.new("per_page must not be negative") if per_page.to_i < 0
+        return per_page.to_i
+      end
       return 100 if !per_page && page
       return nil
     end

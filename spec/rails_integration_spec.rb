@@ -24,6 +24,33 @@ require 'rspec/rails'
     #   byebug
     # end
 
+    context "with column_sort_order url params" do
+      let(:column_sort_order) { { column_name: "age", sort_values: ["30", "40"], direction: "desc" } }
+
+      it "sorts by the provided values" do
+        get :index, params: { sort: "id:asc", column_sort_order: column_sort_order }
+        expect(response.status).to eq(200)
+      end
+
+      it "binds sort values as literals" do
+        column_sort_order[:sort_values] = ["1 THEN 0 END), (select 1"]
+        get :index, params: { sort: "id:asc", column_sort_order: column_sort_order }
+        expect(response.status).to eq(200)
+      end
+
+      it "rejects sql in the direction" do
+        column_sort_order[:direction] = "desc, (select 1)"
+        expect { get :index, params: { sort: "id:asc", column_sort_order: column_sort_order } }
+          .to raise_error(QueryHelper::InvalidQueryError)
+      end
+
+      it "rejects unknown columns" do
+        column_sort_order[:column_name] = "(select 1)"
+        expect { get :index, params: { sort: "id:asc", column_sort_order: column_sort_order } }
+          .to raise_error(QueryHelper::InvalidQueryError)
+      end
+    end
+
     it "test example queries" do
       ExampleQueries::SQL_QUERIES.each_with_index do |q, index|
 

@@ -93,6 +93,13 @@ class QueryHelper
     end
 
     def validate_criterion
+      # criteria come from request params, so make sure they are values we can bind
+      if criterion.class == Array
+        invalid_criterion_error() unless ["in", "notin"].include?(operator_code) && criterion.all? { |c| scalar?(c) }
+      else
+        invalid_criterion_error() unless scalar?(criterion)
+      end
+
       case operator_code
         when "gte", "lte", "gt", "lt"
           begin
@@ -114,6 +121,10 @@ class QueryHelper
           invalid_criterion_error() unless ["true", "false"].include?(criterion.to_s)
       end
       true
+    end
+
+    def scalar?(value)
+      [String, Symbol, Numeric, TrueClass, FalseClass, NilClass, Date, Time].any? { |klass| value.is_a?(klass) }
     end
 
     def invalid_criterion_error

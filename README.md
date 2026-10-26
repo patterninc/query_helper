@@ -107,18 +107,28 @@ Example:
   class SomeController
 
     def index
-      sort_column, sort_direction = params[:custom_sort]&.split(':')  
+      sort_column, sort_direction = params[:custom_sort]&.split(':')
+
+      # Look the enum up by name. Never `send` a user supplied string to the model.
+      sort_values = Customer.defined_enums.fetch(sort_column.to_s) do
+        raise QueryHelper::InvalidQueryError.new("Sorting not allowed on column '#{sort_column}'")
+      end.values
 
       column_sort_order = {
         column_name: sort_column,
         direction: sort_direction,
-        sort_values: Customer.send(sort_column.pluralize).values
+        sort_values: sort_values
       }
 
       @query_helper.update(query: query, column_sort_order: column_sort_order)
     end
   end
   ```
+
+  `column_name` must be a column known to the query (a selected alias, a custom mapping or a model attribute),
+  `direction` must be `asc` or `desc`, and `sort_values` are quoted as SQL literals. Anything else raises
+  `QueryHelper::InvalidQueryError`.
+
 #### Filtering
 
 `filter[column][operator_code]=value`
