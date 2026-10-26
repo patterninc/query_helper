@@ -87,14 +87,13 @@ class QueryHelper
       @column_sort_order[key] || @column_sort_order[key.to_s]
     end
 
-    # Only allow plain identifiers that map to a known column
+    # Only allow known columns, and use their mapped sql like ordinary sorts do
     def custom_sort_column(sort_column)
       sort_column = sort_column.to_s
-      known_column = /\A[a-zA-Z_]\w*(\.[a-zA-Z_]\w*)?\z/.match?(sort_column) && @column_maps.any? do |m|
-        m.alias_name.to_s.casecmp?(sort_column) || m.sql_expression == sort_column
-      end
-      raise InvalidQueryError.new("Sorting not allowed on column '#{sort_column}'") unless known_column
-      sort_column
+      map = @column_maps.find { |m| m.alias_name.to_s.casecmp?(sort_column) } ||
+        @column_maps.find { |m| m.sql_expression == sort_column }
+      raise InvalidQueryError.new("Sorting not allowed on column '#{sort_column}'") unless map
+      map.sql_expression
     end
 
     def custom_sort_direction(direction)

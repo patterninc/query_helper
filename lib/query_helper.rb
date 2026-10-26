@@ -80,7 +80,7 @@ class QueryHelper
     per_page: nil,
     search_string: nil,
     metadata: nil,
-    max_per_page: nil
+    max_per_page: @max_per_page # pass nil to remove the cap
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model if model || query
@@ -97,11 +97,12 @@ class QueryHelper
     @sql_sort.sort_tiebreak = sort_tiebreak if sort_tiebreak
     @sql_sort.column_sort_order = column_sort_order if column_sort_order
     @search_string = search_string if search_string
-    @max_per_page = max_per_page if max_per_page
+    max_per_page_changed = max_per_page != @max_per_page
+    @max_per_page = max_per_page
     @page = determine_page(page: page, per_page: per_page) if page
     @per_page = determine_per_page(page: page, per_page: per_page) if per_page
     @metadata = metadata if metadata
-    @per_page = determine_per_page(page: @page, per_page: @per_page) if max_per_page && @per_page
+    @per_page = determine_per_page(page: @page, per_page: @per_page) if max_per_page_changed && !per_page && @per_page
     set_limit_and_offset()
     return self
   end
@@ -223,8 +224,9 @@ class QueryHelper
 
     def determine_page(page:, per_page:)
       if page
-        raise InvalidQueryError.new("page must be greater than 0") if page.to_i < 1
-        return page.to_i
+        page = pagination_integer(page, "page")
+        raise InvalidQueryError.new("page must be greater than 0") if page < 1
+        return page
       end
       return 1 if !page && per_page
       return nil
@@ -232,11 +234,18 @@ class QueryHelper
 
     def determine_per_page(page:, per_page:)
       if per_page
-        raise InvalidQueryError.new("per_page must not be negative") if per_page.to_i < 0
-        return @max_per_page ? [per_page.to_i, @max_per_page].min : per_page.to_i
+        per_page = pagination_integer(per_page, "per_page")
+        raise InvalidQueryError.new("per_page must not be negative") if per_page < 0
+        return @max_per_page ? [per_page, @max_per_page].min : per_page
       end
       return [100, @max_per_page].compact.min if !per_page && page
       return nil
+    end
+
+    # page/per_page come from request params, so they may be arrays or hashes
+    def pagination_integer(value, name)
+      raise InvalidQueryError.new("#{name} must be a number") unless value.is_a?(String) || value.is_a?(Integer)
+      value.to_i
     end
 
     def set_limit_and_offset
@@ -306,6 +315,7 @@ class QueryHelper
           false
         end
       end
+      raise InvalidQueryError.new("search_fields don't match any searchable columns") if maps.empty?
       bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
       @bind_variables[bind_variable] = "%#{@search_string}%"
       filter = "#{maps.map{|m| "coalesce(#{m.sql_expression}::varchar, '')"}.join(" || ")} ilike :#{bind_variable}"

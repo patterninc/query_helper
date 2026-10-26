@@ -13,9 +13,11 @@ These now raise `QueryHelper::InvalidQueryError` (make sure you rescue it and re
 - `page` below 1 or a negative `per_page`
 - filter criteria that are hashes, arrays for operators other than `in`/`notin`, or filter values that are not `operator => criterion` pairs
 - invalid `column_sort_order` columns, directions or values
+- `page`/`per_page` that aren't numbers (e.g. `page[]=1`)
+- a search where none of the `search_fields` resolve to a column
 - includes that are not in `query_helper_allowed_includes`, when it is defined
 
-`column_sort_order` values are now quoted, so string values compare as strings (`'1'` instead of `1`). Postgres and SQLite coerce these for integer columns.
+`column_sort_order[:column_name]` now resolves through the column maps like ordinary sorts, so the generated SQL uses the mapped expression (e.g. `customers.customer_type` rather than `customer_type`). `column_sort_order` values are now quoted, so string values compare as strings (`'1'` instead of `1`). Postgres and SQLite coerce these for integer columns.
 
 If you relied on filtering or sorting by a column that matches your `filter_parameters`, select it in your query or add it to `custom_mappings`.
 

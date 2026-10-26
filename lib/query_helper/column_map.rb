@@ -11,10 +11,11 @@ class QueryHelper
         maps << m if maps.select{|x| x.alias_name == m.alias_name}.empty?
       end
 
+      selected_columns = parser.bare_select_columns
       model.attribute_names.each do |attribute|
         # Model attributes are filterable/sortable even when the query doesn't select them,
-        # so leave out sensitive ones (Rails filter_attributes) unless they are mapped explicitly
-        next if sensitive_attribute?(model, attribute)
+        # so leave out sensitive ones (Rails filter_attributes) unless the query selects them
+        next if sensitive_attribute?(model, attribute) && !selected_columns.include?(attribute)
         if maps.select{|x| x.alias_name == attribute}.empty?
           maps << ColumnMap.new(alias_name: attribute, sql_expression: "#{model.table_name.pluralize}.#{attribute}")
         end

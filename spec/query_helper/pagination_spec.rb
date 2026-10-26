@@ -16,6 +16,13 @@ RSpec.describe QueryHelper do
         .to raise_error(QueryHelper::InvalidQueryError)
     end
 
+    it "rejects structured pagination params" do
+      expect { described_class.new(model: Parent, query: "select * from parents", page: ["1"], per_page: "10") }
+        .to raise_error(QueryHelper::InvalidQueryError, "page must be a number")
+      expect { described_class.new(model: Parent, query: "select * from parents", page: "1", per_page: { "a" => "10" }) }
+        .to raise_error(QueryHelper::InvalidQueryError, "per_page must be a number")
+    end
+
     it "rejects a bad page on update" do
       query_helper = described_class.new(model: Parent, query: "select * from parents")
       expect { query_helper.update(page: "-2") }.to raise_error(QueryHelper::InvalidQueryError)
@@ -39,6 +46,16 @@ RSpec.describe QueryHelper do
       query_helper = described_class.new(model: Parent, query: query, page: "1", per_page: "500")
       expect(query_helper.update(max_per_page: 50).per_page).to eq(50)
       expect(query_helper.bind_variables[:limit]).to eq(50)
+    end
+
+    it "can be disabled on update" do
+      query_helper = described_class.new(model: Parent, query: query, page: "1", per_page: "10")
+      expect(query_helper.update(max_per_page: nil, per_page: "5000").per_page).to eq(5000)
+    end
+
+    it "keeps the cap when update doesn't pass one" do
+      query_helper = described_class.new(model: Parent, query: query, page: "1", per_page: "10", max_per_page: 20)
+      expect(query_helper.update(per_page: "50").per_page).to eq(20)
     end
 
     it "can be disabled" do

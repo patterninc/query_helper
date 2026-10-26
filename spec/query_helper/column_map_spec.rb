@@ -23,6 +23,20 @@ RSpec.describe QueryHelper::ColumnMap do
       expect(alias_names("select parents.age as age from parents")).to include("age")
     end
 
+    it "keeps sensitive attributes the query selects as bare or quoted columns" do
+      expect(alias_names("select age from parents")).to include("age")
+      expect(alias_names('select "parents"."age", id from parents')).to include("age")
+    end
+
+    it "does not count columns used inside functions as selected" do
+      expect(alias_names("select coalesce(age, 0) as years from parents")).not_to include("age")
+    end
+
+    it "rejects a search when every search field is hidden" do
+      query_helper = QueryHelper.new(model: Parent, query: "select id from parents", search_fields: ["age"], search_string: "4")
+      expect { query_helper.build_query }.to raise_error(QueryHelper::InvalidQueryError)
+    end
+
     it "keeps sensitive attributes that are custom mapped" do
       maps = described_class.create_column_mappings(query: "select * from parents", custom_mappings: { "age" => "parents.age" }, model: Parent)
       expect(maps.map(&:alias_name)).to include("age")

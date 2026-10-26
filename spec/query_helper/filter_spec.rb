@@ -24,6 +24,11 @@ RSpec.describe QueryHelper::Filter do
     expect { build_filter("eql", ["1", "2"]) }.to raise_error(QueryHelper::InvalidQueryError)
   end
 
+  it "rejects structured criteria for like" do
+    expect { build_filter("like", ["1", "2"]) }.to raise_error(QueryHelper::InvalidQueryError)
+    expect { build_filter("like", { "a" => "b" }) }.to raise_error(QueryHelper::InvalidQueryError)
+  end
+
   it "rejects nested values in an in list" do
     expect { build_filter("in", [["1"], { "a" => "b" }]) }.to raise_error(QueryHelper::InvalidQueryError)
   end
