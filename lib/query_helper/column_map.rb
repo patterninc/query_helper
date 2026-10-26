@@ -12,12 +12,22 @@ class QueryHelper
       end
 
       model.attribute_names.each do |attribute|
+        # Model attributes are filterable/sortable even when the query doesn't select them,
+        # so leave out sensitive ones (Rails filter_attributes) unless they are mapped explicitly
+        next if sensitive_attribute?(model, attribute)
         if maps.select{|x| x.alias_name == attribute}.empty?
           maps << ColumnMap.new(alias_name: attribute, sql_expression: "#{model.table_name.pluralize}.#{attribute}")
         end
       end
 
       maps
+    end
+
+    def self.sensitive_attribute?(model, attribute)
+      return false unless defined?(ActiveSupport::ParameterFilter) && model.respond_to?(:filter_attributes)
+      return false if model.filter_attributes.blank?
+      value = Object.new
+      ActiveSupport::ParameterFilter.new(model.filter_attributes).filter(attribute => value)[attribute] != value
     end
 
     def self.create_from_hash(hash)

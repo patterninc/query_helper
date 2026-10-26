@@ -35,8 +35,12 @@ class QueryHelper
         QueryHelper::SqlSort.new(sort_string: params[:sort], sort_tiebreak: params[:sort_tiebreak], column_sort_order: params[:column_sort_order])
       end
 
+      # Define query_helper_allowed_includes in a controller to restrict which
+      # associations the include param can load, e.g. [:parent, { children: [:toys] }]
       def create_query_helper_associations
-        QueryHelper::Associations.process_association_params(params[:include])
+        associations = QueryHelper::Associations.process_association_params(params[:include])
+        return associations unless respond_to?(:query_helper_allowed_includes, true)
+        QueryHelper::Associations.validate_associations!(associations, query_helper_allowed_includes)
       end
 
       def query_helper_params

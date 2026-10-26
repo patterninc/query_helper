@@ -13,6 +13,12 @@ require "query_helper/invalid_query_error"
 
 class QueryHelper
 
+  # Upper bound for per_page across all instances; set to nil to disable
+  class << self
+    attr_accessor :max_per_page
+  end
+  self.max_per_page = 1000
+
   attr_accessor :model, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload, :search_field, :search_string, :metadata
   attr_reader :query
 
@@ -32,13 +38,15 @@ class QueryHelper
     preload: [], # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
     search_fields: [],
     search_string: nil,
-    metadata: {}
+    metadata: {},
+    max_per_page: QueryHelper.max_per_page # per_page values above this are clamped to it
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model
     @bind_variables = bind_variables
     @sql_filter = sql_filter
     @sql_sort = sql_sort
+    @max_per_page = max_per_page
     @page = determine_page(page: page, per_page: per_page)
     @per_page = determine_per_page(page: page, per_page: per_page)
     set_limit_and_offset()
@@ -71,7 +79,8 @@ class QueryHelper
     page: nil,
     per_page: nil,
     search_string: nil,
-    metadata: nil
+    metadata: nil,
+    max_per_page: nil
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model if model || query
@@ -88,9 +97,11 @@ class QueryHelper
     @sql_sort.sort_tiebreak = sort_tiebreak if sort_tiebreak
     @sql_sort.column_sort_order = column_sort_order if column_sort_order
     @search_string = search_string if search_string
+    @max_per_page = max_per_page if max_per_page
     @page = determine_page(page: page, per_page: per_page) if page
     @per_page = determine_per_page(page: page, per_page: per_page) if per_page
     @metadata = metadata if metadata
+    @per_page = determine_per_page(page: @page, per_page: @per_page) if max_per_page && @per_page
     set_limit_and_offset()
     return self
   end
@@ -222,9 +233,9 @@ class QueryHelper
     def determine_per_page(page:, per_page:)
       if per_page
         raise InvalidQueryError.new("per_page must not be negative") if per_page.to_i < 0
-        return per_page.to_i
+        return @max_per_page ? [per_page.to_i, @max_per_page].min : per_page.to_i
       end
-      return 100 if !per_page && page
+      return [100, @max_per_page].compact.min if !per_page && page
       return nil
     end
 

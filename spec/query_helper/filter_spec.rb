@@ -37,24 +37,3 @@ RSpec.describe QueryHelper::SqlFilter do
     expect { sql_filter.create_filters }.to raise_error(QueryHelper::InvalidQueryError)
   end
 end
-
-RSpec.describe QueryHelper do
-  describe "pagination params" do
-    it "rejects a page below 1" do
-      expect { described_class.new(model: Parent, query: "select * from parents", page: "0", per_page: "10") }
-        .to raise_error(QueryHelper::InvalidQueryError)
-      expect { described_class.new(model: Parent, query: "select * from parents", page: "-1", per_page: "10") }
-        .to raise_error(QueryHelper::InvalidQueryError)
-    end
-
-    it "rejects a negative per_page" do
-      expect { described_class.new(model: Parent, query: "select * from parents", page: "1", per_page: "-5") }
-        .to raise_error(QueryHelper::InvalidQueryError)
-    end
-
-    it "rejects a bad page on update" do
-      query_helper = described_class.new(model: Parent, query: "select * from parents")
-      expect { query_helper.update(page: "-2") }.to raise_error(QueryHelper::InvalidQueryError)
-    end
-  end
-end

@@ -51,6 +51,27 @@ require 'rspec/rails'
       end
     end
 
+    context "with include url params" do
+      it "loads any association when no allowlist is defined" do
+        get :index, params: { include: "children" }
+        expect(JSON.parse(response.body)["data"].first).to have_key("children")
+      end
+
+      context "when the controller defines query_helper_allowed_includes" do
+        before { controller.define_singleton_method(:query_helper_allowed_includes) { [:children] } }
+
+        it "loads allowed associations" do
+          get :index, params: { include: ["children"] }
+          expect(JSON.parse(response.body)["data"].first).to have_key("children")
+        end
+
+        it "rejects associations that are not allowed" do
+          expect { get :index, params: { include: { children: ["parent"] } } }
+            .to raise_error(QueryHelper::InvalidQueryError, "Including 'children.parent' is not allowed")
+        end
+      end
+    end
+
     it "test example queries" do
       ExampleQueries::SQL_QUERIES.each_with_index do |q, index|
 

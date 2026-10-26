@@ -78,6 +78,12 @@ end
 
 `http://www.example.com/resources?page=1&per_page=25`
 
+`per_page` is capped at `QueryHelper.max_per_page` (1000 by default). Change it globally in an initializer, or per query with the `max_per_page:` option (`nil` turns the cap off):
+
+```ruby
+QueryHelper.max_per_page = 500
+```
+
 #### Sorting
 
 `sort=column:direction`
@@ -188,6 +194,16 @@ Include ActiveRecord associations in the payload.  The association must be defin
 Single Association: `http://www.example.com/resources?include=child_resource`
 
 Multiple Associations: `http://www.example.com/resources?include[]=child_resource&include[]=parent_resource`
+
+Every attribute of an included record is serialized, so restrict what can be included by defining `query_helper_allowed_includes` in your controller. Requests for anything else raise `QueryHelper::InvalidQueryError`:
+
+```ruby
+class ResourcesController < ApplicationController
+  def query_helper_allowed_includes
+    [:child_resource, { parent_resource: [:owner] }]
+  end
+end
+```
 
 
 
@@ -354,6 +370,15 @@ or
   }
 }
 ```
+
+## Security
+
+QueryHelper builds SQL from URL params, so keep the following in mind:
+
+- **Rescue `QueryHelper::InvalidQueryError`** (e.g. `rescue_from QueryHelper::InvalidQueryError` returning a 400). It is raised for unknown filter/sort columns, invalid operators and criteria, invalid `column_sort_order` values, invalid pagination params and disallowed includes.
+- **Define `query_helper_allowed_includes`** in controllers that use the `include` param (see [Associations](#associations)).
+- **Sensitive columns.** Every model attribute can be filtered and sorted on, even if your query does not select it. Attributes matching `filter_attributes` (Rails' `config.filter_parameters`, e.g. `password`, `token`, `secret`) are left out unless you select them explicitly or add a custom mapping. Make sure your `filter_parameters` cover your sensitive columns.
+- **Never interpolate params into `query`, `custom_mappings` or `column_sort_order[:column_name]`**. Pass values with `bind_variables` instead.
 
 ## Contributing
 
