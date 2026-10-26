@@ -4,7 +4,6 @@ PATH
     query_helper (0.5.0)
       activerecord (> 5)
       activesupport (> 5)
-      sqlite3
 
 GEM
   remote: https://rubygems.org/
@@ -109,6 +108,7 @@ DEPENDENCIES
   rake (~> 13.0)
   rspec (~> 3.0)
   rspec-rails
+  sqlite3
 
 BUNDLED WITH
    2.2.29

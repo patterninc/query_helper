@@ -20,3 +20,5 @@ These now raise `QueryHelper::InvalidQueryError` (make sure you rescue it and re
 If you relied on filtering or sorting by a column that matches your `filter_parameters`, select it in your query or add it to `custom_mappings`.
 
 `per_page` above 1000 is now clamped. Set `QueryHelper.max_per_page` or pass `max_per_page:` to change it.
+
+`sqlite3` is no longer a runtime dependency. Add it to your own Gemfile if you use it.
