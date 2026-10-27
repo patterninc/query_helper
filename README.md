@@ -78,6 +78,12 @@ end
 
 `http://www.example.com/resources?page=1&per_page=25`
 
+`per_page` is capped at `QueryHelper.max_per_page` (1000 by default). Change it globally in an initializer, or per query with the `max_per_page:` option (`nil` turns the cap off):
+
+```ruby
+QueryHelper.max_per_page = 500
+```
+
 #### Sorting
 
 `sort=column:direction`
@@ -107,18 +113,28 @@ Example:
   class SomeController
 
     def index
-      sort_column, sort_direction = params[:custom_sort]&.split(':')  
+      sort_column, sort_direction = params[:custom_sort]&.split(':')
+
+      # Look the enum up by name. Never `send` a user supplied string to the model.
+      sort_values = Customer.defined_enums.fetch(sort_column.to_s) do
+        raise QueryHelper::InvalidQueryError.new("Sorting not allowed on column '#{sort_column}'")
+      end.values
 
       column_sort_order = {
         column_name: sort_column,
         direction: sort_direction,
-        sort_values: Customer.send(sort_column.pluralize).values
+        sort_values: sort_values
       }
 
       @query_helper.update(query: query, column_sort_order: column_sort_order)
     end
   end
   ```
+
+  `column_name` must be a column known to the query (a selected alias, a custom mapping or a model attribute),
+  `direction` must be `asc` or `desc`, and `sort_values` are quoted as SQL literals. Anything else raises
+  `QueryHelper::InvalidQueryError`.
+
 #### Filtering
 
 `filter[column][operator_code]=value`
@@ -178,6 +194,24 @@ Include ActiveRecord associations in the payload.  The association must be defin
 Single Association: `http://www.example.com/resources?include=child_resource`
 
 Multiple Associations: `http://www.example.com/resources?include[]=child_resource&include[]=parent_resource`
+
+The `include` param only works in controllers that define `query_helper_allowed_includes`. Requests for anything not in the list, or any `include` in a controller without the list, raise `QueryHelper::InvalidQueryError`:
+
+```ruby
+class ResourcesController < ApplicationController
+  def query_helper_allowed_includes
+    [:child_resource, { parent_resource: [:owner] }]
+  end
+end
+```
+
+Included records leave out attributes that match the associated model's `filter_attributes` (Rails' `config.filter_parameters`, e.g. `password`, `token`, `secret`). This doesn't apply when you pass your own `include` in `as_json_options`.
+
+While you add allowlists, you can restore the pre-1.0 behavior (any association can be included) in an initializer. This is not recommended:
+
+```ruby
+QueryHelper.allow_unlisted_includes = true
+```
 
 
 
@@ -344,6 +378,15 @@ or
   }
 }
 ```
+
+## Security
+
+QueryHelper builds SQL from URL params, so keep the following in mind:
+
+- **Rescue `QueryHelper::InvalidQueryError`** (e.g. `rescue_from QueryHelper::InvalidQueryError` returning a 400). It is raised for unknown filter/sort columns, invalid operators and criteria, invalid `column_sort_order` values, invalid pagination params and disallowed includes.
+- **Define `query_helper_allowed_includes`** in controllers that use the `include` param (see [Associations](#associations)). Without it, `include` is rejected.
+- **Sensitive columns.** Every model attribute can be filtered and sorted on, even if your query does not select it. Attributes matching `filter_attributes` (Rails' `config.filter_parameters`, e.g. `password`, `token`, `secret`) are left out unless you select them explicitly or add a custom mapping. Make sure your `filter_parameters` cover your sensitive columns.
+- **Never interpolate params into `query`, `custom_mappings` or `column_sort_order[:column_name]`**. Pass values with `bind_variables` instead.
 
 ## Contributing
 

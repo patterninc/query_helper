@@ -194,6 +194,21 @@ class QueryHelper
       column_maps.compact
     end
 
+    # Plain column names in the select clause, e.g. `select id, "name", parents.age from ...`.
+    # Uses the whited out sql so columns inside functions or subqueries aren't included
+    def bare_select_columns
+      return [] unless select_included? && from_included?
+      start_position = select_index(:end)
+      white_out_selects = @white_out_sql[start_position...from_index()]
+      selects = @sql[start_position...from_index()]
+      position = 0
+      white_out_selects.split(",", -1).map do |segment|
+        column = selects[position, segment.length].squish
+        position += segment.length + 1
+        column[/\A(?:distinct\s+)?(?:"?\w+"?\.)?"?([a-zA-Z_]\w*)"?\z/i, 1]
+      end.compact
+    end
+
     private
 
     def find_index(regex, position=:start)

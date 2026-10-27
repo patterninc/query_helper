@@ -4,16 +4,20 @@ on:
   push:
     tags:
       - v*
+
+permissions:
+  contents: write # rake release pushes the tag
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
 
       - name: Release Gem
-        if: contains(github.ref, 'refs/tags/v')
-        uses: cadwallion/publish-rubygems-action@master
+        # Third-party action that receives RUBYGEMS_API_KEY, so pin it to a reviewed commit
+        uses: cadwallion/publish-rubygems-action@94a6f4cd5350581749c569b5001eecc864e3ad0b
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           RUBYGEMS_API_KEY: ${{secrets.RUBYGEMS_API_KEY}}

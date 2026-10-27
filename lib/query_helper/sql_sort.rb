@@ -34,7 +34,7 @@ class QueryHelper
           direction = sort.split(":")[1]
           modifier = sort.split(":")[2]
           begin
-            sql_expression = @column_maps.find{ |m| m.alias_name.casecmp?(sort_alias) }.sql_expression
+            sql_expression = @column_maps.find{ |m| m.alias_name.to_s.casecmp?(sort_alias.to_s) }.sql_expression
           rescue NoMethodError => e
             raise InvalidQueryError.new("Sorting not allowed on column '#{sort_alias}'")
           end
@@ -60,22 +60,54 @@ class QueryHelper
           sql_strings << "#{sql_expression} #{direction}"
         end
       end
-      sql_strings << parse_custom_sort_string if @column_sort_order.present? && @column_sort_order[:sort_values].present?
+      sql_strings << parse_custom_sort_string if @column_sort_order.present? && column_sort_option(:sort_values).present?
       sql_strings
     end
 
     # This method is used for sorting enum based column
     def parse_custom_sort_string
-      sort_column = @column_sort_order[:column_name]
-      sort_values = @column_sort_order[:sort_values]
-      direction = @column_sort_order[:direction]
+      sort_column = custom_sort_column(column_sort_option(:column_name))
+      sort_values = Array(column_sort_option(:sort_values))
+      direction = custom_sort_direction(column_sort_option(:direction))
 
       sql_expression = '(CASE'
       sort_values.each_with_index do |value, index|
-          sql_expression << " WHEN #{sort_column}=#{value} THEN #{index}"
+          sql_expression << " WHEN #{sort_column}=#{quote_sort_value(value)} THEN #{index}"
       end
-      sql_expression << " END) #{direction}" 
+      sql_expression << " END) #{direction}"
       sql_expression
+    end
+
+    private
+
+    # column_sort_order may come straight from request params, so it can be a
+    # plain hash (symbol or string keys), ActionController::Parameters, or junk
+    def column_sort_option(key)
+      raise InvalidQueryError.new("Invalid column_sort_order") unless @column_sort_order.respond_to?(:key?)
+      @column_sort_order[key] || @column_sort_order[key.to_s]
+    end
+
+    # Only allow known columns, and use their mapped sql like ordinary sorts do
+    def custom_sort_column(sort_column)
+      sort_column = sort_column.to_s
+      map = @column_maps.find { |m| m.alias_name.to_s.casecmp?(sort_column) } ||
+        @column_maps.find { |m| m.sql_expression == sort_column }
+      raise InvalidQueryError.new("Sorting not allowed on column '#{sort_column}'") unless map
+      map.sql_expression
+    end
+
+    def custom_sort_direction(direction)
+      return "asc" if direction.blank?
+      direction = direction.to_s.downcase
+      raise InvalidQueryError.new("Invalid sort direction '#{direction}'") unless ["asc", "desc"].include?(direction)
+      direction
+    end
+
+    def quote_sort_value(value)
+      unless [String, Symbol, Numeric, TrueClass, FalseClass, NilClass].any? { |klass| value.is_a?(klass) }
+        raise InvalidQueryError.new("Invalid sort value '#{value}'")
+      end
+      ActiveRecord::Base.connection.quote(value)
     end
   end
 end

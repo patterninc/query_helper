@@ -19,6 +19,7 @@ class QueryHelper
         # Find the sql mapping if it exists
         map = @column_maps.find { |m| m.alias_name == comparate_alias }
         raise InvalidQueryError.new("cannot filter by #{comparate_alias}") unless map
+        raise InvalidQueryError.new("invalid filter for #{comparate_alias}") unless criteria.respond_to?(:each_pair)
 
         # create the filter
         criteria.each do |k, v|

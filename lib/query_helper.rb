@@ -13,6 +13,15 @@ require "query_helper/invalid_query_error"
 
 class QueryHelper
 
+  # Upper bound for per_page across all instances; set to nil to disable
+  class << self
+    attr_accessor :max_per_page, :allow_unlisted_includes
+  end
+  self.max_per_page = 1000
+  # The include url param is rejected unless the controller defines query_helper_allowed_includes.
+  # Set to true to restore the pre-1.0 behavior of allowing any association
+  self.allow_unlisted_includes = false
+
   attr_accessor :model, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload, :search_field, :search_string, :metadata
   attr_reader :query
 
@@ -32,13 +41,15 @@ class QueryHelper
     preload: [], # preload activerecord associations - used instead of `associations` when you don't want them included in the payload
     search_fields: [],
     search_string: nil,
-    metadata: {}
+    metadata: {},
+    max_per_page: QueryHelper.max_per_page # per_page values above this are clamped to it
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model
     @bind_variables = bind_variables
     @sql_filter = sql_filter
     @sql_sort = sql_sort
+    @max_per_page = max_per_page
     @page = determine_page(page: page, per_page: per_page)
     @per_page = determine_per_page(page: page, per_page: per_page)
     set_limit_and_offset()
@@ -71,7 +82,8 @@ class QueryHelper
     page: nil,
     per_page: nil,
     search_string: nil,
-    metadata: nil
+    metadata: nil,
+    max_per_page: @max_per_page # pass nil to remove the cap
   )
     @query = query.class < ActiveRecord::Relation ? query.to_sql : query if query
     @model = query.class < ActiveRecord::Relation ? query.base_class : model if model || query
@@ -88,9 +100,12 @@ class QueryHelper
     @sql_sort.sort_tiebreak = sort_tiebreak if sort_tiebreak
     @sql_sort.column_sort_order = column_sort_order if column_sort_order
     @search_string = search_string if search_string
+    max_per_page_changed = max_per_page != @max_per_page
+    @max_per_page = max_per_page
     @page = determine_page(page: page, per_page: per_page) if page
     @per_page = determine_per_page(page: page, per_page: per_page) if per_page
     @metadata = metadata if metadata
+    @per_page = determine_per_page(page: @page, per_page: @per_page) if max_per_page_changed && !per_page && @per_page
     set_limit_and_offset()
     return self
   end
@@ -211,15 +226,29 @@ class QueryHelper
   private
 
     def determine_page(page:, per_page:)
-      return page.to_i if page
+      if page
+        page = pagination_integer(page, "page")
+        raise InvalidQueryError.new("page must be greater than 0") if page < 1
+        return page
+      end
       return 1 if !page && per_page
       return nil
     end
 
     def determine_per_page(page:, per_page:)
-      return per_page.to_i if per_page
-      return 100 if !per_page && page
+      if per_page
+        per_page = pagination_integer(per_page, "per_page")
+        raise InvalidQueryError.new("per_page must not be negative") if per_page < 0
+        return @max_per_page ? [per_page, @max_per_page].min : per_page
+      end
+      return [100, @max_per_page].compact.min if !per_page && page
       return nil
+    end
+
+    # page/per_page come from request params, so they may be arrays or hashes
+    def pagination_integer(value, name)
+      raise InvalidQueryError.new("#{name} must be a number") unless value.is_a?(String) || value.is_a?(Integer)
+      value.to_i
     end
 
     def set_limit_and_offset
@@ -289,6 +318,7 @@ class QueryHelper
           false
         end
       end
+      raise InvalidQueryError.new("search_fields don't match any searchable columns") if maps.empty?
       bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
       @bind_variables[bind_variable] = "%#{@search_string}%"
       filter = "#{maps.map{|m| "coalesce(#{m.sql_expression}::varchar, '')"}.join(" || ")} ilike :#{bind_variable}"

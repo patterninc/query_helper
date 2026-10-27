@@ -20,6 +20,7 @@ class QueryHelper
       @bind_variable = ('a'..'z').to_a.shuffle[0,20].join.to_sym
 
       translate_operator_code()
+      validate_criterion_type()
       mofify_criterion()
       modify_comparate()
       validate_criterion()
@@ -92,6 +93,16 @@ class QueryHelper
       end 
     end
 
+    # criteria come from request params, so make sure they are values we can bind.
+    # Runs before mofify_criterion so like wildcards can't turn structured input into a string
+    def validate_criterion_type
+      if criterion.class == Array
+        invalid_criterion_error() unless ["in", "notin"].include?(operator_code) && criterion.all? { |c| scalar?(c) }
+      else
+        invalid_criterion_error() unless scalar?(criterion)
+      end
+    end
+
     def validate_criterion
       case operator_code
         when "gte", "lte", "gt", "lt"
@@ -114,6 +125,10 @@ class QueryHelper
           invalid_criterion_error() unless ["true", "false"].include?(criterion.to_s)
       end
       true
+    end
+
+    def scalar?(value)
+      [String, Symbol, Numeric, TrueClass, FalseClass, NilClass, Date, Time].any? { |klass| value.is_a?(klass) }
     end
 
     def invalid_criterion_error

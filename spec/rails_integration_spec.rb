@@ -24,6 +24,78 @@ require 'rspec/rails'
     #   byebug
     # end
 
+    context "with column_sort_order url params" do
+      let(:column_sort_order) { { column_name: "age", sort_values: ["30", "40"], direction: "desc" } }
+
+      it "sorts by the provided values" do
+        get :index, params: { sort: "id:asc", column_sort_order: column_sort_order }
+        expect(response.status).to eq(200)
+      end
+
+      it "binds sort values as literals" do
+        column_sort_order[:sort_values] = ["1 THEN 0 END), (select 1"]
+        get :index, params: { sort: "id:asc", column_sort_order: column_sort_order }
+        expect(response.status).to eq(200)
+      end
+
+      it "rejects sql in the direction" do
+        column_sort_order[:direction] = "desc, (select 1)"
+        expect { get :index, params: { sort: "id:asc", column_sort_order: column_sort_order } }
+          .to raise_error(QueryHelper::InvalidQueryError)
+      end
+
+      it "rejects unknown columns" do
+        column_sort_order[:column_name] = "(select 1)"
+        expect { get :index, params: { sort: "id:asc", column_sort_order: column_sort_order } }
+          .to raise_error(QueryHelper::InvalidQueryError)
+      end
+    end
+
+    context "with include url params" do
+      it "rejects includes when no allowlist is defined" do
+        expect { get :index, params: { include: "children" } }
+          .to raise_error(QueryHelper::InvalidQueryError, /Define query_helper_allowed_includes in ParentsController/)
+      end
+
+      context "when allow_unlisted_includes is enabled" do
+        around do |example|
+          QueryHelper.allow_unlisted_includes = true
+          example.run
+        ensure
+          QueryHelper.allow_unlisted_includes = false
+        end
+
+        it "loads any association" do
+          get :index, params: { include: "children" }
+          expect(JSON.parse(response.body)["data"].first).to have_key("children")
+        end
+      end
+
+      context "when the controller defines query_helper_allowed_includes" do
+        before { controller.define_singleton_method(:query_helper_allowed_includes) { [:children] } }
+
+        it "loads allowed associations" do
+          get :index, params: { include: ["children"] }
+          expect(JSON.parse(response.body)["data"].first).to have_key("children")
+        end
+
+        it "leaves sensitive columns out of included records" do
+          Child.filter_attributes = [:age]
+          get :index, params: { include: ["children"] }
+          child = JSON.parse(response.body)["data"].first["children"].first
+          expect(child).to include("id", "name")
+          expect(child).not_to have_key("age")
+        ensure
+          Child.remove_instance_variable(:@filter_attributes)
+        end
+
+        it "rejects associations that are not allowed" do
+          expect { get :index, params: { include: { children: ["parent"] } } }
+            .to raise_error(QueryHelper::InvalidQueryError, "Including 'children.parent' is not allowed")
+        end
+      end
+    end
+
     it "test example queries" do
       ExampleQueries::SQL_QUERIES.each_with_index do |q, index|
 

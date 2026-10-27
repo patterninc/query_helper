@@ -2,6 +2,9 @@ name: CI
 
 on: [push]
 
+permissions:
+  contents: read
+
 env:
   RAILS_ENV: test
   GEMFILE_RUBY_VERSION: 2.7.2
@@ -10,7 +13,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Ruby 2.7.2
         uses: ruby/setup-ruby@v1
