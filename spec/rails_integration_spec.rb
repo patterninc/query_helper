@@ -52,9 +52,23 @@ require 'rspec/rails'
     end
 
     context "with include url params" do
-      it "loads any association when no allowlist is defined" do
-        get :index, params: { include: "children" }
-        expect(JSON.parse(response.body)["data"].first).to have_key("children")
+      it "rejects includes when no allowlist is defined" do
+        expect { get :index, params: { include: "children" } }
+          .to raise_error(QueryHelper::InvalidQueryError, /Define query_helper_allowed_includes in ParentsController/)
+      end
+
+      context "when allow_unlisted_includes is enabled" do
+        around do |example|
+          QueryHelper.allow_unlisted_includes = true
+          example.run
+        ensure
+          QueryHelper.allow_unlisted_includes = false
+        end
+
+        it "loads any association" do
+          get :index, params: { include: "children" }
+          expect(JSON.parse(response.body)["data"].first).to have_key("children")
+        end
       end
 
       context "when the controller defines query_helper_allowed_includes" do
@@ -63,6 +77,16 @@ require 'rspec/rails'
         it "loads allowed associations" do
           get :index, params: { include: ["children"] }
           expect(JSON.parse(response.body)["data"].first).to have_key("children")
+        end
+
+        it "leaves sensitive columns out of included records" do
+          Child.filter_attributes = [:age]
+          get :index, params: { include: ["children"] }
+          child = JSON.parse(response.body)["data"].first["children"].first
+          expect(child).to include("id", "name")
+          expect(child).not_to have_key("age")
+        ensure
+          Child.remove_instance_variable(:@filter_attributes)
         end
 
         it "rejects associations that are not allowed" do

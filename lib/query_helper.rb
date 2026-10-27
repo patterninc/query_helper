@@ -15,9 +15,12 @@ class QueryHelper
 
   # Upper bound for per_page across all instances; set to nil to disable
   class << self
-    attr_accessor :max_per_page
+    attr_accessor :max_per_page, :allow_unlisted_includes
   end
   self.max_per_page = 1000
+  # The include url param is rejected unless the controller defines query_helper_allowed_includes.
+  # Set to true to restore the pre-1.0 behavior of allowing any association
+  self.allow_unlisted_includes = false
 
   attr_accessor :model, :bind_variables, :sql_filter, :sql_sort, :page, :per_page, :single_record, :associations, :as_json_options, :executed_query, :api_payload, :preload, :search_field, :search_string, :metadata
   attr_reader :query

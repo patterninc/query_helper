@@ -24,11 +24,17 @@ class QueryHelper
       maps
     end
 
-    def self.sensitive_attribute?(model, attribute)
-      return false unless defined?(ActiveSupport::ParameterFilter) && model.respond_to?(:filter_attributes)
-      return false if model.filter_attributes.blank?
+    def self.sensitive_attribute?(model, attribute, filter = sensitive_attribute_filter(model))
+      return false unless filter
       value = Object.new
-      ActiveSupport::ParameterFilter.new(model.filter_attributes).filter(attribute => value)[attribute] != value
+      filter.filter(attribute => value)[attribute] != value
+    end
+
+    # nil when the model has no filter_attributes (or Rails is too old to have them)
+    def self.sensitive_attribute_filter(model)
+      return nil unless defined?(ActiveSupport::ParameterFilter) && model.respond_to?(:filter_attributes)
+      return nil if model.filter_attributes.blank?
+      ActiveSupport::ParameterFilter.new(model.filter_attributes)
     end
 
     def self.create_from_hash(hash)

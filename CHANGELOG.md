@@ -1,11 +1,15 @@
 # Changelog
 
-## 0.5.0
+## 1.0.0
+
+### Breaking
+- **The `include` url param is rejected unless the controller defines `query_helper_allowed_includes`.** Before, any association could be included and every column of it serialized, including password hashes and tokens. Add an allowlist to each controller that uses `include`. If you need time to do that, set `QueryHelper.allow_unlisted_includes = true` in an initializer to restore the old behavior.
 
 ### Security
 - Fixed SQL injection through `column_sort_order`, which `QueryHelperConcern` passes from request params. `column_name` must now be a known column, `direction` must be `asc` or `desc`, and `sort_values` are quoted as SQL literals.
 - Model attributes matching `filter_attributes` (Rails `config.filter_parameters`) can no longer be filtered, sorted or searched on unless the query selects them or they are custom mapped. This stops blind extraction of secrets through `filter[...][like]`.
-- Added an optional `query_helper_allowed_includes` controller hook to restrict the `include` param.
+- Added the `query_helper_allowed_includes` controller hook, which lists the associations the `include` param can load (nested includes supported).
+- Included records leave out attributes that match the associated model's `filter_attributes`. This doesn't apply when you pass your own `include` in `as_json_options`.
 - `per_page` is capped at `QueryHelper.max_per_page` (default 1000).
 
 ### Upgrade notes
@@ -15,7 +19,7 @@ These now raise `QueryHelper::InvalidQueryError` (make sure you rescue it and re
 - invalid `column_sort_order` columns, directions or values
 - `page`/`per_page` that aren't numbers (e.g. `page[]=1`)
 - a search where none of the `search_fields` resolve to a column
-- includes that are not in `query_helper_allowed_includes`, when it is defined
+- any `include` in a controller without `query_helper_allowed_includes`, or an `include` not in the list
 
 `column_sort_order[:column_name]` now resolves through the column maps like ordinary sorts, so the generated SQL uses the mapped expression (e.g. `customers.customer_type` rather than `customer_type`). `column_sort_order` values are now quoted, so string values compare as strings (`'1'` instead of `1`). Postgres and SQLite coerce these for integer columns.
 
