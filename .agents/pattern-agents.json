@@ -1,0 +1,7 @@
+{
+  "$schema": "https://oly.ai-sdlc.aws.pattern.com/schemas/pattern-agents/v2.schema.json",
+  "schema_version": 2,
+  "github": {
+    "repo": "patterninc/query_helper"
+  }
+}
