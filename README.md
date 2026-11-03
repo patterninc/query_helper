@@ -441,6 +441,8 @@ The gem isn't deployed anywhere. A release is a new version on [RubyGems](https:
 
    The tag triggers `.github/workflows/publish_rubygems.yml`, which runs `rake release` using the `RUBYGEMS_API_KEY` repository secret.
 
+   > **Known issue:** the `v1.0.0` publish run failed (`LoadError: cannot load such file -- rspec/core/rake_task`) because the action runs `rake release` without installing the bundle. Until the workflow is fixed, confirm the new version appears on [RubyGems](https://rubygems.org/gems/query_helper) after the tag run. A green run alone doesn't prove the gem was published.
+
 Design decisions are recorded in [docs/adr/](docs/adr/). Guidance for AI agents is in [AGENTS.md](AGENTS.md).
 
 ## Contributing
