@@ -388,6 +388,63 @@ QueryHelper builds SQL from URL params, so keep the following in mind:
 - **Sensitive columns.** Every model attribute can be filtered and sorted on, even if your query does not select it. Attributes matching `filter_attributes` (Rails' `config.filter_parameters`, e.g. `password`, `token`, `secret`) are left out unless you select them explicitly or add a custom mapping. Make sure your `filter_parameters` cover your sensitive columns.
 - **Never interpolate params into `query`, `custom_mappings` or `column_sort_order[:column_name]`**. Pass values with `bind_variables` instead.
 
+## Development
+
+### Prerequisites
+
+- **Ruby 2.7.2.** CI uses this version (`.github/workflows/ci.yml`). The gemspec allows `>= 2.6.0`.
+- **Bundler 2.2.x.** `Gemfile.lock` is `BUNDLED WITH 2.2.29`.
+- A C toolchain for the `sqlite3` and `nokogiri` native extensions.
+- **Postgres is not needed to run the tests.** The gem generates Postgres SQL for host apps, but the spec suite runs on an in-memory SQLite database that `spec/spec_helper.rb` creates and seeds with Faker data. You only need Postgres to try the gem inside a real Rails app.
+
+### Setup
+
+```bash
+git clone https://github.com/patterninc/query_helper.git
+cd query_helper
+gem install bundler -v 2.2.29
+bundle install        # or bin/setup
+```
+
+### Running the tests
+
+```bash
+bundle exec rspec spec                                # full suite (what CI runs)
+bundle exec rspec spec/query_helper/filter_spec.rb    # one file
+bundle exec rspec spec/query_helper/filter_spec.rb:10 # one example
+bundle exec rake                                      # default rake task runs the specs
+```
+
+Unit specs live in `spec/query_helper/`. Controller-level specs that go through `QueryHelperConcern` live in `spec/rails_integration_spec.rb`, using the minimal Rails app in `spec/fixtures/`.
+
+Static analysis runs Brakeman on every push (`.github/workflows/brakeman.yml`):
+
+```bash
+gem install brakeman -v 5.4.1
+brakeman --color --force -q
+```
+
+`bin/console` opens IRB with the gem loaded.
+
+### Releasing
+
+The gem isn't deployed anywhere. A release is a new version on [RubyGems](https://rubygems.org/gems/query_helper).
+
+1. Bump `QueryHelper::VERSION` in `lib/query_helper/version.rb`, then run `bundle install` so `Gemfile.lock` picks up the new version.
+2. Add a section for the version to [CHANGELOG.md](CHANGELOG.md), with breaking changes and upgrade notes.
+3. Open a PR and merge it to `master` once CI and Brakeman pass.
+4. A maintainer tags the merge commit and pushes the tag:
+
+   ```bash
+   git tag v1.2.3 && git push origin v1.2.3
+   ```
+
+   The tag triggers `.github/workflows/publish_rubygems.yml`, which runs `rake release` using the `RUBYGEMS_API_KEY` repository secret.
+
+   > **Known issue:** the `v1.0.0` publish run failed (`LoadError: cannot load such file -- rspec/core/rake_task`) because the action runs `rake release` without installing the bundle. Until the workflow is fixed, confirm the new version appears on [RubyGems](https://rubygems.org/gems/query_helper) after the tag run. A green run alone doesn't prove the gem was published.
+
+Design decisions are recorded in [docs/adr/](docs/adr/). Guidance for AI agents is in [AGENTS.md](AGENTS.md).
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/patterninc/query_helper. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
