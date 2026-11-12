@@ -8,6 +8,7 @@ decision changes, add a new record that supersedes the old one and update the ol
 | --- | --- | --- |
 | [0001](0001-postgres-first-sql-generation.md) | Generate Postgres SQL by editing the caller's query string | Accepted |
 | [0002](0002-url-param-security-model.md) | Security model for URL-param filtering, sorting and includes | Accepted |
+| [0003](0003-publish-to-github-packages.md) | Publish releases to GitHub Packages, automatically on version bump | Accepted |
 
 Template:
 

@@ -14,10 +14,10 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/patterninc/query_helper"
   spec.license       = "MIT"
 
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
+  # Releases go to the patterninc GitHub Packages registry only. This makes `gem push` and
+  # `rake release` refuse to push to rubygems.org by accident.
   if spec.respond_to?(:metadata)
-    # spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
+    spec.metadata["allowed_push_host"] = "https://rubygems.pkg.github.com/patterninc"
     #
     # spec.metadata["homepage_uri"] = spec.homepage
     # spec.metadata["source_code_uri"] = "TODO: Put your gem's public repo URL here."

@@ -1,24 +1,35 @@
 # QueryHelper
-[![Gem Version](https://badge.fury.io/rb/query_helper.svg)](https://badge.fury.io/rb/query_helper)
 [![CI](https://github.com/patterninc/query_helper/actions/workflows/ci.yml/badge.svg)](https://github.com/patterninc/query_helper/actions)
 
 QueryHelper is a ruby gem used to paginate, sort, and filter your API calls in Ruby on Rails using URL params in your HTTP requests.  It currently only supports Postgres.  
 
 ## Installation
 
-Add this line to your application's Gemfile:
+The gem is published to the `patterninc` GitHub Packages RubyGems registry, not rubygems.org.
+You must be signed in to GitHub with access to this repository to install it.
 
-```ruby
-gem 'query_helper'
-```
+1. Create a GitHub personal access token (classic) with the `read:packages` scope, and authorize it
+   for SSO on the `patterninc` organization if prompted.
+2. Give Bundler the token (this stays out of the Gemfile and out of git):
 
-And then execute:
+   ```bash
+   bundle config set --global rubygems.pkg.github.com YOUR_GITHUB_USERNAME:YOUR_TOKEN
+   ```
 
-    $ bundle
+3. Add the registry as a source in your application's Gemfile:
 
-Or install it yourself as:
+   ```ruby
+   source "https://rubygems.pkg.github.com/patterninc" do
+     gem "query_helper"
+   end
+   ```
 
-    $ gem install query_helper
+4. Run `bundle install`.
+
+In CI, set the `BUNDLE_RUBYGEMS__PKG__GITHUB__COM` environment variable to `USERNAME:TOKEN` instead
+of running `bundle config`. In GitHub Actions, a `GITHUB_TOKEN` from another repository can read the
+package only if this repository's Actions access settings allow it; otherwise use a token stored as
+a secret.
 
 ## Quick Use
 
@@ -428,20 +439,12 @@ brakeman --color --force -q
 
 ### Releasing
 
-The gem isn't deployed anywhere. A release is a new version on [RubyGems](https://rubygems.org/gems/query_helper).
+The gem isn't deployed anywhere. A release is a new version in the `patterninc` [GitHub Packages](https://github.com/orgs/patterninc/packages?repo_name=query_helper) RubyGems registry, and it happens automatically when a version bump is merged.
 
 1. Bump `QueryHelper::VERSION` in `lib/query_helper/version.rb`, then run `bundle install` so `Gemfile.lock` picks up the new version.
 2. Add a section for the version to [CHANGELOG.md](CHANGELOG.md), with breaking changes and upgrade notes.
 3. Open a PR and merge it to `master` once CI and Brakeman pass.
-4. A maintainer tags the merge commit and pushes the tag:
-
-   ```bash
-   git tag v1.2.3 && git push origin v1.2.3
-   ```
-
-   The tag triggers `.github/workflows/publish_rubygems.yml`, which runs `rake release` using the `RUBYGEMS_API_KEY` repository secret.
-
-   > **Known issue:** the `v1.0.0` publish run failed (`LoadError: cannot load such file -- rspec/core/rake_task`) because the action runs `rake release` without installing the bundle. Until the workflow is fixed, confirm the new version appears on [RubyGems](https://rubygems.org/gems/query_helper) after the tag run. A green run alone doesn't prove the gem was published.
+4. Merging to `master` runs `.github/workflows/publish_github_packages.yml`: it runs the tests, builds the gem, pushes it to GitHub Packages, then tags `vX.Y.Z` and creates a GitHub release. A version that already has a tag is skipped, so merges that don't bump the version publish nothing. Check the new version appears under the repository's Packages afterwards. A green run alone isn't proof.
 
 Design decisions are recorded in [docs/adr/](docs/adr/). Guidance for AI agents is in [AGENTS.md](AGENTS.md).
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+- Releases are published to the `patterninc` GitHub Packages RubyGems registry instead of rubygems.org, automatically when a version bump is merged to `master`. The gemspec's `allowed_push_host` now blocks pushes elsewhere.
+
+### Upgrade notes
+Applications must install the gem from `https://rubygems.pkg.github.com/patterninc` with a GitHub token that has `read:packages`. See the README's Installation section. rubygems.org will not receive versions after `0.4.0`.
+
 ## 1.0.0
 
 ### Breaking
