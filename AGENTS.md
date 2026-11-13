@@ -56,7 +56,7 @@ docs/adr/                            # Architecture decision records
 ## Commands
 
 Prerequisites: Ruby 3.3 (what CI and the consuming apps use; the gemspec still allows `>= 2.6.0`, but the
-specs and lockfile, Rails 8.1, need Ruby 3.2+), Bundler 2.5.x (lockfile
+specs and lockfile, Rails 8.0, need Ruby 3.2+), Bundler 2.5.x (lockfile
 is `BUNDLED WITH 2.5.22`), and a C toolchain for the `sqlite3` and `nokogiri` native extensions.
 You do **not** need Postgres to run the tests.
 
@@ -117,7 +117,7 @@ See [.agents/skills/release-gem/SKILL.md](.agents/skills/release-gem/SKILL.md) f
   Seed data is random (Faker), so assert on shape and relationships, not on fixed values.
 - Every behavior change needs a spec in `spec/query_helper/` or `spec/rails_integration_spec.rb`.
   Every security-relevant change also needs a spec that sends the hostile input.
-- Rails compatibility: the gem supports ActiveRecord/ActiveSupport `> 5`. The lockfile pins 8.1
+- Rails compatibility: the gem supports ActiveRecord/ActiveSupport `> 5`. The lockfile pins 8.0
   for development. Keep the existing pre/post Rails 7 fallbacks (e.g. `Preloader` in
   `associations.rb`) unless you are deliberately dropping support, and record that in the CHANGELOG.
 

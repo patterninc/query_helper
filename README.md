@@ -404,7 +404,7 @@ QueryHelper builds SQL from URL params, so keep the following in mind:
 
 ### Prerequisites
 
-- **Ruby 3.3.** CI uses this version (`.github/workflows/ci.yml`), as do the applications that use the gem. The gemspec still allows `>= 2.6.0`, but the test suite and its lockfile (Rails 8.1) need Ruby 3.2 or newer.
+- **Ruby 3.3.** CI uses this version (`.github/workflows/ci.yml`), as do the applications that use the gem. The gemspec still allows `>= 2.6.0`, but the test suite and its lockfile (Rails 8.0) need Ruby 3.2 or newer.
 - **Bundler 2.5.** `Gemfile.lock` is `BUNDLED WITH 2.5.22`, the version bundled with Ruby 3.3.6.
 - A C toolchain for the `sqlite3` and `nokogiri` native extensions.
 - **Postgres is not needed to run the tests.** The gem generates Postgres SQL for host apps, but the spec suite runs on an in-memory SQLite database that `spec/spec_helper.rb` creates and seeds with Faker data. You only need Postgres to try the gem inside a real Rails app.
