@@ -5,6 +5,8 @@
 ### Changed
 - Releases are published to the `patterninc` GitHub Packages RubyGems registry instead of rubygems.org, automatically when a version bump is merged to `master`. The gemspec's `allowed_push_host` now blocks pushes elsewhere.
 
+- Development and CI moved from Ruby 2.7 to Ruby 3.3 (Rails 8.1 in the lockfile; the test-data gem `faker` is now `>= 2.0`). No change to `lib/`, and the gemspec still allows Ruby `>= 2.6.0`, but the specs no longer run on Ruby older than 3.2.
+
 ### Upgrade notes
 Applications must install the gem from `https://rubygems.pkg.github.com/patterninc` with a GitHub token that has `read:packages`. See the README's Installation section. rubygems.org will not receive versions after `0.4.0`.
 

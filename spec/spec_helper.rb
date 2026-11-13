@@ -24,8 +24,8 @@ RSpec.configure do |config|
         "lt" => 40
       }
     }
-    @per_page = Faker::Number.between(5,15)
-    @page = Faker::Number.between(2,5)
+    @per_page = Faker::Number.between(from: 5, to: 15)
+    @page = Faker::Number.between(from: 2, to: 5)
     @url_params = {
       parent_id: 1,
       random_param: true,
@@ -58,9 +58,9 @@ RSpec.configure do |config|
 
   # Load data into databases
   (0..99).each do
-    parent = Parent.create(name: Faker::Name.name, age: Faker::Number.between(25, 55))
-    (0..Faker::Number.between(1, 5)).each do
-      Child.create(name: Faker::Name.name, parent: parent, age: Faker::Number.between(1, 25))
+    parent = Parent.create(name: Faker::Name.name, age: Faker::Number.between(from: 25, to: 55))
+    (0..Faker::Number.between(from: 1, to: 5)).each do
+      Child.create(name: Faker::Name.name, parent: parent, age: Faker::Number.between(from: 1, to: 25))
     end
   end
 end

@@ -31,10 +31,10 @@ jobs:
         with:
           fetch-depth: 0 # need existing tags to know whether this version is already released
 
-      - name: Set up Ruby 2.7
+      - name: Set up Ruby 3.3
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.8
+          ruby-version: "3.3"
           bundler-cache: true
 
       - name: Read version and check what is left to do

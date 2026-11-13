@@ -43,7 +43,7 @@ spec/
   rails_integration_spec.rb          # Controller specs through QueryHelperConcern
 bin/setup, bin/console               # bundle install / IRB with the gem loaded
 .github/workflows/
-  ci.yml                             # bundle exec rspec spec (Ruby 2.7.8) on every push
+  ci.yml                             # bundle exec rspec spec (Ruby 3.3) on every push
   brakeman.yml                       # Brakeman 5.4.1 on every push
   publish_github_packages.yml        # On a version bump merged to master: test, build, push to GitHub Packages, tag
   backfill_github_packages.yml       # Manual: publish already-released tags (default: the ones apps pin) to GitHub Packages
@@ -55,12 +55,13 @@ docs/adr/                            # Architecture decision records
 
 ## Commands
 
-Prerequisites: Ruby 2.7.8 (what CI uses, the last 2.7 patch release; the gemspec allows `>= 2.6.0`), Bundler 2.2.x (lockfile
-is `BUNDLED WITH 2.2.29`), and a C toolchain for the `sqlite3` and `nokogiri` native extensions.
+Prerequisites: Ruby 3.3 (what CI and the consuming apps use; the gemspec still allows `>= 2.6.0`, but the
+specs and lockfile, Rails 8.1, need Ruby 3.2+), Bundler 2.5.x (lockfile
+is `BUNDLED WITH 2.5.22`), and a C toolchain for the `sqlite3` and `nokogiri` native extensions.
 You do **not** need Postgres to run the tests.
 
 ```bash
-gem install bundler -v 2.2.29
+gem install bundler -v 2.5.22
 bundle install                       # or bin/setup
 
 bundle exec rspec spec               # full suite, exactly what CI runs
@@ -116,7 +117,7 @@ See [.agents/skills/release-gem/SKILL.md](.agents/skills/release-gem/SKILL.md) f
   Seed data is random (Faker), so assert on shape and relationships, not on fixed values.
 - Every behavior change needs a spec in `spec/query_helper/` or `spec/rails_integration_spec.rb`.
   Every security-relevant change also needs a spec that sends the hostile input.
-- Rails compatibility: the gem supports ActiveRecord/ActiveSupport `> 5`. The lockfile pins 6.1
+- Rails compatibility: the gem supports ActiveRecord/ActiveSupport `> 5`. The lockfile pins 8.1
   for development. Keep the existing pre/post Rails 7 fallbacks (e.g. `Preloader` in
   `associations.rb`) unless you are deliberately dropping support, and record that in the CHANGELOG.
 
