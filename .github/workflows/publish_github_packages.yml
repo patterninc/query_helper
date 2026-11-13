@@ -1,0 +1,99 @@
+# Publishes to the GitHub Packages RubyGems registry of the patterninc org. Needs no secrets
+# beyond the built-in GITHUB_TOKEN. See docs/adr/0003-publish-to-github-packages.md.
+name: Publish Gem
+
+on:
+  push:
+    branches: [master]
+    # Only a version bump can produce a new release.
+    paths: [lib/query_helper/version.rb]
+  workflow_dispatch: # re-run a release that failed part way
+
+# Two merges in quick succession must not race on the same version.
+concurrency:
+  group: publish-gem
+  cancel-in-progress: false
+
+permissions:
+  contents: write  # push the vX.Y.Z tag, create the GitHub release
+  packages: write  # push to the GitHub Packages RubyGems registry
+
+env:
+  REGISTRY: https://rubygems.pkg.github.com/${{ github.repository_owner }}
+
+jobs:
+  publish:
+    # workflow_dispatch lets you pick any branch; only master may release.
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need existing tags to know whether this version is already released
+
+      - name: Set up Ruby 3.3
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Read version and check what is left to do
+        id: version
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(ruby -r./lib/query_helper/version -e 'print QueryHelper::VERSION')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          # The tag is created right after the gem is pushed, so a tag means the gem is published.
+          if git rev-parse -q --verify "refs/tags/v$VERSION" > /dev/null; then
+            echo "v$VERSION is already published."
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+          fi
+          # Tracked separately so a re-run can create a release that failed after the tag was pushed.
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run tests
+        if: steps.version.outputs.publish == 'true'
+        env:
+          RAILS_ENV: test
+        run: bundle exec rspec spec
+
+      - name: Build gem
+        if: steps.version.outputs.publish == 'true'
+        run: gem build query_helper.gemspec
+
+      - name: Push gem to GitHub Packages
+        if: steps.version.outputs.publish == 'true'
+        env:
+          GEM_HOST_API_KEY: "Bearer ${{ secrets.GITHUB_TOKEN }}"
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          mkdir -p "$HOME/.gem"
+          (umask 077; printf -- "---\n:github: %s\n" "$GEM_HOST_API_KEY" > "$HOME/.gem/credentials")
+          gem push --key github --host "$REGISTRY" "query_helper-$VERSION.gem"
+
+      # After the push on purpose: if the push fails there is no tag, so a re-run tries again.
+      - name: Tag
+        if: steps.version.outputs.publish == 'true'
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: Create GitHub release
+        if: steps.version.outputs.release == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          awk -v h="## $VERSION" '$0 == h {f=1; next} /^## / {f=0} f' CHANGELOG.md > release_notes.md
+          [ -s release_notes.md ] || echo "See CHANGELOG.md" > release_notes.md
+          # The .gem is deliberately not attached: this repo is public, the package registry is not.
+          gh release create "v$VERSION" --title "v$VERSION" --notes-file release_notes.md

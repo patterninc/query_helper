@@ -1,6 +1,6 @@
 ---
 name: release-gem
-description: Prepares a query_helper release PR (version bump, Gemfile.lock, CHANGELOG entry) and gives the maintainer the tag command that publishes to RubyGems. Use when a maintainer asks to cut, prepare or bump a query_helper release. Do not use for ordinary feature or fix PRs, and never push a v* tag or publish the gem yourself.
+description: Prepares a query_helper release PR (version bump, Gemfile.lock, CHANGELOG entry) and explains that merging it publishes to GitHub Packages. Use when a maintainer asks to cut, prepare or bump a query_helper release. Do not use for ordinary feature or fix PRs, and never push a v* tag or publish the gem yourself.
 ---
 
 # Release query_helper
@@ -24,21 +24,18 @@ description: Prepares a query_helper release PR (version bump, Gemfile.lock, CHA
 5. Run `bundle exec rspec spec` and `gem build query_helper.gemspec`, then delete the built `.gem`.
    Both must succeed.
 6. Open a PR titled `Release vX.Y.Z` with the CHANGELOG section as the body.
-7. In the PR, tell the maintainer to run this after merge:
-
-   ```bash
-   git checkout master && git pull
-   git tag vX.Y.Z && git push origin vX.Y.Z
-   ```
-
-   The tag triggers `.github/workflows/publish_rubygems.yml` (`rake release`).
+7. In the PR, tell the maintainer that merging it releases: the publish workflow
+   (`.github/workflows/publish_github_packages.yml`) tests, builds, pushes to the
+   `patterninc` GitHub Packages registry, tags `vX.Y.Z` and creates a GitHub release. No tag needs
+   pushing by hand.
 
 ## Guardrails
 
-- Never push a `v*` tag, run `rake release` or `gem push`. Publishing is the maintainer's step.
+- Never push a `v*` tag, run `rake release` or `gem push`. The workflow publishes when the
+  maintainer merges the release PR.
 - Never edit `.github/workflows/`. If the publish workflow needs a change, write the diff in the
-  PR description. The v1.0.0 publish failed with `LoadError: rspec/core/rake_task` because
-  `rake release` ran without the bundle installed. Check whether that is fixed before promising
-  the tag will publish.
-- After a publish run, check that the version shows up at https://rubygems.org/gems/query_helper.
-  A green tag alone doesn't prove the gem was published.
+  PR description. Check `.github/workflows/` actually contains `publish_github_packages.yml`
+  (not the old `publish_rubygems.yml`) before promising that merging publishes.
+- After the merge, check that the version shows up under the repository's Packages
+  (https://github.com/orgs/patterninc/packages?repo_name=query_helper). A green run alone doesn't
+  prove the gem was published.

@@ -13,8 +13,8 @@ require 'rspec/rails'
     #       "lt" => 40
     #     }
     #   },
-    #   page: Faker::Number.between(5,15).to_s,
-    #   per_page: Faker::Number.between(2,5).to_s,
+    #   page: Faker::Number.between(from: 5, to: 15).to_s,
+    #   per_page: Faker::Number.between(from: 2, to: 5).to_s,
     #   sort: "name:desc",
     #   include: "parent"
     # }
@@ -103,8 +103,8 @@ require 'rspec/rails'
           sort_direction = ["asc","desc"].sample
 
           url_params = {
-            page: Faker::Number.between(5,15).to_s,
-            per_page: Faker::Number.between(2,5).to_s,
+            page: Faker::Number.between(from: 5, to: 15).to_s,
+            per_page: Faker::Number.between(from: 2, to: 5).to_s,
             sort: "#{sort}:#{sort_direction}",
             test_number: index
           }
@@ -132,7 +132,7 @@ require 'rspec/rails'
         q[:expected_filters].each do |filter|
           filter[:operator_codes].each do |oc|
             filter_value = if filter[:class] == Integer
-              Faker::Number.between(0,100).to_s
+              Faker::Number.between(from: 0, to: 100).to_s
             elsif filter[:class] == String
               case oc
               when "in", "notin"
@@ -153,8 +153,8 @@ require 'rspec/rails'
             }
 
             url_params = {
-              page: Faker::Number.between(5,15).to_s,
-              per_page: Faker::Number.between(2,5).to_s,
+              page: Faker::Number.between(from: 5, to: 15).to_s,
+              per_page: Faker::Number.between(from: 2, to: 5).to_s,
               filter: filter_url_param,
               test_number: index
             }

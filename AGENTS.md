@@ -4,14 +4,14 @@ Guidance for AI agents (and humans) working in `patterninc/query_helper`.
 
 ## What this repo is
 
-`query_helper` is a Ruby gem, published to RubyGems, that adds pagination, sorting, filtering,
+`query_helper` is a Ruby gem, published to the `patterninc` GitHub Packages registry, that adds pagination, sorting, filtering,
 text search and association loading to Rails API endpoints, driven by URL params
 (`page`, `per_page`, `sort`, `sort_tiebreak`, `custom_sort`, `filter[...]`, `search_for`, `include`).
 It works on ActiveRecord relations and on raw SQL strings by parsing the SQL and inserting
 `where` / `having` / `qualify` / `order by` / `limit` clauses into it.
 
 - It is a **library**. It is not deployed anywhere and has no AWS, database or runtime
-  infrastructure of its own. A "release" is a gem version pushed to RubyGems.
+  infrastructure of its own. A "release" is a gem version pushed to GitHub Packages.
 - Generated SQL targets **Postgres** (e.g. `ilike`, `::varchar`, `nulls last`,
   `count(*) over ()`). The spec suite runs on in-memory **SQLite**; see
   [ADR 0001](docs/adr/0001-postgres-first-sql-generation.md).
@@ -43,9 +43,11 @@ spec/
   rails_integration_spec.rb          # Controller specs through QueryHelperConcern
 bin/setup, bin/console               # bundle install / IRB with the gem loaded
 .github/workflows/
-  ci.yml                             # bundle exec rspec spec (Ruby 2.7.2) on every push
+  ci.yml                             # bundle exec rspec spec on Ruby 3.3/3.4 x Rails 8.0/8.1 on every push
   brakeman.yml                       # Brakeman 5.4.1 on every push
-  publish_rubygems.yml               # On a v* tag: rake release to RubyGems
+  publish_github_packages.yml        # On a version bump merged to master: test, build, push to GitHub Packages, tag
+  backfill_github_packages.yml       # Manual: publish already-released tags (default: the ones apps pin) to GitHub Packages
+gemfiles/rails_8_1.gemfile          # Same as Gemfile but Rails 8.1 (+ its lockfile); the root Gemfile is Rails 8.0
 docs/adr/                            # Architecture decision records
 .agents/
   pattern-agents.json                # Oly agent-dispatch manifest
@@ -54,17 +56,19 @@ docs/adr/                            # Architecture decision records
 
 ## Commands
 
-Prerequisites: Ruby 2.7.2 (what CI uses; the gemspec allows `>= 2.6.0`), Bundler 2.2.x (lockfile
-is `BUNDLED WITH 2.2.29`), and a C toolchain for the `sqlite3` and `nokogiri` native extensions.
+Prerequisites: Ruby 3.3 (what CI and the consuming apps use; the gemspec still allows `>= 2.6.0`, but the
+specs and lockfile, Rails 8.0, need Ruby 3.2+), Bundler 2.5.x (lockfile
+is `BUNDLED WITH 2.5.22`), and a C toolchain for the `sqlite3` and `nokogiri` native extensions.
 You do **not** need Postgres to run the tests.
 
 ```bash
-gem install bundler -v 2.2.29
+gem install bundler -v 2.5.22
 bundle install                       # or bin/setup
 
-bundle exec rspec spec               # full suite, exactly what CI runs
+bundle exec rspec spec               # full suite (Rails 8.0), what each CI matrix job runs
 bundle exec rspec spec/query_helper/filter_spec.rb      # one file
 bundle exec rspec spec/query_helper/filter_spec.rb:10   # one example
+BUNDLE_GEMFILE=gemfiles/rails_8_1.gemfile bundle exec rspec spec   # against Rails 8.1 (CI runs both)
 bundle exec rake                     # default task = spec
 
 gem install brakeman -v 5.4.1 && brakeman --color --force -q   # static analysis, as in brakeman.yml
@@ -77,20 +81,21 @@ Terraform in this repo.
 
 ## Release / deploy flow
 
-There is no deployment. Releases go to RubyGems:
+There is no deployment. Releases go to the GitHub Packages RubyGems registry
+(`https://rubygems.pkg.github.com/patterninc`), automatically ([ADR 0003](docs/adr/0003-publish-to-github-packages.md)):
 
 1. Bump `QueryHelper::VERSION` in `lib/query_helper/version.rb` and run `bundle install` so the
    `query_helper (x.y.z)` line in `Gemfile.lock` matches.
 2. Add a `## x.y.z` section to `CHANGELOG.md`. Breaking changes and upgrade notes are required for
    anything that changes behavior callers rely on.
 3. Merge to `master` through a PR, with CI and Brakeman green.
-4. A maintainer pushes the tag `vx.y.z` on the merge commit. `publish_rubygems.yml` runs
-   `rake release` (Bundler gem tasks) with the `RUBYGEMS_API_KEY` repo secret.
+4. The merge triggers the publish workflow, which runs the specs, builds the gem, pushes it with the
+   built-in `GITHUB_TOKEN`, then tags `vx.y.z` and creates a GitHub release. A version that is
+   already tagged is skipped. There is no tag step for a human and no API-key secret.
 
-Known state: the `v1.0.0` publish run failed with `LoadError: cannot load such file --
-rspec/core/rake_task`. The publish action runs `rake release` without the bundle installed, and
-`Rakefile` requires RSpec. As a result RubyGems still lists `0.4.0` as the latest version.
-Fixing it is a workflow change for a human. Agents cannot push `.github/workflows/` changes.
+Known state: `publish_github_packages.yml` replaced `publish_rubygems.yml`, which failed on `v1.0.0`
+and pushed to rubygems.org. The package is private to the org by default and its access is
+managed in the package settings, not the repo (see the ADR). Never make it public: that can't be undone.
 
 See [.agents/skills/release-gem/SKILL.md](.agents/skills/release-gem/SKILL.md) for the step-by-step.
 
@@ -114,7 +119,7 @@ See [.agents/skills/release-gem/SKILL.md](.agents/skills/release-gem/SKILL.md) f
   Seed data is random (Faker), so assert on shape and relationships, not on fixed values.
 - Every behavior change needs a spec in `spec/query_helper/` or `spec/rails_integration_spec.rb`.
   Every security-relevant change also needs a spec that sends the hostile input.
-- Rails compatibility: the gem supports ActiveRecord/ActiveSupport `> 5`. The lockfile pins 6.1
+- Rails compatibility: the gem supports ActiveRecord/ActiveSupport `> 5`. The lockfile pins 8.0
   for development. Keep the existing pre/post Rails 7 fallbacks (e.g. `Preloader` in
   `associations.rb`) unless you are deliberately dropping support, and record that in the CHANGELOG.
 
@@ -137,8 +142,8 @@ Don't:
 - Don't widen what URL params can reach (unlisted includes, sensitive columns, unmapped
   identifiers) by default. New exposure must be opt-in, like `QueryHelper.allow_unlisted_includes`.
 - Don't loosen or delete security specs to make a change pass.
-- Don't bump `VERSION`, push `v*` tags or publish to RubyGems unless a maintainer asked for a
-  release.
+- Don't bump `VERSION`, push `v*` tags or publish the gem anywhere unless a maintainer asked for a
+  release. Merging a version bump publishes it.
 - Don't edit `.github/workflows/` from an agent. Put the proposed diff in the PR description instead.
 - Don't add `sqlite3` (or any database adapter) back as a runtime dependency. It is development-only.
 - Don't commit secrets, `.env` files, internal links or account ids. The repo is public.

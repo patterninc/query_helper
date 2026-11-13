@@ -1,0 +1,67 @@
+# One-off, manual: publish already-released versions to the GitHub Packages registry.
+#
+# Builds each git tag as it was released and pushes it. The published version is the tag's number,
+# not the one in that tag's version.rb: v0.3.2 and v0.4.1 were tagged without bumping version.rb
+# (they say 0.3.1 and 0.4.0), and the tag is what applications pin in their Gemfile.
+#
+# Run it from the Actions tab (it must exist on master first). A version that is already in the
+# registry fails its push; re-run with only the tags that still need publishing.
+name: Backfill Gem Versions
+
+on:
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: Space-separated git tags to publish
+        required: true
+        default: "v0.3.2 v0.3.5 v0.3.6 v0.3.8 v0.4.1 v0.4.3 v0.4.4"
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: https://rubygems.pkg.github.com/${{ github.repository_owner }}
+
+jobs:
+  backfill:
+    # workflow_dispatch lets you pick any branch; only master may publish.
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need every tag
+          persist-credentials: false
+
+      - name: Set up Ruby 3.3
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+
+      - name: Build and push each tag
+        env:
+          TAGS: ${{ inputs.tags }}
+          GEM_HOST_API_KEY: "Bearer ${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          mkdir -p "$HOME/.gem"
+          (umask 077; printf -- "---\n:github: %s\n" "$GEM_HOST_API_KEY" > "$HOME/.gem/credentials")
+          failed=""
+          for tag in $TAGS; do
+            if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::'$tag' is not a vX.Y.Z tag"; failed="$failed $tag"; continue
+            fi
+            version="${tag#v}"
+            echo "::group::$tag"
+            if git checkout -q --detach "refs/tags/$tag" \
+              && sed -i "s/VERSION = \".*\"/VERSION = \"$version\"/" lib/query_helper/version.rb \
+              && gem build query_helper.gemspec \
+              && gem push --key github --host "$REGISTRY" "query_helper-$version.gem"; then
+              echo "published query_helper $version from $tag"
+            else
+              echo "::error::failed to publish $tag"; failed="$failed $tag"
+            fi
+            git checkout -q -- . && git clean -fdq
+            echo "::endgroup::"
+          done
+          if [ -n "$failed" ]; then echo "Failed:$failed"; exit 1; fi
