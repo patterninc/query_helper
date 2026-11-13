@@ -1,12 +1,5 @@
-# Proposed replacement for .github/workflows/publish_rubygems.yml
-#
-# Agents can't push to .github/workflows/, so a maintainer installs it:
-#   git rm .github/workflows/publish_rubygems.yml
-#   git mv docs/proposed-workflows/publish_github_packages.yml .github/workflows/
-#   (then delete docs/proposed-workflows/)
-#
 # Publishes to the GitHub Packages RubyGems registry of the patterninc org. Needs no secrets
-# beyond the built-in GITHUB_TOKEN.
+# beyond the built-in GITHUB_TOKEN. See docs/adr/0003-publish-to-github-packages.md.
 name: Publish Gem
 
 on:

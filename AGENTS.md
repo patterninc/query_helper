@@ -89,10 +89,8 @@ There is no deployment. Releases go to the GitHub Packages RubyGems registry
    built-in `GITHUB_TOKEN`, then tags `vx.y.z` and creates a GitHub release. A version that is
    already tagged is skipped. There is no tag step for a human and no API-key secret.
 
-Known state: the workflow is proposed in `docs/proposed-workflows/publish_github_packages.yml` and
-replaces `publish_rubygems.yml` (which failed on `v1.0.0` and still pushes to rubygems.org). Agents
-cannot push `.github/workflows/` changes, so a maintainer must move the file. Until then nothing
-publishes to GitHub Packages. Package access is inherited from the repository, so it is only
+Known state: `publish_github_packages.yml` replaced `publish_rubygems.yml`, which failed on `v1.0.0`
+and pushed to rubygems.org. Package access is inherited from the repository, so it is only
 org-private if the repository is (see the ADR).
 
 See [.agents/skills/release-gem/SKILL.md](.agents/skills/release-gem/SKILL.md) for the step-by-step.
