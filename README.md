@@ -27,9 +27,10 @@ You must be signed in to GitHub with access to this repository to install it.
 4. Run `bundle install`.
 
 In CI, set the `BUNDLE_RUBYGEMS__PKG__GITHUB__COM` environment variable to `USERNAME:TOKEN` instead
-of running `bundle config`. In GitHub Actions, a `GITHUB_TOKEN` from another repository can read the
-package only if this repository's Actions access settings allow it; otherwise use a token stored as
-a secret.
+of running `bundle config`. In GitHub Actions, either use a token stored as a secret, or let the
+consuming repository's `GITHUB_TOKEN` read the package: an org admin adds that repository under the
+package's **Package settings > Manage Actions access** with the read role, and the workflow sets
+`permissions: packages: read`.
 
 ## Quick Use
 
@@ -403,7 +404,7 @@ QueryHelper builds SQL from URL params, so keep the following in mind:
 
 ### Prerequisites
 
-- **Ruby 2.7.2.** CI uses this version (`.github/workflows/ci.yml`). The gemspec allows `>= 2.6.0`.
+- **Ruby 2.7.8.** CI uses this version (`.github/workflows/ci.yml`). The gemspec allows `>= 2.6.0`.
 - **Bundler 2.2.x.** `Gemfile.lock` is `BUNDLED WITH 2.2.29`.
 - A C toolchain for the `sqlite3` and `nokogiri` native extensions.
 - **Postgres is not needed to run the tests.** The gem generates Postgres SQL for host apps, but the spec suite runs on an in-memory SQLite database that `spec/spec_helper.rb` creates and seeds with Faker data. You only need Postgres to try the gem inside a real Rails app.

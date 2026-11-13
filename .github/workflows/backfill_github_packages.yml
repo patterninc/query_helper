@@ -25,6 +25,8 @@ env:
 
 jobs:
   backfill:
+    # workflow_dispatch lets you pick any branch; only master may publish.
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,10 +34,10 @@ jobs:
           fetch-depth: 0 # need every tag
           persist-credentials: false
 
-      - name: Set up Ruby 2.7.2
+      - name: Set up Ruby 2.7
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7.2
+          ruby-version: 2.7.8
 
       - name: Build and push each tag
         env:

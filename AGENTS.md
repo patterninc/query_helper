@@ -43,7 +43,7 @@ spec/
   rails_integration_spec.rb          # Controller specs through QueryHelperConcern
 bin/setup, bin/console               # bundle install / IRB with the gem loaded
 .github/workflows/
-  ci.yml                             # bundle exec rspec spec (Ruby 2.7.2) on every push
+  ci.yml                             # bundle exec rspec spec (Ruby 2.7.8) on every push
   brakeman.yml                       # Brakeman 5.4.1 on every push
   publish_github_packages.yml        # On a version bump merged to master: test, build, push to GitHub Packages, tag
   backfill_github_packages.yml       # Manual: publish already-released tags (default: the ones apps pin) to GitHub Packages
@@ -55,7 +55,7 @@ docs/adr/                            # Architecture decision records
 
 ## Commands
 
-Prerequisites: Ruby 2.7.2 (what CI uses; the gemspec allows `>= 2.6.0`), Bundler 2.2.x (lockfile
+Prerequisites: Ruby 2.7.8 (what CI uses, the last 2.7 patch release; the gemspec allows `>= 2.6.0`), Bundler 2.2.x (lockfile
 is `BUNDLED WITH 2.2.29`), and a C toolchain for the `sqlite3` and `nokogiri` native extensions.
 You do **not** need Postgres to run the tests.
 
@@ -91,8 +91,8 @@ There is no deployment. Releases go to the GitHub Packages RubyGems registry
    already tagged is skipped. There is no tag step for a human and no API-key secret.
 
 Known state: `publish_github_packages.yml` replaced `publish_rubygems.yml`, which failed on `v1.0.0`
-and pushed to rubygems.org. Package access is inherited from the repository, so it is only
-org-private if the repository is (see the ADR).
+and pushed to rubygems.org. The package is private to the org by default and its access is
+managed in the package settings, not the repo (see the ADR). Never make it public: that can't be undone.
 
 See [.agents/skills/release-gem/SKILL.md](.agents/skills/release-gem/SKILL.md) for the step-by-step.
 

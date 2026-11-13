@@ -22,13 +22,15 @@ by people authenticated to the `patterninc` GitHub organization.
 
 ## Consequences
 
-- GitHub Packages RubyGems has no package-level permissions: **access is inherited from the
-  repository.** While this repo is public, the package is readable by any GitHub user with a token.
-  Limiting it to the organization requires making the repository private (or internal on GitHub
-  Enterprise). This is a repository setting, not something the code can enforce.
+- The RubyGems registry has package-level permissions. A new package is **private** whatever the
+  repository's visibility, and it is only readable by people and repositories given access in the
+  package settings (it inherits the linked repository's access by default). The repo staying
+  public does not make the gem public. Org admins grant `patterninc` members read access in
+  **Package settings**, and must never switch the package to public: that can't be undone.
 - Consumers need a token with `read:packages` even to install (see the README).
-- Other repositories' Actions can only install the gem if this repository's Actions access setting
-  allows it (private repos: Settings > Actions > General > Access).
+- Another repository's Actions can install the gem only if it is added under the package's
+  **Manage Actions access** (read role) and its workflow has `permissions: packages: read`; otherwise
+  use a token secret.
 - Applications pin git tags today, not gem versions. `backfill_github_packages.yml` (manual) publishes
   those existing tags to the registry so apps can switch source without changing code. It publishes
   each tag under the tag's own number, because `v0.3.2` and `v0.4.1` were tagged without bumping
@@ -36,4 +38,4 @@ by people authenticated to the `patterninc` GitHub organization.
 - rubygems.org keeps the old `0.4.0` and `1.0.0` never reached it. New versions are not published
   there. Yank or leave `0.4.0` as the maintainers prefer.
 - A push that succeeds followed by a tag step that fails leaves a published version with no tag. A
-  re-run then fails on the duplicate version; push the tag by hand.
+  re-run then fails on the duplicate version; push the tag by hand (a missing release alone is fixed by a re-run).
