@@ -46,6 +46,7 @@ bin/setup, bin/console               # bundle install / IRB with the gem loaded
   ci.yml                             # bundle exec rspec spec (Ruby 2.7.2) on every push
   brakeman.yml                       # Brakeman 5.4.1 on every push
   publish_github_packages.yml        # On a version bump merged to master: test, build, push to GitHub Packages, tag
+  backfill_github_packages.yml       # Manual: publish already-released tags (default: the ones apps pin) to GitHub Packages
 docs/adr/                            # Architecture decision records
 .agents/
   pattern-agents.json                # Oly agent-dispatch manifest

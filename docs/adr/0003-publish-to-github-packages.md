@@ -29,6 +29,10 @@ by people authenticated to the `patterninc` GitHub organization.
 - Consumers need a token with `read:packages` even to install (see the README).
 - Other repositories' Actions can only install the gem if this repository's Actions access setting
   allows it (private repos: Settings > Actions > General > Access).
+- Applications pin git tags today, not gem versions. `backfill_github_packages.yml` (manual) publishes
+  those existing tags to the registry so apps can switch source without changing code. It publishes
+  each tag under the tag's own number, because `v0.3.2` and `v0.4.1` were tagged without bumping
+  `version.rb`.
 - rubygems.org keeps the old `0.4.0` and `1.0.0` never reached it. New versions are not published
   there. Yank or leave `0.4.0` as the maintainers prefer.
 - A push that succeeds followed by a tag step that fails leaves a published version with no tag. A
