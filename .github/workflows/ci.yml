@@ -7,21 +7,42 @@ permissions:
 
 env:
   RAILS_ENV: test
-  GEMFILE_RUBY_VERSION: "3.3"
 
 jobs:
-  test:
+  rspec:
+    name: rspec (Ruby ${{ matrix.ruby }}, Rails ${{ matrix.rails }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.3", "3.4"]
+        rails: ["8.0", "8.1"]
+        include:
+          - rails: "8.0"
+            gemfile: Gemfile
+          - rails: "8.1"
+            gemfile: gemfiles/rails_8_1.gemfile
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/${{ matrix.gemfile }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Ruby 3.3
+      - name: Set up Ruby ${{ matrix.ruby }}
         uses: ruby/setup-ruby@v1
         with:
-          # Not needed with a .ruby-version file
-          ruby-version: "3.3"
-          # runs 'bundle install' and caches installed gems automatically
+          ruby-version: ${{ matrix.ruby }}
+          # runs 'bundle install' for BUNDLE_GEMFILE and caches installed gems automatically
           bundler-cache: true
 
       - name: Run tests
         run: bundle exec rspec spec
+
+  # Stable check name for branch protection: it stays "test" however the matrix above changes.
+  test:
+    if: always()
+    needs: rspec
+    runs-on: ubuntu-latest
+    steps:
+      - name: All matrix jobs passed
+        run: |
+          [ "${{ needs.rspec.result }}" = "success" ] || { echo "rspec matrix: ${{ needs.rspec.result }}"; exit 1; }

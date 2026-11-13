@@ -1,0 +1,9 @@
+# Same as the root Gemfile but developed against Rails 8.1. CI runs the specs against both.
+# Run locally with: BUNDLE_GEMFILE=gemfiles/rails_8_1.gemfile bundle exec rspec spec
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+gem "activerecord", "~> 8.1.0"
+gem "actionpack", "~> 8.1.0"
+gem "activesupport", "~> 8.1.0"

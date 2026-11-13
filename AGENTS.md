@@ -43,10 +43,11 @@ spec/
   rails_integration_spec.rb          # Controller specs through QueryHelperConcern
 bin/setup, bin/console               # bundle install / IRB with the gem loaded
 .github/workflows/
-  ci.yml                             # bundle exec rspec spec (Ruby 3.3) on every push
+  ci.yml                             # bundle exec rspec spec on Ruby 3.3/3.4 x Rails 8.0/8.1 on every push
   brakeman.yml                       # Brakeman 5.4.1 on every push
   publish_github_packages.yml        # On a version bump merged to master: test, build, push to GitHub Packages, tag
   backfill_github_packages.yml       # Manual: publish already-released tags (default: the ones apps pin) to GitHub Packages
+gemfiles/rails_8_1.gemfile          # Same as Gemfile but Rails 8.1 (+ its lockfile); the root Gemfile is Rails 8.0
 docs/adr/                            # Architecture decision records
 .agents/
   pattern-agents.json                # Oly agent-dispatch manifest
@@ -64,9 +65,10 @@ You do **not** need Postgres to run the tests.
 gem install bundler -v 2.5.22
 bundle install                       # or bin/setup
 
-bundle exec rspec spec               # full suite, exactly what CI runs
+bundle exec rspec spec               # full suite (Rails 8.0), what each CI matrix job runs
 bundle exec rspec spec/query_helper/filter_spec.rb      # one file
 bundle exec rspec spec/query_helper/filter_spec.rb:10   # one example
+BUNDLE_GEMFILE=gemfiles/rails_8_1.gemfile bundle exec rspec spec   # against Rails 8.1 (CI runs both)
 bundle exec rake                     # default task = spec
 
 gem install brakeman -v 5.4.1 && brakeman --color --force -q   # static analysis, as in brakeman.yml

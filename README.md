@@ -421,7 +421,8 @@ bundle install        # or bin/setup
 ### Running the tests
 
 ```bash
-bundle exec rspec spec                                # full suite (what CI runs)
+bundle exec rspec spec                                # full suite, Rails 8.0 (CI also runs Rails 8.1 on Ruby 3.3 and 3.4)
+BUNDLE_GEMFILE=gemfiles/rails_8_1.gemfile bundle exec rspec spec   # full suite against Rails 8.1
 bundle exec rspec spec/query_helper/filter_spec.rb    # one file
 bundle exec rspec spec/query_helper/filter_spec.rb:10 # one example
 bundle exec rake                                      # default rake task runs the specs
